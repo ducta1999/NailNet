@@ -413,7 +413,7 @@ export default class LogIn extends Component {
 
                       <Item style={styles.item}>
                         <Input
-                          placeholder="First name"
+                          placeholder="First name..."
                           placeholderTextColor="#f1faee"
                           onChangeText={text =>
                             this.setState({firstName: text})
@@ -424,7 +424,7 @@ export default class LogIn extends Component {
 
                       <Item style={styles.item}>
                         <Input
-                          placeholder="Last name"
+                          placeholder="Last name..."
                           placeholderTextColor="#f1faee"
                           onChangeText={text => this.setState({lastName: text})}
                           style={styles.input}
@@ -433,7 +433,7 @@ export default class LogIn extends Component {
 
                       <Item style={styles.item}>
                         <Input
-                          placeholder="Email"
+                          placeholder="Email..."
                           placeholderTextColor="#f1faee"
                           onChangeText={text => this.setState({email: text})}
                           style={styles.input}
@@ -760,7 +760,7 @@ const multiSelectStyles = StyleSheet.create({
   container: {
     backgroundColor: '#457b9d',
   },
-  selectToggleText: {color: 'white'},
+  selectToggleText: {color: 'white', fontFamily: 'Montserrat-medium'},
   button: {backgroundColor: '#D94526'},
   searchBar: {backgroundColor: '#457b9d'},
   searchTextInput: {color: '#D94526'},
