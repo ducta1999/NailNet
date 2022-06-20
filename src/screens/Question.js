@@ -23,7 +23,16 @@ import {
 import PublicQuestion from './questionSubScreens/PublicQuestion';
 import PrivateQuestion from './questionSubScreens/PrivateQuestion';
 import ListFAQ from './questionSubScreens/ListFAQ';
+import {createBottomTabNavigator, createAppContainer} from 'react-navigation';
 // import { TouchableOpacity } from "react-native-gesture-handler";
+import {
+  getAnimatingBottomBar,
+  AnimationType,
+} from 'react-native-animating-bottom-tab-bar';
+import Post from './Post';
+import NailTV from './NailTV';
+import Chat from './Chat';
+import Job from './Job';
 
 export default class Home extends Component {
   constructor(props) {
@@ -46,112 +55,78 @@ export default class Home extends Component {
   }
 
   render() {
-    console.log(this.state.tabPage);
-    console.log(this.state.activeTabValue);
+    const BottomBarStack = getAnimatingBottomBar({
+      type: AnimationType.SvgBottomBar,
+      navigationScreens: {
+        ['ListFAQ']: () => <ListFAQ navigation={this.props.navigation} />,
+        ['PublicQuestion']: () => (
+          <PublicQuestion navigation={this.props.navigation} />
+        ),
+        ['PrivateQuestion']: () => (
+          <PrivateQuestion navigation={this.props.navigation} />
+        ),
+      },
+      navigationParameter: [
+        {
+          label: 'List FAQ',
+          routeName: 'ListFAQ',
+          icons: {
+            unselected: require('../icons/listquestion_off.png'),
+            selected: require('../icons/listquestion_off.png'),
+          },
+          inactiveTextStyle: styles.text,
+          activeTextStyle: styles.text,
+        },
+        {
+          label: 'Public Question',
+          routeName: 'PublicQuestion',
+          icons: {
+            unselected: require('../icons/publicquestion_off.png'),
+            selected: require('../icons/publicquestion_off.png'),
+          },
+          inactiveTextStyle: styles.text,
+          activeTextStyle: styles.text,
+          // isLottieTab: true,
+          // lottieSource: require('../json/home.json'),
+        },
+        {
+          label: 'Private Question',
+          routeName: 'PrivateQuestion',
+          icons: {
+            unselected: require('../icons/privatequestion_off.png'),
+            selected: require('../icons/privatequestion_off.png'),
+          },
+          inactiveTextStyle: styles.text,
+          activeTextStyle: styles.text,
+        },
+      ],
+      configData: {
+        bottomBarConfig: {
+          backgroundColor: '#001d3d',
+          // height: 79,
+          // curveDepth: 36,
+          // curveWidth: 99,
+        },
+      },
+    });
+
+    const AppContainer = createAppContainer(BottomBarStack);
+
     return (
       <Container style={styles.container}>
-        <Header hasTabs searchBar transparent>
-          <View
-            style={{
-              flex: 1,
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              marginTop: 8,
-            }}>
-            <View>
-              {this.state.tabPage == 0 && (
-                // <Icon
-                //   name="menu"
-                //   style={styles.iconMenu}
-                //   onPress={() => this.onpenDrawer()}
-                // />
-                <TouchableOpacity onPress={() => this.onpenDrawer()}>
-                  <Thumbnail
-                    small
-                    source={require('../icons/menu.png')}
-                    style={styles.thumbnail}
-                  />
-                </TouchableOpacity>
-              )}
-              {this.state.tabPage != 0 && (
-                <TouchableOpacity onPress={() => this.goTabBack()}>
-                  <Thumbnail
-                    small
-                    source={require('../icons/left_arrow.png')}
-                    style={styles.thumbnail}
-                  />
-                </TouchableOpacity>
-              )}
-            </View>
-            <View>
-              {this.state.tabPage == 0 && (
-                <Input
-                  placeholder="Enter name to search"
-                  placeholderTextColor="#848484"
-                  style={styles.input}
-                  onSubmitEditing={event =>
-                    this.setState({searchText: event.nativeEvent.text})
-                  }
-                />
-              )}
-              {this.state.tabPage == 1 && (
-                <View>
-                  <Text style={styles.title}>PUBLIC QUESTION LIST</Text>
-                </View>
-              )}
-              {this.state.tabPage == 2 && (
-                <View>
-                  <Text style={styles.title}>PRIVATE QUESTION LIST</Text>
-                </View>
-              )}
-            </View>
-
-            <View>
-              <View>
-                <TouchableOpacity onPress={() => this.openAddQuestionPage()}>
-                  <Thumbnail
-                    source={require('../icons/edit.png')}
-                    style={styles.thumbnail}
-                  />
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-        </Header>
-        <Tabs
+        <AppContainer />
+        {/* <Tabs
           transparent
           // page={this.state.activeTabValue}
           tabBarPosition="bottom"
           tabContainerStyle={{height: 60}}
-          tabBarUnderlineStyle={styles.tabUnderLine}
-          // onChangeTab={this.onChangeTab}
-          //locked
-        >
+          tabBarUnderlineStyle={styles.tabUnderLine}>
           <Tab
             style={styles.tabs}
             heading={
               <TouchableOpacity onPress={() => this.onChangeTab(0)}>
                 <TabHeading style={styles.tabHeading}>
                   <View>
-                    {/* {this.state.tabPage != 0 && (
-                      <View style={styles.tabHeadingContent}>
-                        <Thumbnail
-                          small
-                          source={require("../icons/listquestion_off.png")}
-                        />
-                        <Text style={styles.tabHeadingText}>List</Text>
-                      </View>
-                    )}
-
-                    {this.state.tabPage == 0 && (
-                      <View style={styles.tabHeadingContent}>
-                        <Thumbnail
-                          small
-                          source={require("../icons/listquestion_on.png")}
-                        />
-                        <Text style={styles.tabHeadingTextOn}>List</Text>
-                      </View>
-                    )} */}
                     <View style={styles.tabHeadingContent}>
                       <Thumbnail
                         small
@@ -164,7 +139,6 @@ export default class Home extends Component {
               </TouchableOpacity>
             }>
             <ListFAQ
-              //onChangeTab={this.onChangeTab}
               navigation={this.props.navigation}
               searchText={this.state.searchText}
             />
@@ -175,29 +149,6 @@ export default class Home extends Component {
               <TouchableOpacity onPress={() => this.onChangeTab(1)}>
                 <TabHeading style={styles.tabHeading}>
                   <View>
-                    {/* {this.state.tabPage != 1 && (
-                      <View style={styles.tabHeadingContent}>
-                        <Thumbnail
-                          small
-                          source={require("../icons/publicquestion_off.png")}
-                        />
-                        <Text style={styles.tabHeadingText}>
-                          Public Question
-                        </Text>
-                      </View>
-                    )}
-
-                    {this.state.tabPage == 1 && (
-                      <View style={styles.tabHeadingContent}>
-                        <Thumbnail
-                          small
-                          source={require("../icons/publicquestion_on.png")}
-                        />
-                        <Text style={styles.tabHeadingTextOn}>
-                          Public Question
-                        </Text>
-                      </View>
-                    )} */}
                     <View style={styles.tabHeadingContent}>
                       <Thumbnail
                         small
@@ -220,29 +171,6 @@ export default class Home extends Component {
               <TouchableOpacity onPress={() => this.onChangeTab(2)}>
                 <TabHeading style={styles.tabHeading}>
                   <View>
-                    {/* {this.state.tabPage != 2 && (
-                      <View style={styles.tabHeadingContent}>
-                        <Thumbnail
-                          small
-                          source={require("../icons/privatequestion_off.png")}
-                        />
-                        <Text style={styles.tabHeadingText}>
-                          Private Question
-                        </Text>
-                      </View>
-                    )}
-
-                    {this.state.tabPage == 2 && (
-                      <View style={styles.tabHeadingContent}>
-                        <Thumbnail
-                          small
-                          source={require("../icons/privatequestion_on.png")}
-                        />
-                        <Text style={styles.tabHeadingTextOn}>
-                          Private Question
-                        </Text>
-                      </View>
-                    )} */}
                     <View style={styles.tabHeadingContent}>
                       <Thumbnail
                         small
@@ -261,7 +189,7 @@ export default class Home extends Component {
               onChangeTab={this.onChangeTab}
             />
           </Tab>
-        </Tabs>
+        </Tabs> */}
       </Container>
     );
   }
@@ -344,5 +272,10 @@ const styles = StyleSheet.create({
     width: 25,
     height: 25,
     marginTop: 5,
+    borderRadius: 0,
+  },
+  text: {
+    color: 'white',
+    fontSize: 12,
   },
 });

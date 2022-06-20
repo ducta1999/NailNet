@@ -1,5 +1,5 @@
-import React, { Component } from "react";
-import { StyleSheet, ScrollView } from "react-native";
+import React, {Component} from 'react';
+import {StyleSheet, ScrollView, TouchableOpacity} from 'react-native';
 import {
   View,
   Text,
@@ -11,18 +11,19 @@ import {
   Right,
   Thumbnail,
   Button,
-  Spinner
-} from "native-base";
-import * as dataService from "../../services/DataService";
-import * as authentication from "../../services/Authentication";
-import * as constant from "../../services/Constant";
+  Spinner,
+  Header,
+} from 'native-base';
+import * as dataService from '../../services/DataService';
+import * as authentication from '../../services/Authentication';
+import * as constant from '../../services/Constant';
 
 export default class PrivateQuestion extends Component {
   constructor(props) {
     super(props);
     this.state = {
       questions: [],
-      loading: true
+      loading: true,
     };
 
     this.gotoQuestionDetail = this.gotoQuestionDetail.bind(this);
@@ -38,18 +39,44 @@ export default class PrivateQuestion extends Component {
 
     var items = await dataService.get(
       `api/faqquestions/getall?isApproved=true&private=true&sortby=createtime&email=` +
-        user.email
+        user.email,
     );
 
     this.setState({
       questions: items,
-      loading: false
+      loading: false,
     });
+  }
+
+  openAddQuestionPage() {
+    this.props.navigation.navigate('AddQuestionPublic');
   }
 
   render() {
     return (
       <Content>
+        <Header hasTabs searchBar transparent>
+          <View
+            style={{
+              flex: 1,
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              marginTop: 8,
+            }}>
+            <View></View>
+
+            <View>
+              <View>
+                <TouchableOpacity onPress={() => this.openAddQuestionPage()}>
+                  <Thumbnail
+                    source={require('../../icons/edit.png')}
+                    style={styles.thumbnail}
+                  />
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Header>
         {this.state.loading == false ? (
           <ScrollView>
             <List>
@@ -60,20 +87,19 @@ export default class PrivateQuestion extends Component {
                     avatar
                     key={i}
                     noBorder
-                    onPress={() => this.gotoQuestionDetail(item.id)}
-                  >
+                    onPress={() => this.gotoQuestionDetail(item.id)}>
                     <Left>
                       <Thumbnail
                         small
                         //source={require("../../icons/Avatar.png")}
-                        defaultSource={{ uri: "avatar" }}
+                        defaultSource={{uri: 'avatar'}}
                         source={{
                           uri:
                             constant.BASE_URL +
-                            "api/avatars/getimage/" +
+                            'api/avatars/getimage/' +
                             item.createByEmail +
-                            "?random_number=" +
-                            new Date().getTime()
+                            '?random_number=' +
+                            new Date().getTime(),
                         }}
                       />
                     </Left>
@@ -123,8 +149,7 @@ export default class PrivateQuestion extends Component {
                       <Button
                         backgroundColor="#47BFB3"
                         style={styles.replyButton}
-                        onPress={() => this.gotoQuestionDetail(item.id)}
-                      >
+                        onPress={() => this.gotoQuestionDetail(item.id)}>
                         <Text>REPLY</Text>
                       </Button>
                     </Right>
@@ -137,11 +162,10 @@ export default class PrivateQuestion extends Component {
             <Spinner color="red" />
             <Text
               style={{
-                textAlign: "center",
-                color: "white",
-                fontWeight: "bold"
-              }}
-            >
+                textAlign: 'center',
+                color: 'white',
+                fontWeight: 'bold',
+              }}>
               Loading
             </Text>
           </View>
@@ -155,49 +179,55 @@ export default class PrivateQuestion extends Component {
     questions.items.find(i => i.id == id).view++;
 
     this.setState({
-      questions: questions
+      questions: questions,
     });
 
     await dataService.put(`api/faqquestions/updateview/${id}`, null);
 
-    this.props.navigation.navigate("QuestionDetail", {
-      id: id
+    this.props.navigation.navigate('QuestionDetail', {
+      id: id,
     });
   }
 }
 
 const styles = StyleSheet.create({
   name: {
-    color: "#D94526",
-    fontWeight: "bold"
+    color: '#D94526',
+    fontWeight: 'bold',
   },
   question: {
-    color: "white"
+    color: 'white',
   },
   title: {
-    color: "#47BFB3",
-    fontSize: 12
+    color: '#47BFB3',
+    fontSize: 12,
   },
   category: {
-    color: "#47BFB3",
-    fontSize: 12
+    color: '#47BFB3',
+    fontSize: 12,
   },
   footerGroupText: {
-    color: "#47BFB3",
-    fontSize: 12
+    color: '#47BFB3',
+    fontSize: 12,
   },
   footerGroup: {
     flex: 1,
-    flexDirection: "row"
+    flexDirection: 'row',
   },
   footerGroupView: {
-    marginRight: 20
+    marginRight: 20,
   },
   right: {
     marginTop: 15,
-    marginLeft: 15
+    marginLeft: 15,
   },
   replyButton: {
-    height: 30
-  }
+    height: 30,
+  },
+  thumbnail: {
+    width: 25,
+    height: 25,
+    marginTop: 5,
+    borderRadius: 0,
+  },
 });

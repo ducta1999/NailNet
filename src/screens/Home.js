@@ -41,7 +41,7 @@ export default class Home extends Component {
           uri: require('../icons/icon_promotion.png'),
         },
         {
-          name: 'Order Equipment Supplies',
+          name: 'Order Equipment',
           description: 'ORDER EQUIPMENT SUPPLIES',
           screenName: 'Shop',
           uri: require('../icons/icon_supplies.png'),
@@ -100,7 +100,7 @@ export default class Home extends Component {
   render() {
     return (
       <Container style={styles.container}>
-        <Header transparent>
+        <Header transparent style={{marginTop: 18}}>
           <View
             style={{
               flex: 1,
@@ -108,14 +108,7 @@ export default class Home extends Component {
               justifyContent: 'space-between',
               marginTop: 8,
             }}>
-            <View>
-              {/* <Button transparent>
-                <Icon
-                  name="menu"
-                  style={styles.icon}
-                  onPress={() => this.onpenDrawer()}
-                />
-              </Button> */}
+            <View style={{marginLeft: 9}}>
               <TouchableOpacity onPress={() => this.onpenDrawer()}>
                 <Thumbnail
                   small
@@ -124,14 +117,20 @@ export default class Home extends Component {
                 />
               </TouchableOpacity>
             </View>
-            <View>
-              <Title style={styles.title}>HOME</Title>
-            </View>
-            <View>
+            <View
+              style={{
+                backgroundColor: 'rgba(102, 155, 188, 0.2)',
+                width: 48,
+                height: 48,
+                borderRadius: 24,
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginRight: 9,
+              }}>
               <Thumbnail
                 small
                 square
-                source={require('../icons/nailtalkpro-app-icon.png')}
+                source={require('../icons/customer-service.png')}
                 style={styles.thumbnail}
               />
             </View>
@@ -155,38 +154,39 @@ export default class Home extends Component {
         <View
           style={styles.GridViewContainer}
           onPress={() => this.navigateTo(item.screenName)}>
-          {/* <View style={styles.GridViewContainer}> */}
           <TouchableOpacity
             style={{justifyContent: 'center', alignItems: 'center'}}
             onPress={() => this.navigateTo(item.screenName)}>
-            {/* <Text style={styles.GridViewTextLayoutName}>{item.name}</Text>
-            <Text style={styles.GridViewTextLayoutDescription}>
-              {item.description}
-            </Text> */}
+            {/* <Text style={styles.GridViewTextLayoutName}>{item.name}</Text> */}
+
             <ImageBackground
               source={require('../icons/button_bg.png')}
               style={{
-                width: 150,
-                height: 160,
+                width: 68,
+                height: 68,
                 alignItems: 'center',
                 justifyContent: 'center',
-                //borderRadius: 10
               }}
-              imageStyle={{borderRadius: 10}}>
+              imageStyle={{borderRadius: 34}}>
               <Thumbnail
                 small
                 square
                 source={item.uri}
-                style={{width: 80, height: 100}}
+                style={{width: 39, height: 39}}
               />
             </ImageBackground>
 
             <Text style={styles.GridViewTextLayoutDescription}>
               {item.name}
             </Text>
+            <Text
+              style={[
+                styles.GridViewTextLayoutDescription,
+                {fontFamily: 'Montserrat-Regular', fontSize: 11},
+              ]}>
+              {item.description}
+            </Text>
           </TouchableOpacity>
-
-          {/* </View> */}
         </View>
       );
     } else if (item.name == 'final') {
@@ -207,7 +207,21 @@ export default class Home extends Component {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#1F2426',
+    backgroundColor: '#001d3d',
+  },
+  GridFinalViewContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 168,
+    width: 50,
+    margin: 16,
+    //backgroundColor: "#47BFB3"
+    backgroundColor: 'rgba(0, 53, 102, 0.68)',
+    borderRadius: 24,
+    borderRightWidth: 3.9,
+    borderBottomWidth: 3.9,
+    borderColor: 'rgba(0, 29, 61, 0.79)',
   },
   GridViewTextLayoutName: {
     fontSize: 30,
@@ -219,25 +233,23 @@ const styles = StyleSheet.create({
     fontSize: 12,
     justifyContent: 'center',
     color: '#fff',
-  },
-  GridFinalViewContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: 180,
-    width: 50,
-    margin: 5,
-    backgroundColor: '#1F2426',
+    fontFamily: 'Montserrat-SemiBold',
+    textAlign: 'center',
+    marginTop: 9,
   },
   GridViewContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    height: 200,
+    height: 168,
     width: 50,
-    margin: 5,
+    margin: 16,
     //backgroundColor: "#47BFB3"
-    backgroundColor: '#1F2426',
+    backgroundColor: 'rgba(0, 53, 102, 0.79)',
+    borderRadius: 24,
+    borderRightWidth: 3.9,
+    borderBottomWidth: 3.9,
+    borderColor: 'rgba(0, 80, 157, 0.79)',
   },
   flatlist: {
     marginTop: 20,
@@ -248,11 +260,13 @@ const styles = StyleSheet.create({
     // marginLeft: 100,
     fontSize: 20,
     marginTop: 5,
+    fontFamily: 'Montserrat-SemiBoldItalic',
   },
   //icon: { fontSize: 40 },
   thumbnail: {
     width: 25,
-    height: 25,
+    // height: 25,
     marginTop: 5,
+    borderRadius: 0,
   },
 });

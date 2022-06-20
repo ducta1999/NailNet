@@ -1,5 +1,10 @@
 import React, {Component} from 'react';
-import {StyleSheet, ScrollView, TouchableOpacity} from 'react-native';
+import {
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Dimensions,
+} from 'react-native';
 import {
   View,
   Text,
@@ -19,6 +24,7 @@ import {
   Spinner,
   TabHeading,
   Picker,
+  Header,
 } from 'native-base';
 import Icon from 'react-native-vector-icons/FontAwesome';
 // import { TouchableOpacity } from "react-native-gesture-handler";
@@ -26,6 +32,7 @@ import * as dataService from '../../services/DataService';
 import * as authentication from '../../services/Authentication';
 import * as constant from '../../services/Constant';
 import SectionedMultiSelect from 'react-native-sectioned-multi-select';
+import LinearGradient from 'react-native-linear-gradient';
 
 export default class ListFAQ extends Component {
   constructor(props) {
@@ -151,11 +158,57 @@ export default class ListFAQ extends Component {
     this.ensureDataFetched(this.state.searchText, value[0]);
   }
 
+  onpenDrawer() {
+    this.props.navigation.openDrawer();
+  }
+
+  openAddQuestionPage() {
+    this.props.navigation.navigate('AddQuestionPublic');
+  }
   render() {
     const {industries, loading} = this.state;
-
     return (
-      <Content>
+      <Content style={{backgroundColor: '#001d3d'}}>
+        <Header hasTabs searchBar transparent>
+          <View
+            style={{
+              flex: 1,
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              marginTop: 8,
+            }}>
+            <View>
+              <TouchableOpacity onPress={() => this.onpenDrawer()}>
+                <Thumbnail
+                  small
+                  source={require('../../icons/menu.png')}
+                  style={styles.thumbnail}
+                />
+              </TouchableOpacity>
+            </View>
+            <View>
+              <Input
+                placeholder="Enter name to search"
+                placeholderTextColor="#848484"
+                style={styles.input}
+                onSubmitEditing={event =>
+                  this.setState({searchText: event.nativeEvent.text})
+                }
+              />
+            </View>
+
+            <View>
+              <View>
+                <TouchableOpacity onPress={() => this.openAddQuestionPage()}>
+                  <Thumbnail
+                    source={require('../../icons/edit.png')}
+                    style={styles.thumbnail}
+                  />
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Header>
         <View style={{marginLeft: 20}}>
           <View>
             <Thumbnail
@@ -248,7 +301,7 @@ export default class ListFAQ extends Component {
                   </TabHeading>
                 }
                 style={styles.tabs}>
-                <View style={{flex: 1, backgroundColor: '#1F2426'}}>
+                <View style={{flex: 1, backgroundColor: '#003566'}}>
                   {this.renderListItem(
                     item.profiles,
                     item.industry.description,
@@ -286,9 +339,85 @@ export default class ListFAQ extends Component {
   }
 
   renderListItem(list, description, id) {
+    const {height} = Dimensions.get('window');
+
     return (
-      <ScrollView>
-        <List>
+      <ScrollView style={{minHeight: height}}>
+        {list.map((item, i) => (
+          <TouchableOpacity
+            activeOpacity={0.79}
+            onPress={() => this.openPrivateQuestion(item.id, description, id)}>
+            <LinearGradient
+              start={{x: 0.0, y: 0.25}}
+              end={{x: 0.5, y: 1.0}}
+              colors={['#002945', '#003a61', '#00406c']}
+              style={{
+                margin: 9,
+              }}>
+              <View
+                style={{
+                  borderRadius: 4,
+                  overflow: 'hidden',
+                  padding: 12,
+                }}>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: 12,
+                  }}>
+                  <View
+                    style={{
+                      flexDirection: 'column',
+                      justifyContent: 'space-between',
+                    }}>
+                    <Text
+                      style={
+                        styles.name
+                      }>{`${item.firstName} ${item.lastName}`}</Text>
+                    <Text style={styles.major}>{description}</Text>
+                  </View>
+
+                  <Thumbnail
+                    large
+                    source={require('../../icons/Avatar.png')}
+                    defaultSource={{uri: 'avatar'}}
+                    // source={{
+                    //   uri:
+                    //     constant.BASE_URL +
+                    //     'api/avatars/getimage/' +
+                    //     item.email +
+                    //     '?random_number=' +
+                    //     new Date().getTime(),
+                    // }}
+                    style={styles.avatar}
+                  />
+                </View>
+                <View style={{padding: 12}}>
+                  <Text style={styles.pd9}>
+                    <Text style={styles.titleLeft}>Company: </Text>
+                    <Text style={styles.titleRight}>
+                      {' '}
+                      {item.businessAddress}
+                    </Text>
+                  </Text>
+
+                  <Text style={styles.pd9}>
+                    <Text style={styles.titleLeft}>Email: {'        '}</Text>
+                    <Text style={styles.titleRight}>{item.email}</Text>
+                  </Text>
+
+                  <Text style={styles.pd9}>
+                    <Text style={styles.titleLeft}>Phone: {'      '}</Text>
+                    <Text style={styles.titleRight}> {item.phone}</Text>
+                  </Text>
+                </View>
+              </View>
+            </LinearGradient>
+          </TouchableOpacity>
+        ))}
+        {/* <List>
           {list.map((item, i) => (
             <ListItem
               onPress={() => this.openPrivateQuestion(item.id, description, id)}
@@ -298,7 +427,7 @@ export default class ListFAQ extends Component {
               <Left>
                 <Thumbnail
                   large
-                  //source={require("../../icons/Avatar.png")}
+                  // source={require('../../icons/Avatar.png')}
                   defaultSource={{uri: 'avatar'}}
                   source={{
                     uri:
@@ -316,21 +445,18 @@ export default class ListFAQ extends Component {
                   {item.firstName} {item.lastName}
                 </Text>
                 <Text>
-                  <Text style={styles.company}>Company: </Text>
-                  <Text style={styles.companyText}>
-                    {' '}
-                    {item.businessAddress}
-                  </Text>
+                  <Text style={styles.titleLeft}>Company: </Text>
+                  <Text style={styles.titleRight}> {item.businessAddress}</Text>
                 </Text>
 
                 <Text>
-                  <Text style={styles.email}>Email: {'        '}</Text>
-                  <Text style={styles.emailText}>{item.email}</Text>
+                  <Text style={styles.titleLeft}>Email: {'        '}</Text>
+                  <Text style={styles.titleRight}>{item.email}</Text>
                 </Text>
 
                 <Text>
-                  <Text style={styles.phone}>Phone: {'      '}</Text>
-                  <Text style={styles.phoneText}> {item.phone}</Text>
+                  <Text style={styles.titleLeft}>Phone: {'      '}</Text>
+                  <Text style={styles.titleRight}> {item.phone}</Text>
                 </Text>
               </Body>
               <Right>
@@ -343,7 +469,7 @@ export default class ListFAQ extends Component {
               </Right>
             </ListItem>
           ))}
-        </List>
+        </List> */}
       </ScrollView>
     );
   }
@@ -368,7 +494,7 @@ const styles = StyleSheet.create({
     right: 25,
   },
   tabs: {
-    backgroundColor: '#1F2426',
+    backgroundColor: '#003566',
     borderWidth: 0,
   },
   picker: {
@@ -377,54 +503,58 @@ const styles = StyleSheet.create({
     color: 'white',
   },
   tabHeading: {
-    backgroundColor: '#1F2426',
+    backgroundColor: '#002945',
+    fontFamily: 'Montserrat-Regular',
     // borderBottomWidth: 1,
     // borderBottomColor: "white"
   },
   tabUnderLine: {
-    display: 'none',
-    backgroundColor: '#1F2426',
+    // display: 'none',
+    backgroundColor: '#fff',
+    height: 1.68,
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
   },
   name: {
-    color: '#D94526',
-    fontWeight: 'bold',
+    color: '#bce3fa',
+    fontFamily: 'Montserrat-SemiBold',
     fontSize: 16,
   },
-  company: {
+  titleLeft: {
     color: 'white',
     fontSize: 12,
+    fontFamily: 'Montserrat-SemiBold',
   },
-  email: {
+  titleRight: {
     color: 'white',
     fontSize: 12,
-  },
-  phone: {
-    color: 'white',
-    fontSize: 12,
-  },
-  companyText: {
-    color: 'white',
-    fontSize: 12,
-  },
-  emailText: {
-    color: 'white',
-    fontSize: 12,
-    marginLeft: 15,
-  },
-  phoneText: {
-    color: 'white',
-    fontSize: 12,
+    fontFamily: 'Montserrat-Regular',
   },
   avatar: {
-    left: 0,
-    marginTop: 20,
+    width: 44,
+    height: 44,
+    borderWidth: 1,
+    borderColor: 'white',
   },
   right: {
     marginTop: 25,
 
     paddingLeft: 0,
   },
-  body: {},
+  thumbnail: {
+    width: 25,
+    height: 25,
+    marginTop: 5,
+    borderRadius: 0,
+  },
+  major: {
+    color: '#89aae6',
+    fontSize: 11,
+    fontFamily: 'Montserrat-SemiBoldItalic',
+  },
+  pd9: {
+    paddingVertical: 4,
+  },
 });
 
 //multiselect style

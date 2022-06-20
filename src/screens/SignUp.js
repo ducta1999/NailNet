@@ -301,7 +301,7 @@ export default class LogIn extends Component {
                 <CardItem style={styles.carditem}>
                   <Content>
                     <Form>
-                      <View>
+                      <View style={{paddingLeft: 16}}>
                         <View>
                           <Thumbnail
                             small
@@ -310,7 +310,7 @@ export default class LogIn extends Component {
                         </View>
                         <View
                           style={{
-                            marginLeft: 55,
+                            marginLeft: 39,
                             justifyContent: 'center',
                             marginTop: -45,
                           }}>
@@ -485,7 +485,7 @@ export default class LogIn extends Component {
                         />
                       </Item>
 
-                      <View>
+                      <View style={{paddingLeft: 16}}>
                         <View>
                           <Thumbnail
                             small
@@ -494,7 +494,7 @@ export default class LogIn extends Component {
                         </View>
                         <View
                           style={{
-                            marginLeft: 55,
+                            marginLeft: 39,
                             justifyContent: 'center',
                             marginTop: -50,
                           }}>
@@ -542,7 +542,7 @@ export default class LogIn extends Component {
                       </View>
 
                       <View>
-                        <View>
+                        <View style={{paddingLeft: 16}}>
                           <Thumbnail
                             small
                             source={require('../icons/signupicon_city.png')}
