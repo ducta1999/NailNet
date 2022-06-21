@@ -27,12 +27,14 @@ import {
   Header,
 } from 'native-base';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 // import { TouchableOpacity } from "react-native-gesture-handler";
 import * as dataService from '../../services/DataService';
 import * as authentication from '../../services/Authentication';
 import * as constant from '../../services/Constant';
 import SectionedMultiSelect from 'react-native-sectioned-multi-select';
 import LinearGradient from 'react-native-linear-gradient';
+import MultiSelect from '../Components/MultiSelect';
 
 export default class ListFAQ extends Component {
   constructor(props) {
@@ -104,53 +106,61 @@ export default class ListFAQ extends Component {
   }
 
   async ensureDataFetched(searchText, city) {
-    var industriesFromAPI = await dataService.get('api/faqindustries/getall');
+    try {
+      var industriesFromAPI = await dataService.get('api/faqindustries/getall');
 
-    var industries = [];
+      var industries = [];
 
-    for (var index = industriesFromAPI.items.length - 1; index >= 0; index--) {
-      var profiles = [];
-      if (searchText == null) {
-        if (city == null) {
-          profiles = await dataService.get(
-            'api/profiles/getall?isApproved=true&ispro=true&industryid=' +
-              industriesFromAPI.items[index].id,
-          );
+      for (
+        var index = industriesFromAPI.items.length - 1;
+        index >= 0;
+        index--
+      ) {
+        var profiles = [];
+        if (searchText == null) {
+          if (city == null) {
+            profiles = await dataService.get(
+              'api/profiles/getall?isApproved=true&ispro=true&industryid=' +
+                industriesFromAPI.items[index].id,
+            );
+          } else {
+            profiles = await dataService.get(
+              'api/profiles/getall?isApproved=true&ispro=true&industryid=' +
+                industriesFromAPI.items[index].id +
+                '&city=' +
+                city,
+            );
+          }
         } else {
-          profiles = await dataService.get(
-            'api/profiles/getall?isApproved=true&ispro=true&industryid=' +
-              industriesFromAPI.items[index].id +
-              '&city=' +
-              city,
-          );
+          if (city == null) {
+            profiles = await dataService.get(
+              'api/profiles/getall?isApproved=true&ispro=true&industryid=' +
+                industriesFromAPI.items[index].id +
+                '&name=' +
+                searchText,
+            );
+          } else {
+            profiles = await dataService.get(
+              'api/profiles/getall?isApproved=true&ispro=true&industryid=' +
+                industriesFromAPI.items[index].id +
+                '&name=' +
+                searchText +
+                '&city=' +
+                city,
+            );
+          }
         }
-      } else {
-        if (city == null) {
-          profiles = await dataService.get(
-            'api/profiles/getall?isApproved=true&ispro=true&industryid=' +
-              industriesFromAPI.items[index].id +
-              '&name=' +
-              searchText,
-          );
-        } else {
-          profiles = await dataService.get(
-            'api/profiles/getall?isApproved=true&ispro=true&industryid=' +
-              industriesFromAPI.items[index].id +
-              '&name=' +
-              searchText +
-              '&city=' +
-              city,
-          );
-        }
+
+        industries.push({
+          industry: industriesFromAPI.items[index],
+          profiles: profiles.items,
+        });
       }
 
-      industries.push({
-        industry: industriesFromAPI.items[index],
-        profiles: profiles.items,
-      });
+      this.setState({industries: industries, loading: false});
+    } catch (error) {
+      console.log(error);
     }
-
-    this.setState({industries: industries, loading: false});
   }
 
   applyFilterByCity(value) {
@@ -191,9 +201,10 @@ export default class ListFAQ extends Component {
                 placeholder="Enter name to search"
                 placeholderTextColor="#848484"
                 style={styles.input}
-                onSubmitEditing={event =>
-                  this.setState({searchText: event.nativeEvent.text})
-                }
+                onSubmitEditing={event => {
+                  console.log(event.nativeEvent.text);
+                  this.setState({searchText: event.nativeEvent.text});
+                }}
               />
             </View>
 
@@ -209,55 +220,15 @@ export default class ListFAQ extends Component {
             </View>
           </View>
         </Header>
-        <View style={{marginLeft: 20}}>
-          <View>
-            <Thumbnail
-              small
-              source={require('../../icons/signupicon_city.png')}
+        <View style={{paddingHorizontal: 16, marginBottom: 9}}>
+          {this.state.cities && (
+            <MultiSelect
+              items={this.state.cities}
+              placeHolder="Choose City..."
+              selectedItems={this.state.selectedCity}
+              setSelectedItems={value => this.setState({selectedCity: value})}
             />
-          </View>
-          <View
-            style={{
-              marginLeft: 55,
-              justifyContent: 'center',
-              marginTop: -50,
-            }}>
-            {this.state.cities && (
-              <SectionedMultiSelect
-                items={this.state.cities}
-                uniqueKey="id"
-                subKey="children"
-                expandDropDowns={true}
-                selectText="Choose City..."
-                showDropDowns={true}
-                readOnlyHeadings={true}
-                onSelectedItemsChange={value =>
-                  // this.setState({ selectedCity: value })
-                  this.applyFilterByCity(value)
-                }
-                selectedItems={this.state.selectedCity}
-                single={true}
-                selectToggleIconComponent={
-                  <Icon
-                    name="caret-down"
-                    color="#D94526"
-                    size={30}
-                    style={styles.caretIcon}
-                  />
-                }
-                searchIconComponent={
-                  <Icon
-                    name="search"
-                    color="#D94526"
-                    size={15}
-                    style={{marginLeft: 15}}
-                  />
-                }
-                colors={color}
-                styles={multiSelectStyles}
-              />
-            )}
-          </View>
+          )}
         </View>
         {/* <Item>
           <Thumbnail
@@ -504,7 +475,7 @@ const styles = StyleSheet.create({
   },
   tabHeading: {
     backgroundColor: '#002945',
-    fontFamily: 'Montserrat-Regular',
+    fontFamily: 'Montserrat-Medium',
     // borderBottomWidth: 1,
     // borderBottomColor: "white"
   },
@@ -528,7 +499,7 @@ const styles = StyleSheet.create({
   titleRight: {
     color: 'white',
     fontSize: 12,
-    fontFamily: 'Montserrat-Regular',
+    fontFamily: 'Montserrat-Medium',
   },
   avatar: {
     width: 44,

@@ -21,6 +21,8 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import * as tinh_tp from '../json/tinh_tp.json';
 import SectionedMultiSelect from 'react-native-sectioned-multi-select';
 import LottieView from 'lottie-react-native';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import MultiSelect from './Components/MultiSelect';
 
 export default class LogIn extends Component {
   constructor(props) {
@@ -157,14 +159,14 @@ export default class LogIn extends Component {
       const {
         firstName,
         lastName,
-        phone,
+        phone = '',
         email,
         password,
         passwordConfirm,
-        businessName,
-        businessAddress,
+        businessName = '',
+        businessAddress = '',
         state,
-        zipCode,
+        zipCode = '',
         businessSummary,
         selectedOccupation,
         selectedIndustry,
@@ -279,6 +281,17 @@ export default class LogIn extends Component {
   render() {
     const {width, height} = Dimensions.get('window');
 
+    const dataCarousel = [
+      {
+        key: 'industry',
+        view: <></>,
+      },
+      {
+        key: 'description',
+        view: <></>,
+      },
+    ];
+
     return (
       <Container style={styles.container}>
         <Content>
@@ -301,116 +314,33 @@ export default class LogIn extends Component {
                 <CardItem style={styles.carditem}>
                   <Content>
                     <Form>
-                      <View style={{paddingLeft: 16}}>
-                        <View>
-                          <Thumbnail
-                            small
-                            source={require('../icons/signupicon_nail.png')}
+                      <View style={{paddingLeft: 16, marginBottom: 9}}>
+                        {this.state.loading == false && (
+                          <MultiSelect
+                            items={this.state.occupations}
+                            placeHolder="Choose Occupation..."
+                            selectedItems={this.state.selectedOccupation}
+                            setSelectedItems={value =>
+                              this.setState({selectedOccupation: value})
+                            }
                           />
-                        </View>
-                        <View
-                          style={{
-                            marginLeft: 39,
-                            justifyContent: 'center',
-                            marginTop: -45,
-                          }}>
-                          {this.state.loading == false && (
-                            <SectionedMultiSelect
-                              items={this.state.occupations}
-                              uniqueKey="id"
-                              subKey="children"
-                              expandDropDowns={true}
-                              selectText="Choose Occupation..."
-                              showDropDowns={true}
-                              readOnlyHeadings={true}
-                              onSelectedItemsChange={value =>
-                                this.setState({selectedOccupation: value})
-                              }
-                              selectedItems={this.state.selectedOccupation}
-                              single={true}
-                              selectToggleIconComponent={
-                                <Icon
-                                  name="caret-down"
-                                  color="#D94526"
-                                  size={30}
-                                  style={styles.caretIcon}
-                                />
-                              }
-                              searchIconComponent={
-                                <Icon
-                                  name="search"
-                                  color="#D94526"
-                                  size={15}
-                                  style={{marginLeft: 15}}
-                                />
-                              }
-                              colors={color}
-                              styles={multiSelectStyles}
-                            />
-                          )}
-                        </View>
+                        )}
                       </View>
 
                       {this.state.selectedOccupation[0] == 3 && (
-                        <View>
-                          <View>
-                            <Thumbnail
-                              small
-                              source={require('../icons/signupicon_nail.png')}
+                        <View style={{paddingLeft: 16, marginBottom: 9}}>
+                          {this.state.loading == false && (
+                            <MultiSelect
+                              items={this.state.industries}
+                              placeHolder="Choose Industry..."
+                              selectedItems={this.state.selectedIndustry}
+                              setSelectedItems={value =>
+                                this.setState({selectedIndustry: value})
+                              }
                             />
-                          </View>
-                          <View
-                            style={{
-                              marginLeft: 55,
-                              justifyContent: 'center',
-                              marginTop: -45,
-                            }}>
-                            {this.state.loading == false && (
-                              <SectionedMultiSelect
-                                items={this.state.industries}
-                                uniqueKey="id"
-                                subKey="children"
-                                expandDropDowns={true}
-                                selectText="Choose Industry..."
-                                showDropDowns={true}
-                                readOnlyHeadings={true}
-                                onSelectedItemsChange={value =>
-                                  this.setState({selectedIndustry: value})
-                                }
-                                selectedItems={this.state.selectedIndustry}
-                                single={false}
-                                selectToggleIconComponent={
-                                  <Icon
-                                    name="caret-down"
-                                    color="#D94526"
-                                    size={30}
-                                    style={styles.caretIcon}
-                                  />
-                                }
-                                searchIconComponent={
-                                  <Icon
-                                    name="search"
-                                    color="#D94526"
-                                    size={15}
-                                    style={{marginLeft: 15}}
-                                  />
-                                }
-                                colors={color}
-                                styles={multiSelectStyles}
-                              />
-                            )}
-                          </View>
+                          )}
                         </View>
                       )}
-                      {/* 
-                  {this.state.selectedIndustryText != "" && (
-                    <View style={{ alignItems: "center" }}>
-                      <Text style={styles.input}>
-                        {this.state.selectedIndustryText}
-                      </Text>
-                    </View>
-                  )} */}
-
                       <Item style={styles.item}>
                         <Input
                           placeholder="First name..."
@@ -439,156 +369,30 @@ export default class LogIn extends Component {
                           style={styles.input}
                         />
                       </Item>
-
-                      <Item style={styles.item}>
-                        <Input
-                          keyboardType="number-pad"
-                          placeholder="Phone number..."
-                          placeholderTextColor="#f1faee"
-                          onChangeText={text => this.setState({phone: text})}
-                          style={styles.input}
-                        />
-                      </Item>
-
-                      {this.state.selectedOccupation[0] != 1 && (
-                        <View style={{marginLeft: 15}}>
-                          <Item style={styles.item}>
-                            <Input
-                              placeholder="Business name..."
-                              placeholderTextColor="#f1faee"
-                              onChangeText={text =>
-                                this.setState({businessName: text})
-                              }
-                              style={styles.input}
-                            />
-                          </Item>
-
-                          <Item style={styles.item}>
-                            <Input
-                              placeholder="Business address..."
-                              placeholderTextColor="#f1faee"
-                              onChangeText={text =>
-                                this.setState({businessAddress: text})
-                              }
-                              style={styles.input}
-                            />
-                          </Item>
-                        </View>
-                      )}
-
-                      <Item style={styles.item}>
-                        <Input
-                          placeholder="Zipcode..."
-                          placeholderTextColor="#f1faee"
-                          onChangeText={text => this.setState({zipCode: text})}
-                          style={styles.input}
-                        />
-                      </Item>
-
-                      <View style={{paddingLeft: 16}}>
-                        <View>
-                          <Thumbnail
-                            small
-                            source={require('../icons/signupicon_state.png')}
+                      <View style={{paddingLeft: 16, marginBottom: 9}}>
+                        {this.state.loading == false && (
+                          <MultiSelect
+                            items={this.state.states}
+                            placeHolder="Choose State..."
+                            selectedItems={this.state.selectedState}
+                            setSelectedItems={value =>
+                              this.setState({selectedState: value})
+                            }
                           />
-                        </View>
-                        <View
-                          style={{
-                            marginLeft: 39,
-                            justifyContent: 'center',
-                            marginTop: -50,
-                          }}>
-                          {this.state.loading == false && this.state.states && (
-                            <SectionedMultiSelect
-                              items={this.state.states}
-                              uniqueKey="id"
-                              subKey="children"
-                              expandDropDowns={true}
-                              selectText="Choose State..."
-                              showDropDowns={true}
-                              readOnlyHeadings={true}
-                              onSelectedItemsChange={value =>
-                                this.setState({selectedState: value})
-                              }
-                              selectedItems={this.state.selectedState}
-                              single={true}
-                              selectToggleIconComponent={
-                                <Icon
-                                  name="caret-down"
-                                  color="#D94526"
-                                  size={30}
-                                  style={styles.caretIcon}
-                                />
-                              }
-                              searchIconComponent={
-                                <Icon
-                                  name="search"
-                                  color="#D94526"
-                                  size={15}
-                                  style={{marginLeft: 15}}
-                                />
-                              }
-                              colors={color}
-                              styles={multiSelectStyles}
-                            />
-                          )}
-                        </View>
-                        {/* <Input
-                          placeholder="Please enter your state..."
-                          placeholderTextColor="#f1faee"
-                          onChangeText={text => this.setState({ state: text })}
-                          style={styles.input}
-                        /> */}
+                        )}
                       </View>
 
-                      <View>
-                        <View style={{paddingLeft: 16}}>
-                          <Thumbnail
-                            small
-                            source={require('../icons/signupicon_city.png')}
+                      <View style={{paddingLeft: 16, marginBottom: 9}}>
+                        {this.state.loading == false && this.state.cities && (
+                          <MultiSelect
+                            items={this.state.cities}
+                            placeHolder="Choose City..."
+                            selectedItems={this.state.selectedCity}
+                            setSelectedItems={value =>
+                              this.setState({selectedCity: value})
+                            }
                           />
-                        </View>
-                        <View
-                          style={{
-                            marginLeft: 55,
-                            justifyContent: 'center',
-                            marginTop: -50,
-                          }}>
-                          {this.state.loading == false && this.state.cities && (
-                            <SectionedMultiSelect
-                              items={this.state.cities}
-                              uniqueKey="id"
-                              subKey="children"
-                              expandDropDowns={true}
-                              selectText="Choose City..."
-                              showDropDowns={true}
-                              readOnlyHeadings={true}
-                              onSelectedItemsChange={value =>
-                                this.setState({selectedCity: value})
-                              }
-                              selectedItems={this.state.selectedCity}
-                              single={true}
-                              selectToggleIconComponent={
-                                <Icon
-                                  name="caret-down"
-                                  color="#D94526"
-                                  size={30}
-                                  style={styles.caretIcon}
-                                />
-                              }
-                              searchIconComponent={
-                                <Icon
-                                  name="search"
-                                  color="#D94526"
-                                  size={15}
-                                  style={{marginLeft: 15}}
-                                />
-                              }
-                              colors={color}
-                              styles={multiSelectStyles}
-                            />
-                          )}
-                        </View>
+                        )}
                       </View>
 
                       <Item style={styles.item}>
@@ -693,7 +497,7 @@ const styles = StyleSheet.create({
   },
   input: {
     fontSize: 14,
-    fontFamily: 'Montserrat-MediumItalic',
+    fontFamily: 'Montserrat-Medium',
     borderRadius: 4,
     overflow: 'hidden',
     backgroundColor: 'rgba(29, 53, 87, 0.5)',

@@ -182,7 +182,7 @@ export default class Home extends Component {
             <Text
               style={[
                 styles.GridViewTextLayoutDescription,
-                {fontFamily: 'Montserrat-Regular', fontSize: 11},
+                {fontFamily: 'Montserrat-Medium', fontSize: 11},
               ]}>
               {item.description}
             </Text>

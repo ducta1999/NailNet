@@ -94,7 +94,7 @@ export default class LogIn extends Component {
           this.setState({
             success: false,
           });
-        }, 1999);
+        }, 999);
       } else {
         toastService.error('Error: ' + result.data);
       }
@@ -156,7 +156,7 @@ export default class LogIn extends Component {
                   {this.state.success === true ? (
                     <View style={{height: 36, width: 36}}>
                       <LottieView
-                        source={require('../json/loginPassed.json')}
+                        source={require('../json/success.json')}
                         autoPlay
                       />
                     </View>
