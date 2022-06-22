@@ -1,5 +1,11 @@
 import React, {Component} from 'react';
-import {Alert, StyleSheet, TouchableOpacity, Dimensions} from 'react-native';
+import {
+  Alert,
+  StyleSheet,
+  TouchableOpacity,
+  Dimensions,
+  Linking,
+} from 'react-native';
 import {
   Container,
   Content,
@@ -22,6 +28,7 @@ import * as tinh_tp from '../json/tinh_tp.json';
 import SectionedMultiSelect from 'react-native-sectioned-multi-select';
 import LottieView from 'lottie-react-native';
 import MultiSelect from './Components/MultiSelect';
+import Carousel from 'react-native-snap-carousel';
 
 export default class LogIn extends Component {
   constructor(props) {
@@ -176,14 +183,14 @@ export default class LogIn extends Component {
 
       if (email.trim() == '') {
         toastService.error('Error: ' + 'Email cannot be empty!');
-
+        this.swapSlide.snapToItem(2);
         this.setState({buttonLoading: false});
         return;
       }
 
       if (selectedCity == null || selectedCity.length == 0) {
         toastService.error('Error: ' + 'Please choose your city!');
-
+        this.swapSlide.snapToItem(1);
         this.setState({buttonLoading: false});
         return;
       }
@@ -197,7 +204,7 @@ export default class LogIn extends Component {
 
       if (selectedOccupation == null || selectedOccupation.length == 0) {
         toastService.error('Error: ' + 'Please choose your occupation!');
-
+        this.swapSlide.snapToItem(0);
         this.setState({buttonLoading: false});
         return;
       }
@@ -235,8 +242,6 @@ export default class LogIn extends Component {
         isApproved: selectedOccupation[0] == 1 ? true : false,
       };
 
-      console.log(selectedCity);
-
       var result = await dataSetvice.post('api/profiles/add', data);
 
       if (result.status === 200) {
@@ -262,6 +267,9 @@ export default class LogIn extends Component {
       } else {
         console.log(result);
         this.setState({buttonLoading: false});
+        if (result.data.includes('Email already exists')) {
+          this.swapSlide.snapToItem(2);
+        }
         toastService.error('Error: ' + result.data);
       }
     } catch (error) {
@@ -277,17 +285,291 @@ export default class LogIn extends Component {
     }
   }
 
+  swapSlide = value => {
+    this.setState({carousel: value});
+  };
+
   render() {
     const {width, height} = Dimensions.get('window');
 
     const dataCarousel = [
       {
-        key: 'industry',
-        view: <></>,
+        key: 'occupation',
+        view: (
+          <>
+            <View style={{marginBottom: 9}}>
+              {this.state.loading == false && (
+                <MultiSelect
+                  backgroundColor="#0065ff"
+                  items={this.state.occupations}
+                  placeHolder="Choose Occupation"
+                  selectedItems={this.state.selectedOccupation}
+                  setSelectedItems={value =>
+                    this.setState({selectedOccupation: value})
+                  }
+                />
+              )}
+            </View>
+
+            {this.state.selectedOccupation[0] == 3 && (
+              <View style={{marginBottom: 9}}>
+                {this.state.loading == false && (
+                  <MultiSelect
+                    items={this.state.industries}
+                    placeHolder="Choose Industry"
+                    selectedItems={this.state.selectedIndustry}
+                    setSelectedItems={value =>
+                      this.setState({selectedIndustry: value})
+                    }
+                  />
+                )}
+              </View>
+            )}
+            <Button
+              block
+              backgroundColor="#168aad"
+              style={styles.submitButton}
+              onPress={() => this.swapSlide.snapToNext()}>
+              <Text style={styles.submitButtonText}>Continue</Text>
+            </Button>
+          </>
+        ),
       },
       {
-        key: 'description',
-        view: <></>,
+        key: 'address',
+        view: (
+          <>
+            <View style={{marginBottom: 9}}>
+              {this.state.loading == false && (
+                <MultiSelect
+                  items={this.state.states}
+                  placeHolder="Choose State"
+                  selectedItems={this.state.selectedState}
+                  setSelectedItems={value =>
+                    this.setState({selectedState: value})
+                  }
+                />
+              )}
+            </View>
+
+            <View style={{marginBottom: 9}}>
+              {this.state.loading == false && this.state.cities && (
+                <MultiSelect
+                  items={this.state.cities}
+                  placeHolder="Choose City"
+                  selectedItems={this.state.selectedCity}
+                  setSelectedItems={value =>
+                    this.setState({selectedCity: value})
+                  }
+                />
+              )}
+            </View>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}>
+              <Button
+                block
+                backgroundColor="#4c5c68"
+                style={[styles.submitButton, {width: '48%'}]}
+                onPress={() => this.swapSlide.snapToPrev()}>
+                <Icon name="arrow-back-circle-outline" color="#fff" size={28} />
+              </Button>
+              <Button
+                block
+                backgroundColor="#168aad"
+                style={[styles.submitButton, {width: '48%'}]}
+                onPress={() => this.swapSlide.snapToNext()}>
+                <Text style={styles.submitButtonText}>Continue</Text>
+              </Button>
+            </View>
+          </>
+        ),
+      },
+
+      {
+        key: 'email',
+        view: (
+          <>
+            <View style={styles.item}>
+              <Icon
+                name="mail-open-outline"
+                color="#6c757d"
+                size={24}
+                style={styles.icon}
+              />
+              <Input
+                placeholder="Email"
+                placeholderTextColor="#6c757d"
+                onChangeText={text => this.setState({email: text})}
+                style={styles.input}
+              />
+            </View>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}>
+              <Button
+                block
+                backgroundColor="#4c5c68"
+                style={[styles.submitButton, {width: '48%'}]}
+                onPress={() => this.swapSlide.snapToPrev()}>
+                <Icon name="arrow-back-circle-outline" color="#fff" size={28} />
+              </Button>
+              <Button
+                block
+                backgroundColor="#168aad"
+                style={[styles.submitButton, {width: '48%'}]}
+                onPress={() => this.swapSlide.snapToNext()}>
+                <Text style={styles.submitButtonText}>Continue</Text>
+              </Button>
+            </View>
+          </>
+        ),
+      },
+      {
+        key: 'user',
+        view: (
+          <>
+            <View style={styles.item}>
+              <Icon
+                name="person-outline"
+                color="#6c757d"
+                size={24}
+                style={styles.icon}
+              />
+              <Input
+                placeholder="First name"
+                placeholderTextColor="#6c757d"
+                onChangeText={text => this.setState({firstName: text})}
+                style={styles.input}
+              />
+            </View>
+
+            <View style={styles.item}>
+              <Icon
+                name="person-outline"
+                color="#6c757d"
+                size={24}
+                style={styles.icon}
+              />
+              <Input
+                placeholder="Last name"
+                placeholderTextColor="#6c757d"
+                onChangeText={text => this.setState({lastName: text})}
+                style={styles.input}
+              />
+            </View>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}>
+              <Button
+                block
+                backgroundColor="#4c5c68"
+                style={[styles.submitButton, {width: '48%'}]}
+                onPress={() => this.swapSlide.snapToPrev()}>
+                <Icon name="arrow-back-circle-outline" color="#fff" size={28} />
+              </Button>
+              <Button
+                block
+                backgroundColor="#168aad"
+                style={[styles.submitButton, {width: '48%'}]}
+                onPress={() => this.swapSlide.snapToNext()}>
+                <Text style={styles.submitButtonText}>Continue</Text>
+              </Button>
+            </View>
+          </>
+        ),
+      },
+      {
+        key: 'password',
+        view: (
+          <>
+            <View style={styles.item}>
+              <Icon
+                name="lock-closed-outline"
+                color="#6c757d"
+                size={24}
+                style={styles.icon}
+              />
+              <Input
+                placeholder="6 Digits Password"
+                placeholderTextColor="#6c757d"
+                secureTextEntry={true}
+                keyboardType="numeric"
+                maxLength={6}
+                value={this.state.password}
+                onChangeText={text =>
+                  this.setState({
+                    password: text.replace(/[^0-9]/g, ''),
+                  })
+                }
+                style={styles.input}
+              />
+            </View>
+
+            <View style={styles.item}>
+              <Icon
+                name="lock-closed-outline"
+                color="#6c757d"
+                size={24}
+                style={styles.icon}
+              />
+              <Input
+                placeholder="Confirm Password"
+                placeholderTextColor="#6c757d"
+                secureTextEntry={true}
+                maxLength={6}
+                keyboardType="numeric"
+                value={this.state.passwordConfirm}
+                onChangeText={text =>
+                  this.setState({
+                    passwordConfirm: text.replace(/[^0-9]/g, ''),
+                  })
+                }
+                style={styles.input}
+              />
+            </View>
+            <Text style={styles.signupText}>
+              By signing up, you're agree to our{' '}
+              <Text
+                onPress={() =>
+                  Linking.openURL('https://privacy.enrichcous.com/')
+                }
+                style={styles.linkText}>
+                Privacy Policy
+              </Text>
+            </Text>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}>
+              <Button
+                block
+                backgroundColor="#4c5c68"
+                style={[styles.submitButton, {width: '48%'}]}
+                onPress={() => this.swapSlide.snapToPrev()}>
+                <Icon name="arrow-back-circle-outline" color="#fff" size={28} />
+              </Button>
+              <Button
+                block
+                backgroundColor="#06d6a0"
+                style={[styles.submitButton, {width: '48%'}]}
+                onPress={() => this.submit()}>
+                <Text style={styles.submitButtonText}>Submit</Text>
+              </Button>
+            </View>
+          </>
+        ),
       },
     ];
 
@@ -307,154 +589,14 @@ export default class LogIn extends Component {
                 <CardItem style={styles.carditem}>
                   <Content>
                     <Text style={styles.title}>Sign up</Text>
-
-                    <Form>
-                      <View style={{paddingLeft: 16, marginBottom: 9}}>
-                        {this.state.loading == false && (
-                          <MultiSelect
-                            backgroundColor="#0065ff"
-                            items={this.state.occupations}
-                            placeHolder="Choose Occupation"
-                            selectedItems={this.state.selectedOccupation}
-                            setSelectedItems={value =>
-                              this.setState({selectedOccupation: value})
-                            }
-                          />
-                        )}
-                      </View>
-
-                      {this.state.selectedOccupation[0] == 3 && (
-                        <View style={{paddingLeft: 16, marginBottom: 9}}>
-                          {this.state.loading == false && (
-                            <MultiSelect
-                              items={this.state.industries}
-                              placeHolder="Choose Industry"
-                              selectedItems={this.state.selectedIndustry}
-                              setSelectedItems={value =>
-                                this.setState({selectedIndustry: value})
-                              }
-                            />
-                          )}
-                        </View>
-                      )}
-                      <View style={styles.item}>
-                        <Icon
-                          name="person-outline"
-                          color="#6c757d"
-                          size={24}
-                          style={styles.icon}
-                        />
-                        <Input
-                          placeholder="First name"
-                          placeholderTextColor="#6c757d"
-                          onChangeText={text =>
-                            this.setState({firstName: text})
-                          }
-                          style={styles.input}
-                        />
-                      </View>
-
-                      <View style={styles.item}>
-                        <Icon
-                          name="person-outline"
-                          color="#6c757d"
-                          size={24}
-                          style={styles.icon}
-                        />
-                        <Input
-                          placeholder="Last name"
-                          placeholderTextColor="#6c757d"
-                          onChangeText={text => this.setState({lastName: text})}
-                          style={styles.input}
-                        />
-                      </View>
-
-                      <View style={styles.item}>
-                        <Icon
-                          name="mail-open-outline"
-                          color="#6c757d"
-                          size={24}
-                          style={styles.icon}
-                        />
-                        <Input
-                          placeholder="Email"
-                          placeholderTextColor="#6c757d"
-                          onChangeText={text => this.setState({email: text})}
-                          style={styles.input}
-                        />
-                      </View>
-                      <View style={{paddingLeft: 16, marginBottom: 9}}>
-                        {this.state.loading == false && (
-                          <MultiSelect
-                            items={this.state.states}
-                            placeHolder="Choose State"
-                            selectedItems={this.state.selectedState}
-                            setSelectedItems={value =>
-                              this.setState({selectedState: value})
-                            }
-                          />
-                        )}
-                      </View>
-
-                      <View style={{paddingLeft: 16, marginBottom: 9}}>
-                        {this.state.loading == false && this.state.cities && (
-                          <MultiSelect
-                            items={this.state.cities}
-                            placeHolder="Choose City"
-                            selectedItems={this.state.selectedCity}
-                            setSelectedItems={value =>
-                              this.setState({selectedCity: value})
-                            }
-                          />
-                        )}
-                      </View>
-
-                      <View style={styles.item}>
-                        <Icon
-                          name="lock-closed-outline"
-                          color="#6c757d"
-                          size={24}
-                          style={styles.icon}
-                        />
-                        <Input
-                          placeholder="6 Digits Password"
-                          placeholderTextColor="#6c757d"
-                          secureTextEntry={true}
-                          keyboardType="numeric"
-                          maxLength={6}
-                          value={this.state.password}
-                          onChangeText={text =>
-                            this.setState({
-                              password: text.replace(/[^0-9]/g, ''),
-                            })
-                          }
-                          style={styles.input}
-                        />
-                      </View>
-
-                      <View style={styles.item}>
-                        <Icon
-                          name="lock-closed-outline"
-                          color="#6c757d"
-                          size={24}
-                          style={styles.icon}
-                        />
-                        <Input
-                          placeholder="Confirm Password"
-                          placeholderTextColor="#6c757d"
-                          secureTextEntry={true}
-                          maxLength={6}
-                          keyboardType="numeric"
-                          value={this.state.passwordConfirm}
-                          onChangeText={text =>
-                            this.setState({
-                              passwordConfirm: text.replace(/[^0-9]/g, ''),
-                            })
-                          }
-                          style={styles.input}
-                        />
-                      </View>
-                    </Form>
+                    <Carousel
+                      scrollEnabled={false}
+                      ref={value => (this.swapSlide = value)}
+                      data={dataCarousel}
+                      renderItem={({item}) => item.view}
+                      sliderWidth={width - 68}
+                      itemWidth={width - 68}
+                    />
                   </Content>
                 </CardItem>
 
@@ -465,16 +607,6 @@ export default class LogIn extends Component {
                       style={styles.cancel}>
                       <Text style={styles.cancelText}>CANCEL</Text>
                     </TouchableOpacity>
-
-                    <Button
-                      backgroundColor="#47BFB3"
-                      style={styles.submitButton}
-                      onPress={() => this.submit()}>
-                      {this.state.buttonLoading == true && (
-                        <Spinner color="green" />
-                      )}
-                      <Text style={styles.submitButtonText}>SUBMIT</Text>
-                    </Button>
                   </View>
                 </CardItem>
               </Card>
@@ -515,10 +647,10 @@ const styles = StyleSheet.create({
   },
   carditem: {
     backgroundColor: '#fff',
-  },
-  picker: {
-    marginLeft: 20,
-    color: 'white',
+    flex: 1,
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   input: {
     fontSize: 14,
@@ -536,7 +668,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingLeft: 16,
   },
   icon: {
     marginRight: 19,
@@ -547,7 +678,6 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     fontSize: 30,
     letterSpacing: -1,
-    paddingLeft: 16,
   },
 
   logoView: {
@@ -561,13 +691,13 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   submitButton: {
-    width: 179,
-    justifyContent: 'center',
-    borderRadius: 14,
+    borderRadius: 9,
+    marginTop: 15,
   },
   submitButtonText: {
-    fontSize: 16,
+    color: 'white',
     fontFamily: 'Montserrat-Bold',
+    textTransform: 'capitalize',
   },
   cancelText: {
     color: 'white',
@@ -583,5 +713,16 @@ const styles = StyleSheet.create({
   },
   buttonGroup: {
     backgroundColor: '#fff',
+  },
+  signupText: {
+    fontSize: 12,
+    fontFamily: 'Montserrat-SemiBoldItalic',
+    color: '#46494c',
+    marginVertical: 9,
+  },
+  linkText: {
+    fontSize: 12,
+    fontFamily: 'Montserrat-SemiBold',
+    color: '#0065ff',
   },
 });

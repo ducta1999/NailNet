@@ -32,7 +32,7 @@ import LottieView from 'lottie-react-native';
 import * as dataService from '../../services/DataService';
 import * as toastService from '../../services/ToastService';
 import * as authentication from '../../services/Authentication';
-import Carousel, {Pagination} from 'react-native-snap-carousel';
+import Carousel from 'react-native-snap-carousel';
 import MultiSelect from '../Components/MultiSelect';
 
 export default class AddQuestionPublic extends Component {
@@ -254,6 +254,7 @@ export default class AddQuestionPublic extends Component {
             <View style={styles.card}>
               <Text style={styles.title}>Create a Question</Text>
               <Carousel
+                scrollEnabled={false}
                 ref={value => (this.swapSlide = value)}
                 data={dataCarousel}
                 renderItem={({item}) => item.view}
