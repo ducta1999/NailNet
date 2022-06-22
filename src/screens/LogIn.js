@@ -20,6 +20,7 @@ import * as dataSetvice from '../services/DataService';
 import * as toastService from '../services/ToastService';
 import * as authentication from '../services/Authentication';
 import AnimatedSplash from 'react-native-animated-splash-screen';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 export default class LogIn extends Component {
   constructor(props) {
@@ -110,38 +111,52 @@ export default class LogIn extends Component {
       <Container style={styles.container}>
         <Content>
           <View style={styles.logoView}>
-            <Thumbnail
-              source={require('../icons/nailtalkpro.png')}
-              style={styles.logo}
+            <LottieView
+              source={require('../json/welcome.json')}
+              autoPlay
+              loop
             />
           </View>
           {this.state.loading == false ? (
-            <Card transparent>
+            <Card transparent style={{padding: 9}}>
               <CardItem style={styles.carditem}>
                 <Content>
+                  <Text style={styles.title}>Login</Text>
                   <Form>
-                    <Item style={styles.item}>
+                    <View style={styles.item}>
+                      <Icon
+                        name="mail-open-outline"
+                        color="#6c757d"
+                        size={24}
+                        style={styles.icon}
+                      />
                       <Input
-                        placeholder="Email..."
-                        placeholderTextColor="#ced4da"
+                        placeholder="Email"
+                        placeholderTextColor="#6c757d"
                         onChangeText={text => this.setState({email: text})}
                         style={styles.input}
                         value={this.state.email}
                       />
-                    </Item>
+                    </View>
 
-                    <Item style={[styles.item, {marginBottom: 0}]}>
+                    <View style={[styles.item, {marginBottom: 0}]}>
+                      <Icon
+                        name="lock-closed-outline"
+                        color="#6c757d"
+                        size={24}
+                        style={styles.icon}
+                      />
                       <Input
                         secureTextEntry={true}
                         keyboardType="default"
-                        placeholder="Password..."
-                        placeholderTextColor="#ced4da"
+                        placeholder="Password"
+                        placeholderTextColor="#6c757d"
                         maxLength={6}
                         onChangeText={text => this.setState({password: text})}
                         style={styles.input}
                         value={this.state.password}
                       />
-                    </Item>
+                    </View>
                   </Form>
                 </Content>
               </CardItem>
@@ -150,7 +165,7 @@ export default class LogIn extends Component {
                 <Button
                   block
                   disabled={this.state.buttonLoading}
-                  backgroundColor="#1d3557"
+                  backgroundColor="#0466c8"
                   style={styles.loginButton}
                   onPress={() => this.submit()}>
                   {this.state.success === true ? (
@@ -161,7 +176,7 @@ export default class LogIn extends Component {
                       />
                     </View>
                   ) : (
-                    <Text style={styles.loginButtonText}>LOGIN</Text>
+                    <Text style={styles.loginButtonText}>Login</Text>
                   )}
                 </Button>
               </CardItem>
@@ -183,17 +198,17 @@ export default class LogIn extends Component {
             footer
             style={[styles.carditem, {justifyContent: 'center'}]}>
             <Text style={styles.signupText}>
-              Don't have an account?{'  '}
+              New to Mango Network?{'  '}
               <Text
                 style={[
                   styles.signupText,
                   {
-                    color: '#a8dadc',
-                    fontFamily: 'Montserrat-MediumItalic',
+                    color: '#184e77',
+                    fontFamily: 'Montserrat-Bold',
                   },
                 ]}
                 onPress={() => this.props.navigation.navigate('SignUp')}>
-                SignUp here
+                Register
               </Text>
             </Text>
           </CardItem>
@@ -205,12 +220,15 @@ export default class LogIn extends Component {
 
 const styles = StyleSheet.create({
   logoView: {
-    // marginTop: 40,
-    marginBottom: 48,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#1d3557',
-    borderBottomRightRadius: 68,
+    flex: 1,
+    height: 268,
+  },
+  title: {
+    fontFamily: 'Montserrat-Bold',
+    color: '#212529',
+    marginBottom: 24,
+    fontSize: 30,
+    letterSpacing: -1,
   },
   logo: {
     width: 300,
@@ -224,21 +242,12 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   signupText: {
-    color: 'white',
+    color: '#6c757d',
     fontSize: 14,
     fontFamily: 'Montserrat-Medium',
   },
-  forgotPassword: {
-    color: 'white',
-    // flex: 1,
-    // flexDirection: "row",
-    // justifyContent: "flex-end",
-    //right: -60,
-    fontSize: 15,
-  },
-
   carditem: {
-    backgroundColor: '#457b9d',
+    backgroundColor: '#fff',
   },
   carditemSignUpAndForgot: {
     marginTop: 25,
@@ -246,34 +255,40 @@ const styles = StyleSheet.create({
   item: {
     marginBottom: 20,
     marginLeft: 0,
-    borderWidth: 0,
-    borderColor: 'transparent',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  icon: {
+    marginRight: 19,
   },
   container: {
-    backgroundColor: '#457b9d',
+    backgroundColor: '#fff',
     flex: 1,
   },
   card: {
-    backgroundColor: '#457b9d',
+    backgroundColor: '#fff',
   },
 
   input: {
     fontSize: 14,
-    fontFamily: 'Montserrat-MediumItalic',
+    fontFamily: 'Montserrat-Medium',
     borderRadius: 4,
     overflow: 'hidden',
-    backgroundColor: 'rgba(29, 53, 87, 0.5)',
-    paddingLeft: 24,
-    color: '#fff',
+    backgroundColor: '#fff',
+    color: '#343a40',
+    borderBottomWidth: 1.1,
+    borderColor: 'rgba(108, 117, 125, 0.5)',
   },
   loginButton: {
     flex: 1,
     justifyContent: 'center',
-    borderRadius: 4,
+    borderRadius: 12,
   },
   loginButtonText: {
-    fontSize: 17,
+    fontSize: 16,
     fontFamily: 'Montserrat-Bold',
     color: '#f1faee',
+    textTransform: 'capitalize',
   },
 });

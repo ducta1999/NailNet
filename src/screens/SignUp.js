@@ -17,11 +17,10 @@ import {
 } from 'native-base';
 import * as dataSetvice from '../services/DataService';
 import * as toastService from '../services/ToastService';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import Icon from 'react-native-vector-icons/Ionicons';
 import * as tinh_tp from '../json/tinh_tp.json';
 import SectionedMultiSelect from 'react-native-sectioned-multi-select';
 import LottieView from 'lottie-react-native';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import MultiSelect from './Components/MultiSelect';
 
 export default class LogIn extends Component {
@@ -298,27 +297,24 @@ export default class LogIn extends Component {
           {this.state.loading == false ? (
             <View>
               <View style={styles.logoView}>
-                <Thumbnail
-                  square
-                  large
-                  source={require('../icons/nailtalkpro.png')}
-                  style={styles.logo}
+                <LottieView
+                  source={require('../json/collab.json')}
+                  autoPlay
+                  loop
                 />
               </View>
-
-              <View style={styles.titleView}>
-                <Text style={styles.titleText}>SIGN UP</Text>
-              </View>
-
               <Card transparent>
                 <CardItem style={styles.carditem}>
                   <Content>
+                    <Text style={styles.title}>Sign up</Text>
+
                     <Form>
                       <View style={{paddingLeft: 16, marginBottom: 9}}>
                         {this.state.loading == false && (
                           <MultiSelect
+                            backgroundColor="#0065ff"
                             items={this.state.occupations}
-                            placeHolder="Choose Occupation..."
+                            placeHolder="Choose Occupation"
                             selectedItems={this.state.selectedOccupation}
                             setSelectedItems={value =>
                               this.setState({selectedOccupation: value})
@@ -332,7 +328,7 @@ export default class LogIn extends Component {
                           {this.state.loading == false && (
                             <MultiSelect
                               items={this.state.industries}
-                              placeHolder="Choose Industry..."
+                              placeHolder="Choose Industry"
                               selectedItems={this.state.selectedIndustry}
                               setSelectedItems={value =>
                                 this.setState({selectedIndustry: value})
@@ -341,39 +337,57 @@ export default class LogIn extends Component {
                           )}
                         </View>
                       )}
-                      <Item style={styles.item}>
+                      <View style={styles.item}>
+                        <Icon
+                          name="person-outline"
+                          color="#6c757d"
+                          size={24}
+                          style={styles.icon}
+                        />
                         <Input
-                          placeholder="First name..."
-                          placeholderTextColor="#f1faee"
+                          placeholder="First name"
+                          placeholderTextColor="#6c757d"
                           onChangeText={text =>
                             this.setState({firstName: text})
                           }
                           style={styles.input}
                         />
-                      </Item>
+                      </View>
 
-                      <Item style={styles.item}>
+                      <View style={styles.item}>
+                        <Icon
+                          name="person-outline"
+                          color="#6c757d"
+                          size={24}
+                          style={styles.icon}
+                        />
                         <Input
-                          placeholder="Last name..."
-                          placeholderTextColor="#f1faee"
+                          placeholder="Last name"
+                          placeholderTextColor="#6c757d"
                           onChangeText={text => this.setState({lastName: text})}
                           style={styles.input}
                         />
-                      </Item>
+                      </View>
 
-                      <Item style={styles.item}>
+                      <View style={styles.item}>
+                        <Icon
+                          name="mail-open-outline"
+                          color="#6c757d"
+                          size={24}
+                          style={styles.icon}
+                        />
                         <Input
-                          placeholder="Email..."
-                          placeholderTextColor="#f1faee"
+                          placeholder="Email"
+                          placeholderTextColor="#6c757d"
                           onChangeText={text => this.setState({email: text})}
                           style={styles.input}
                         />
-                      </Item>
+                      </View>
                       <View style={{paddingLeft: 16, marginBottom: 9}}>
                         {this.state.loading == false && (
                           <MultiSelect
                             items={this.state.states}
-                            placeHolder="Choose State..."
+                            placeHolder="Choose State"
                             selectedItems={this.state.selectedState}
                             setSelectedItems={value =>
                               this.setState({selectedState: value})
@@ -386,7 +400,7 @@ export default class LogIn extends Component {
                         {this.state.loading == false && this.state.cities && (
                           <MultiSelect
                             items={this.state.cities}
-                            placeHolder="Choose City..."
+                            placeHolder="Choose City"
                             selectedItems={this.state.selectedCity}
                             setSelectedItems={value =>
                               this.setState({selectedCity: value})
@@ -395,10 +409,16 @@ export default class LogIn extends Component {
                         )}
                       </View>
 
-                      <Item style={styles.item}>
+                      <View style={styles.item}>
+                        <Icon
+                          name="lock-closed-outline"
+                          color="#6c757d"
+                          size={24}
+                          style={styles.icon}
+                        />
                         <Input
                           placeholder="6 Digits Password"
-                          placeholderTextColor="#f1faee"
+                          placeholderTextColor="#6c757d"
                           secureTextEntry={true}
                           keyboardType="numeric"
                           maxLength={6}
@@ -410,12 +430,18 @@ export default class LogIn extends Component {
                           }
                           style={styles.input}
                         />
-                      </Item>
+                      </View>
 
-                      <Item style={styles.item}>
+                      <View style={styles.item}>
+                        <Icon
+                          name="lock-closed-outline"
+                          color="#6c757d"
+                          size={24}
+                          style={styles.icon}
+                        />
                         <Input
                           placeholder="Confirm Password"
-                          placeholderTextColor="#f1faee"
+                          placeholderTextColor="#6c757d"
                           secureTextEntry={true}
                           maxLength={6}
                           keyboardType="numeric"
@@ -427,7 +453,7 @@ export default class LogIn extends Component {
                           }
                           style={styles.input}
                         />
-                      </Item>
+                      </View>
                     </Form>
                   </Content>
                 </CardItem>
@@ -459,9 +485,8 @@ export default class LogIn extends Component {
                 height: height,
                 width: '100%',
                 justifyContent: 'center',
-                backgroundColor: '#9bf6ff',
               }}>
-              <View style={{height: 222}}>
+              <View style={{height: 111}}>
                 <LottieView
                   source={require('../json/loading.json')}
                   autoPlay
@@ -478,7 +503,7 @@ export default class LogIn extends Component {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#457b9d',
+    backgroundColor: '#fff',
   },
   cardFooter: {
     flex: 1,
@@ -489,7 +514,7 @@ const styles = StyleSheet.create({
     right: 25,
   },
   carditem: {
-    backgroundColor: '#457b9d',
+    backgroundColor: '#fff',
   },
   picker: {
     marginLeft: 20,
@@ -500,32 +525,34 @@ const styles = StyleSheet.create({
     fontFamily: 'Montserrat-Medium',
     borderRadius: 4,
     overflow: 'hidden',
-    backgroundColor: 'rgba(29, 53, 87, 0.5)',
-    paddingLeft: 24,
-    color: '#fff',
+    backgroundColor: '#fff',
+    color: '#343a40',
+    borderBottomWidth: 1.1,
+    borderColor: 'rgba(108, 117, 125, 0.5)',
   },
   item: {
     marginBottom: 20,
-    borderColor: 'transparent',
-  },
-  titleView: {
-    justifyContent: 'center',
+    marginLeft: 0,
+    flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 15,
+    justifyContent: 'space-between',
+    paddingLeft: 16,
   },
-  titleText: {
-    fontSize: 28,
-    //fontWeight: "bold",
-    color: 'white',
-    fontFamily: 'Montserrat-SemiBold',
+  icon: {
+    marginRight: 19,
   },
+  title: {
+    fontFamily: 'Montserrat-Bold',
+    color: '#212529',
+    marginBottom: 24,
+    fontSize: 30,
+    letterSpacing: -1,
+    paddingLeft: 16,
+  },
+
   logoView: {
-    // marginTop: 40,
-    marginBottom: 25,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#1d3557',
-    borderBottomRightRadius: 68,
+    flex: 1,
+    height: 268,
   },
   logo: {
     width: 300,
@@ -555,24 +582,6 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   buttonGroup: {
-    backgroundColor: '#457b9d',
+    backgroundColor: '#fff',
   },
 });
-
-//multiselect style
-const multiSelectStyles = StyleSheet.create({
-  container: {
-    backgroundColor: '#457b9d',
-  },
-  selectToggleText: {color: 'white', fontFamily: 'Montserrat-medium'},
-  button: {backgroundColor: '#D94526'},
-  searchBar: {backgroundColor: '#457b9d'},
-  searchTextInput: {color: '#D94526'},
-});
-const color = {
-  text: '#D94526',
-  subText: '#47BFB3',
-  searchPlaceholderTextColor: '#D94526',
-  itemBackground: '#457b9d',
-  subItemBackground: '#457b9d',
-};

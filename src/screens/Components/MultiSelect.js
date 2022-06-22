@@ -27,7 +27,7 @@ export default function MultiSelect({
       selectedItems={selectedItems}
       single={single}
       selectToggleIconComponent={
-        <Icon name="caret-down" color="#1a759f" size={20} />
+        <Icon name="caret-down" color="#343a40" size={20} />
       }
       searchIconComponent={
         <Icon name="search" color="#fff" size={15} style={{marginRight: 12}} />
@@ -45,15 +45,17 @@ const multiSelectStyles = StyleSheet.create({
     borderRadius: 12,
   },
   selectToggleText: {
-    color: '#1a759f',
-    fontFamily: 'Montserrat-Medium',
+    color: '#343a40',
+    fontFamily: 'Montserrat-SemiBold',
     fontSize: 14,
   },
   selectToggle: {
     backgroundColor: '#fff',
-    padding: 19,
-    borderRadius: 5,
+    padding: 15,
+    borderRadius: 6,
     marginVertical: 9,
+    borderWidth: 1.1,
+    borderColor: 'rgba(108, 117, 125, 0.5)',
   },
   button: {backgroundColor: '#168aad'},
   confirmText: {fontFamily: 'Montserrat-Bold', fontSize: 18, padding: 5},
