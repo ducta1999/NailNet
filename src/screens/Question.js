@@ -24,7 +24,6 @@ import PublicQuestion from './questionSubScreens/PublicQuestion';
 import PrivateQuestion from './questionSubScreens/PrivateQuestion';
 import ListFAQ from './questionSubScreens/ListFAQ';
 import {createBottomTabNavigator, createAppContainer} from 'react-navigation';
-// import { TouchableOpacity } from "react-native-gesture-handler";
 import {
   getAnimatingBottomBar,
   AnimationType,

@@ -91,10 +91,10 @@ export default class LogIn extends Component {
           success: true,
         });
         setTimeout(() => {
-          this.props.navigation.navigate('Home');
           this.setState({
             success: false,
           });
+          this.props.navigation.navigate('Home');
         }, 999);
       } else {
         toastService.error('Error: ' + result.data);
@@ -107,6 +107,8 @@ export default class LogIn extends Component {
   }
 
   render() {
+    const {height} = Dimensions.get('window');
+
     return (
       <Container style={styles.container}>
         <Content>
@@ -131,7 +133,7 @@ export default class LogIn extends Component {
                         style={styles.icon}
                       />
                       <Input
-                        placeholder="Email"
+                        placeholder="Email / Username"
                         placeholderTextColor="#6c757d"
                         onChangeText={text => this.setState({email: text})}
                         style={styles.input}
@@ -168,11 +170,21 @@ export default class LogIn extends Component {
                   backgroundColor="#0466c8"
                   style={styles.loginButton}
                   onPress={() => this.submit()}>
-                  {this.state.success === true ? (
-                    <View style={{height: 36, width: 36}}>
+                  {this.state.buttonLoading ? (
+                    <View style={{height: 99, width: 99}}>
                       <LottieView
+                        source={require('../json/dotLoading.json')}
+                        autoPlay
+                        loop
+                      />
+                    </View>
+                  ) : this.state.success === true ? (
+                    <View style={{height: 99, width: 99}}>
+                      <LottieView
+                        speed={2.5}
                         source={require('../json/success.json')}
                         autoPlay
+                        loop
                       />
                     </View>
                   ) : (
@@ -182,16 +194,18 @@ export default class LogIn extends Component {
               </CardItem>
             </Card>
           ) : (
-            <View>
-              <Spinner color="red" />
-              <Text
-                style={{
-                  textAlign: 'center',
-                  color: 'white',
-                  fontWeight: 'bold',
-                }}>
-                Loading
-              </Text>
+            <View
+              style={{
+                width: '100%',
+                justifyContent: 'center',
+              }}>
+              <View style={{height: 168}}>
+                <LottieView
+                  source={require('../json/loading.json')}
+                  autoPlay
+                  loop
+                />
+              </View>
             </View>
           )}
           <CardItem

@@ -17,7 +17,6 @@ import {
   View,
   Text,
   Card,
-  CardItem,
   Body,
   Spinner,
 } from 'native-base';
@@ -28,7 +27,7 @@ import * as tinh_tp from '../json/tinh_tp.json';
 import SectionedMultiSelect from 'react-native-sectioned-multi-select';
 import LottieView from 'lottie-react-native';
 import MultiSelect from './Components/MultiSelect';
-import Carousel from 'react-native-snap-carousel';
+import Carousel, {Pagination} from 'react-native-snap-carousel';
 
 export default class LogIn extends Component {
   constructor(props) {
@@ -58,6 +57,14 @@ export default class LogIn extends Component {
       states: [],
       selectedCity: [],
       selectedState: [],
+      currentIndex: 0,
+      paginationData: [
+        {title: 'Occupation', isCompleted: false},
+        {title: 'Address', isCompleted: false},
+        {title: 'Account', isCompleted: false},
+        {title: 'Password', isCompleted: false},
+      ],
+      success: false,
     };
 
     this.ensureDataFetched = this.ensureDataFetched.bind(this);
@@ -259,15 +266,21 @@ export default class LogIn extends Component {
             );
           }
         }
-
-        toastService.success('Add profile successfully!');
+        this.setState({
+          success: true,
+        });
 
         this.setState({buttonLoading: false});
-        this.props.navigation.goBack();
+        setTimeout(() => {
+          this.props.navigation.goBack();
+          this.setState({
+            success: false,
+          });
+          toastService.success('Add profile successfully!');
+        }, 999);
       } else {
-        console.log(result);
         this.setState({buttonLoading: false});
-        if (result.data.includes('Email already exists')) {
+        if (result.data.includes('Email')) {
           this.swapSlide.snapToItem(2);
         }
         toastService.error('Error: ' + result.data);
@@ -297,6 +310,7 @@ export default class LogIn extends Component {
         key: 'occupation',
         view: (
           <>
+            <Text style={styles.subTitle}>Choose Your Occupation</Text>
             <View style={{marginBottom: 9}}>
               {this.state.loading == false && (
                 <MultiSelect
@@ -304,9 +318,15 @@ export default class LogIn extends Component {
                   items={this.state.occupations}
                   placeHolder="Choose Occupation"
                   selectedItems={this.state.selectedOccupation}
-                  setSelectedItems={value =>
-                    this.setState({selectedOccupation: value})
-                  }
+                  setSelectedItems={value => {
+                    this.setState({
+                      selectedOccupation: value,
+                      paginationData: [
+                        {title: 'Occupation', isCompleted: true},
+                        ...this.state.paginationData.slice(1),
+                      ],
+                    });
+                  }}
                 />
               )}
             </View>
@@ -319,7 +339,9 @@ export default class LogIn extends Component {
                     placeHolder="Choose Industry"
                     selectedItems={this.state.selectedIndustry}
                     setSelectedItems={value =>
-                      this.setState({selectedIndustry: value})
+                      this.setState({
+                        selectedIndustry: value,
+                      })
                     }
                   />
                 )}
@@ -327,7 +349,7 @@ export default class LogIn extends Component {
             )}
             <Button
               block
-              backgroundColor="#168aad"
+              backgroundColor="#212121"
               style={styles.submitButton}
               onPress={() => this.swapSlide.snapToNext()}>
               <Text style={styles.submitButtonText}>Continue</Text>
@@ -339,6 +361,7 @@ export default class LogIn extends Component {
         key: 'address',
         view: (
           <>
+            <Text style={styles.subTitle}>Choose your address</Text>
             <View style={{marginBottom: 9}}>
               {this.state.loading == false && (
                 <MultiSelect
@@ -359,7 +382,14 @@ export default class LogIn extends Component {
                   placeHolder="Choose City"
                   selectedItems={this.state.selectedCity}
                   setSelectedItems={value =>
-                    this.setState({selectedCity: value})
+                    this.setState({
+                      selectedCity: value,
+                      paginationData: [
+                        ...this.state.paginationData.slice(0, 1),
+                        {title: 'Address', isCompleted: true},
+                        ...this.state.paginationData.slice(2),
+                      ],
+                    })
                   }
                 />
               )}
@@ -379,50 +409,7 @@ export default class LogIn extends Component {
               </Button>
               <Button
                 block
-                backgroundColor="#168aad"
-                style={[styles.submitButton, {width: '48%'}]}
-                onPress={() => this.swapSlide.snapToNext()}>
-                <Text style={styles.submitButtonText}>Continue</Text>
-              </Button>
-            </View>
-          </>
-        ),
-      },
-
-      {
-        key: 'email',
-        view: (
-          <>
-            <View style={styles.item}>
-              <Icon
-                name="mail-open-outline"
-                color="#6c757d"
-                size={24}
-                style={styles.icon}
-              />
-              <Input
-                placeholder="Email"
-                placeholderTextColor="#6c757d"
-                onChangeText={text => this.setState({email: text})}
-                style={styles.input}
-              />
-            </View>
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}>
-              <Button
-                block
-                backgroundColor="#4c5c68"
-                style={[styles.submitButton, {width: '48%'}]}
-                onPress={() => this.swapSlide.snapToPrev()}>
-                <Icon name="arrow-back-circle-outline" color="#fff" size={28} />
-              </Button>
-              <Button
-                block
-                backgroundColor="#168aad"
+                backgroundColor="#212121"
                 style={[styles.submitButton, {width: '48%'}]}
                 onPress={() => this.swapSlide.snapToNext()}>
                 <Text style={styles.submitButtonText}>Continue</Text>
@@ -435,6 +422,32 @@ export default class LogIn extends Component {
         key: 'user',
         view: (
           <>
+            <Text style={styles.subTitle}>Enter account details</Text>
+            <View style={styles.item}>
+              <Icon
+                name="mail-open-outline"
+                color="#6c757d"
+                size={24}
+                style={styles.icon}
+              />
+              <Input
+                placeholder="Email / Username"
+                placeholderTextColor="#6c757d"
+                onChangeText={text => {
+                  if (text.trim() !== '') {
+                    this.setState({
+                      email: text,
+                      paginationData: [
+                        ...this.state.paginationData.slice(0, 2),
+                        {title: 'Account', isCompleted: true},
+                        ...this.state.paginationData.slice(3),
+                      ],
+                    });
+                  } else this.setState({email: text});
+                }}
+                style={styles.input}
+              />
+            </View>
             <View style={styles.item}>
               <Icon
                 name="person-outline"
@@ -479,7 +492,7 @@ export default class LogIn extends Component {
               </Button>
               <Button
                 block
-                backgroundColor="#168aad"
+                backgroundColor="#212121"
                 style={[styles.submitButton, {width: '48%'}]}
                 onPress={() => this.swapSlide.snapToNext()}>
                 <Text style={styles.submitButtonText}>Continue</Text>
@@ -492,6 +505,7 @@ export default class LogIn extends Component {
         key: 'password',
         view: (
           <>
+            <Text style={styles.subTitle}>Enter your password</Text>
             <View style={styles.item}>
               <Icon
                 name="lock-closed-outline"
@@ -506,11 +520,28 @@ export default class LogIn extends Component {
                 keyboardType="numeric"
                 maxLength={6}
                 value={this.state.password}
-                onChangeText={text =>
-                  this.setState({
-                    password: text.replace(/[^0-9]/g, ''),
-                  })
-                }
+                onChangeText={text => {
+                  if (
+                    text.trim() !== '' &&
+                    text === this.state.passwordConfirm
+                  ) {
+                    this.setState({
+                      password: text.replace(/[^0-9]/g, ''),
+                      paginationData: [
+                        ...this.state.paginationData.slice(0, 3),
+                        {title: 'Password', isCompleted: true},
+                      ],
+                    });
+                  } else {
+                    this.setState({
+                      password: text.replace(/[^0-9]/g, ''),
+                      paginationData: [
+                        ...this.state.paginationData.slice(0, 3),
+                        {title: 'Password', isCompleted: false},
+                      ],
+                    });
+                  }
+                }}
                 style={styles.input}
               />
             </View>
@@ -529,14 +560,42 @@ export default class LogIn extends Component {
                 maxLength={6}
                 keyboardType="numeric"
                 value={this.state.passwordConfirm}
-                onChangeText={text =>
-                  this.setState({
-                    passwordConfirm: text.replace(/[^0-9]/g, ''),
-                  })
-                }
+                onChangeText={text => {
+                  if (text.trim() !== '' && text === this.state.password) {
+                    this.setState({
+                      passwordConfirm: text.replace(/[^0-9]/g, ''),
+                      paginationData: [
+                        ...this.state.paginationData.slice(0, 3),
+                        {title: 'Password', isCompleted: true},
+                      ],
+                    });
+                  } else {
+                    this.setState({
+                      passwordConfirm: text.replace(/[^0-9]/g, ''),
+                      paginationData: [
+                        ...this.state.paginationData.slice(0, 3),
+                        {title: 'Password', isCompleted: false},
+                      ],
+                    });
+                  }
+                }}
                 style={styles.input}
               />
             </View>
+            <Text
+              style={[
+                styles.errorTxt,
+                {
+                  opacity:
+                    this.state.password.trim() !== '' &&
+                    this.state.passwordConfirm.trim() !== '' &&
+                    this.state.password !== this.state.passwordConfirm
+                      ? 1
+                      : 0,
+                },
+              ]}>
+              Password and confirm password doesn't match.
+            </Text>
             <Text style={styles.signupText}>
               By signing up, you're agree to our{' '}
               <Text
@@ -562,10 +621,27 @@ export default class LogIn extends Component {
               </Button>
               <Button
                 block
-                backgroundColor="#06d6a0"
+                backgroundColor="#0466c8"
                 style={[styles.submitButton, {width: '48%'}]}
                 onPress={() => this.submit()}>
-                <Text style={styles.submitButtonText}>Submit</Text>
+                {this.state.buttonLoading ? (
+                  <View style={{height: 99, width: 99}}>
+                    <LottieView
+                      source={require('../json/dotLoading.json')}
+                      autoPlay
+                    />
+                  </View>
+                ) : this.state.success === true ? (
+                  <View style={{height: 99, width: 99}}>
+                    <LottieView
+                      speed={2.5}
+                      source={require('../json/success.json')}
+                      autoPlay
+                    />
+                  </View>
+                ) : (
+                  <Text style={styles.submitButtonText}>Submit</Text>
+                )}
               </Button>
             </View>
           </>
@@ -574,68 +650,111 @@ export default class LogIn extends Component {
     ];
 
     return (
-      <Container style={styles.container}>
-        <Content>
-          {this.state.loading == false ? (
-            <View>
-              <View style={styles.logoView}>
-                <LottieView
-                  source={require('../json/collab.json')}
-                  autoPlay
-                  loop
-                />
-              </View>
-              <Card transparent>
-                <CardItem style={styles.carditem}>
-                  <Content>
-                    <Text style={styles.title}>Sign up</Text>
-                    <Carousel
-                      scrollEnabled={false}
-                      ref={value => (this.swapSlide = value)}
-                      data={dataCarousel}
-                      renderItem={({item}) => item.view}
-                      sliderWidth={width - 68}
-                      itemWidth={width - 68}
-                    />
-                  </Content>
-                </CardItem>
-
-                <CardItem footer style={styles.buttonGroup}>
-                  <View style={styles.cardFooter}>
-                    <TouchableOpacity
-                      onPress={() => this.props.navigation.goBack()}
-                      style={styles.cancel}>
-                      <Text style={styles.cancelText}>CANCEL</Text>
-                    </TouchableOpacity>
-                  </View>
-                </CardItem>
-              </Card>
+      <View style={styles.container}>
+        <View
+          style={{
+            width: '100%',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            paddingVertical: 28,
+            paddingHorizontal: 10,
+          }}>
+          <Text style={styles.title}>Sign up</Text>
+          <TouchableOpacity onPress={() => this.props.navigation.goBack()}>
+            <Icon name="close-outline" color="#01161e" size={36} />
+          </TouchableOpacity>
+        </View>
+        <View style={styles.pagination}>
+          {this.state.paginationData.map((item, index) => (
+            <TouchableOpacity
+              activeOpacity={0.79}
+              key={`pagination ${index}`}
+              onPress={() => this.swapSlide.snapToItem(index)}
+              style={{width: '22%', marginBottom: 36}}>
+              <Text
+                style={[
+                  styles.progressTitle,
+                  {
+                    color:
+                      index === this.state.currentIndex
+                        ? '#1db25b'
+                        : item.isCompleted
+                        ? '#686868'
+                        : '#cacaca',
+                  },
+                ]}>
+                {item.title}
+              </Text>
+              <View
+                style={[
+                  styles.progressBar,
+                  {
+                    backgroundColor:
+                      index === this.state.currentIndex || item.isCompleted
+                        ? '#1db25b'
+                        : '#cacaca',
+                  },
+                ]}></View>
+            </TouchableOpacity>
+          ))}
+        </View>
+        {this.state.loading == false ? (
+          <View style={styles.carditem}>
+            <Carousel
+              ref={value => (this.swapSlide = value)}
+              data={dataCarousel}
+              renderItem={({item}) => item.view}
+              sliderWidth={width - 68}
+              itemWidth={width - 68}
+              onSnapToItem={index => this.setState({currentIndex: index})}
+            />
+            <Text style={styles.signupText}>
+              Joined us before?{'  '}
+              <Text
+                style={[
+                  styles.signupText,
+                  {
+                    color: '#184e77',
+                    fontFamily: 'Montserrat-Bold',
+                  },
+                ]}
+                onPress={() => this.props.navigation.goBack()}>
+                Login
+              </Text>
+            </Text>
+          </View>
+        ) : (
+          <View
+            style={{
+              width: '100%',
+              justifyContent: 'center',
+            }}>
+            <View style={{height: 111}}>
+              <LottieView
+                source={require('../json/loading.json')}
+                autoPlay
+                loop
+              />
             </View>
-          ) : (
-            <View
-              style={{
-                height: height,
-                width: '100%',
-                justifyContent: 'center',
-              }}>
-              <View style={{height: 111}}>
-                <LottieView
-                  source={require('../json/loading.json')}
-                  autoPlay
-                  loop
-                />
-              </View>
-            </View>
-          )}
-        </Content>
-      </Container>
+          </View>
+        )}
+      </View>
     );
   }
 }
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#fff',
+    backgroundColor: '#f2f2f2',
+    flex: 1,
+  },
+  pagination: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 10,
   },
   cardFooter: {
     flex: 1,
@@ -650,7 +769,10 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'column',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
+    borderTopLeftRadius: 36,
+    borderTopRightRadius: 36,
+    paddingVertical: 24,
   },
   input: {
     fontSize: 14,
@@ -673,10 +795,9 @@ const styles = StyleSheet.create({
     marginRight: 19,
   },
   title: {
-    fontFamily: 'Montserrat-Bold',
-    color: '#212529',
-    marginBottom: 24,
-    fontSize: 30,
+    fontFamily: 'Montserrat-SemiBold',
+    color: '#01161e',
+    fontSize: 28,
     letterSpacing: -1,
   },
 
@@ -700,7 +821,7 @@ const styles = StyleSheet.create({
     textTransform: 'capitalize',
   },
   cancelText: {
-    color: 'white',
+    color: '#000',
     fontSize: 16,
     fontFamily: 'Montserrat-Bold',
   },
@@ -724,5 +845,37 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: 'Montserrat-SemiBold',
     color: '#0065ff',
+  },
+  progressBar: {
+    backgroundColor: '#cacaca',
+    height: 3,
+    width: '100%',
+    borderRadius: 24,
+  },
+  progressTitle: {
+    fontFamily: 'Montserrat-Bold',
+    fontSize: 12,
+    marginBottom: 9,
+    textAlign: 'center',
+    color: '#cacaca',
+  },
+  errorTxt: {
+    color: '#e71d36',
+    fontFamily: 'Montserrat-SemiBold',
+    fontSize: 11,
+    marginVertical: 9,
+  },
+  subTitle: {
+    fontFamily: 'Montserrat-SemiBold',
+    fontSize: 16,
+    color: '#000814',
+    marginTop: 9,
+    marginBottom: 19,
+    textTransform: 'capitalize',
+  },
+  signupText: {
+    color: '#6c757d',
+    fontSize: 14,
+    fontFamily: 'Montserrat-Medium',
   },
 });

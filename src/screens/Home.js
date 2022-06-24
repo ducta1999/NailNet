@@ -22,6 +22,11 @@ import {
 } from 'native-base';
 // import {TouchableOpacity} from 'react-native-gesture-handler';
 import * as authentication from '../services/Authentication';
+import {createAppContainer} from 'react-navigation';
+import {
+  getAnimatingBottomBar,
+  AnimationType,
+} from 'react-native-animating-bottom-tab-bar';
 
 export default class Home extends Component {
   constructor(props) {
@@ -98,100 +103,152 @@ export default class Home extends Component {
   }
 
   render() {
+    const BottomBarStack = getAnimatingBottomBar({
+      type: AnimationType.SvgBottomBar,
+      navigationScreens: {
+        ['Home']: () => (
+          <>
+            <Header transparent style={{marginTop: 18}}>
+              <View
+                style={{
+                  flex: 1,
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  marginTop: 8,
+                }}>
+                <View style={{marginLeft: 9}}>
+                  <TouchableOpacity onPress={() => this.onpenDrawer()}>
+                    <Thumbnail
+                      small
+                      source={require('../icons/menu.png')}
+                      style={styles.thumbnail}
+                    />
+                  </TouchableOpacity>
+                </View>
+                <View
+                  style={{
+                    backgroundColor: 'rgba(102, 155, 188, 0.2)',
+                    width: 48,
+                    height: 48,
+                    borderRadius: 24,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    marginRight: 9,
+                  }}>
+                  <Thumbnail
+                    small
+                    square
+                    source={require('../icons/customer-service.png')}
+                    style={styles.thumbnail}
+                  />
+                </View>
+              </View>
+            </Header>
+            <Content>
+              <FlatList
+                data={this.state.GridListItems}
+                renderItem={this.renderItem}
+                numColumns={2}
+              />
+            </Content>
+          </>
+        ),
+        ['Shop']: () => <></>,
+        ['Chat']: () => <></>,
+        ['Profile']: () => <></>,
+      },
+      navigationParameter: [
+        {
+          label: 'Home',
+          routeName: 'Home',
+          icons: {
+            unselected: require('../icons/home.png'),
+            selected: require('../icons/homeSelected.png'),
+          },
+          inactiveTextStyle: styles.text,
+          activeTextStyle: styles.text,
+        },
+        {
+          label: 'Shop',
+          routeName: 'Shop',
+          icons: {
+            unselected: require('../icons/shop.png'),
+            selected: require('../icons/shopSelected.png'),
+          },
+          inactiveTextStyle: styles.text,
+          activeTextStyle: styles.text,
+        },
+        {
+          label: 'Chat',
+          routeName: 'Chat',
+          icons: {
+            unselected: require('../icons/message.png'),
+            selected: require('../icons/messageSelected.png'),
+          },
+          inactiveTextStyle: styles.text,
+          activeTextStyle: styles.text,
+        },
+        {
+          label: 'Profile',
+          routeName: 'Profile',
+          icons: {
+            unselected: require('../icons/profile.png'),
+            selected: require('../icons/profileSelected.png'),
+          },
+          inactiveTextStyle: styles.text,
+          activeTextStyle: styles.text,
+        },
+      ],
+      configData: {
+        bottomBarConfig: {
+          backgroundColor: '#fff',
+          // height: 79,
+          // curveDepth: 36,
+          // curveWidth: 99,
+        },
+      },
+    });
+
+    const AppContainer = createAppContainer(BottomBarStack);
+
     return (
       <Container style={styles.container}>
-        <Header transparent style={{marginTop: 18}}>
-          <View
-            style={{
-              flex: 1,
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              marginTop: 8,
-            }}>
-            <View style={{marginLeft: 9}}>
-              <TouchableOpacity onPress={() => this.onpenDrawer()}>
-                <Thumbnail
-                  small
-                  source={require('../icons/menu.png')}
-                  style={styles.thumbnail}
-                />
-              </TouchableOpacity>
-            </View>
-            <View
-              style={{
-                backgroundColor: 'rgba(102, 155, 188, 0.2)',
-                width: 48,
-                height: 48,
-                borderRadius: 24,
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginRight: 9,
-              }}>
-              <Thumbnail
-                small
-                square
-                source={require('../icons/customer-service.png')}
-                style={styles.thumbnail}
-              />
-            </View>
-          </View>
-        </Header>
-        <Content>
-          <FlatList
-            data={this.state.GridListItems}
-            renderItem={this.renderItem}
-            numColumns={2}
-            style={styles.flatlist}
-          />
-        </Content>
+        <AppContainer />
       </Container>
     );
   }
 
   renderItem = ({item}) => {
-    if (item.name != 'final') {
-      return (
-        <View
-          style={styles.GridViewContainer}
+    return (
+      <View
+        style={styles.GridViewContainer}
+        onPress={() => this.navigateTo(item.screenName)}>
+        <TouchableOpacity
+          style={{justifyContent: 'center', alignItems: 'center'}}
           onPress={() => this.navigateTo(item.screenName)}>
-          <TouchableOpacity
-            style={{justifyContent: 'center', alignItems: 'center'}}
-            onPress={() => this.navigateTo(item.screenName)}>
-            {/* <Text style={styles.GridViewTextLayoutName}>{item.name}</Text> */}
+          {/* <Text style={styles.GridViewTextLayoutName}>{item.name}</Text> */}
 
-            <ImageBackground
-              source={require('../icons/button_bg.png')}
-              style={{
-                width: 68,
-                height: 68,
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-              imageStyle={{borderRadius: 34}}>
-              <Thumbnail
-                small
-                square
-                source={item.uri}
-                style={{width: 39, height: 39}}
-              />
-            </ImageBackground>
+          <View
+            style={{
+              width: 90,
+              height: 90,
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: 45,
+              backgroundColor: 'white',
+            }}>
+            <Thumbnail
+              small
+              square
+              source={item.uri}
+              style={{width: 39, height: 39}}
+            />
+          </View>
 
-            <Text style={styles.GridViewTextLayoutDescription}>
-              {item.name}
-            </Text>
-            <Text
-              style={[
-                styles.GridViewTextLayoutDescription,
-                {fontFamily: 'Montserrat-Medium', fontSize: 11},
-              ]}>
-              {item.description}
-            </Text>
-          </TouchableOpacity>
-        </View>
-      );
-    } else if (item.name == 'final') {
-      return <View style={styles.GridFinalViewContainer} />;
-    }
+          <Text style={styles.GridViewTextLayoutDescription}>{item.name}</Text>
+        </TouchableOpacity>
+      </View>
+    );
   };
 
   onpenDrawer() {
@@ -207,21 +264,13 @@ export default class Home extends Component {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#001d3d',
+    backgroundColor: '#dee5e7b3',
   },
-  GridFinalViewContainer: {
-    flex: 1,
+  GridViewContainer: {
     justifyContent: 'center',
     alignItems: 'center',
     height: 168,
-    width: 50,
-    margin: 16,
-    //backgroundColor: "#47BFB3"
-    backgroundColor: 'rgba(0, 53, 102, 0.68)',
-    borderRadius: 24,
-    borderRightWidth: 3.9,
-    borderBottomWidth: 3.9,
-    borderColor: 'rgba(0, 29, 61, 0.79)',
+    width: '48%',
   },
   GridViewTextLayoutName: {
     fontSize: 30,
@@ -232,28 +281,10 @@ const styles = StyleSheet.create({
   GridViewTextLayoutDescription: {
     fontSize: 12,
     justifyContent: 'center',
-    color: '#fff',
+    color: '#555b6e',
     fontFamily: 'Montserrat-SemiBold',
     textAlign: 'center',
     marginTop: 9,
-  },
-  GridViewContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: 168,
-    width: 50,
-    margin: 16,
-    //backgroundColor: "#47BFB3"
-    backgroundColor: 'rgba(0, 53, 102, 0.79)',
-    borderRadius: 24,
-    borderRightWidth: 3.9,
-    borderBottomWidth: 3.9,
-    borderColor: 'rgba(0, 80, 157, 0.79)',
-  },
-  flatlist: {
-    marginTop: 20,
-    marginLeft: 5,
   },
   title: {
     color: '#47BFB3',
@@ -264,9 +295,13 @@ const styles = StyleSheet.create({
   },
   //icon: { fontSize: 40 },
   thumbnail: {
-    width: 25,
+    width: 36,
     // height: 25,
     marginTop: 5,
     borderRadius: 0,
+  },
+  text: {
+    color: '#5e60ce',
+    fontSize: 12,
   },
 });
