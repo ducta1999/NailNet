@@ -34,6 +34,7 @@ import * as toastService from '../../services/ToastService';
 import * as authentication from '../../services/Authentication';
 import Carousel from 'react-native-snap-carousel';
 import MultiSelect from '../Components/MultiSelect';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 export default class AddQuestionPublic extends Component {
   constructor(props) {
@@ -223,11 +224,7 @@ export default class AddQuestionPublic extends Component {
             }}>
             <View>
               <TouchableOpacity onPress={() => this.goTabBack()}>
-                <Thumbnail
-                  large
-                  source={require('../../icons/left_arrow_black.png')}
-                  style={styles.thumbnail}
-                />
+                <Icon name="arrow-back-outline" color="#212529" size={28} />
               </TouchableOpacity>
             </View>
 

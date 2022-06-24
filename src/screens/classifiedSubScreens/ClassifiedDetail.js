@@ -1,9 +1,11 @@
-import * as authentication from "../../services/Authentication";
-import * as dataService from "../../services/DataService";
-import * as constant from "../../services/Constant";
-import React, { Component } from "react";
-import { StyleSheet, TouchableOpacity, Linking } from "react-native";
-import Slideshow from "react-native-image-slider-show";
+import * as authentication from '../../services/Authentication';
+import * as dataService from '../../services/DataService';
+import * as constant from '../../services/Constant';
+import React, {Component} from 'react';
+import {StyleSheet, TouchableOpacity, Linking} from 'react-native';
+import Slideshow from 'react-native-image-slider-show';
+import Ionicon from 'react-native-vector-icons/Ionicons';
+
 import {
   Container,
   Content,
@@ -27,8 +29,8 @@ import {
   Spinner,
   Tabs,
   Tab,
-  TabHeading
-} from "native-base";
+  TabHeading,
+} from 'native-base';
 
 export default class ClassifiedDetail extends Component {
   constructor(props) {
@@ -41,7 +43,7 @@ export default class ClassifiedDetail extends Component {
       email: [],
       user: [],
       category: [],
-      dataSource: []
+      dataSource: [],
     };
 
     if (props.navigation.state.params && props.navigation.state.params.id) {
@@ -55,7 +57,7 @@ export default class ClassifiedDetail extends Component {
     var email = user.email;
 
     var classified = await dataService.get(
-      "api/classifieds/getclassified/" + id
+      'api/classifieds/getclassified/' + id,
     );
 
     var dataSource = [];
@@ -63,18 +65,18 @@ export default class ClassifiedDetail extends Component {
       dataSource.push({
         url:
           constant.BASE_URL +
-          "api/classifiedimages/getimage/" +
-          classified.pictures[i].id
+          'api/classifiedimages/getimage/' +
+          classified.pictures[i].id,
       });
     }
     if (classified.pictures.length == 0) {
       dataSource.push({
-        url: "http://www.daotao-vaas.org.vn/Images/noimage.gif"
+        url: 'http://www.daotao-vaas.org.vn/Images/noimage.gif',
       });
     }
 
     var category = await dataService.get(
-      "api/classifiedcategories/getclassifiedcategory/" + classified.categoryID
+      'api/classifiedcategories/getclassifiedcategory/' + classified.categoryID,
     );
 
     this.setState({
@@ -83,20 +85,13 @@ export default class ClassifiedDetail extends Component {
       email: email,
       user: user,
       category: category,
-      dataSource: dataSource
+      dataSource: dataSource,
     });
   }
 
   render() {
-    const {
-      loading,
-      classified,
-      id,
-      email,
-      user,
-      category,
-      dataSource
-    } = this.state;
+    const {loading, classified, id, email, user, category, dataSource} =
+      this.state;
 
     return (
       <Container style={styles.container}>
@@ -104,18 +99,13 @@ export default class ClassifiedDetail extends Component {
           <View
             style={{
               flex: 1,
-              flexDirection: "row",
-              justifyContent: "space-between",
-              marginTop: 8
-            }}
-          >
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              marginTop: 8,
+            }}>
             <View>
               <TouchableOpacity onPress={() => this.props.navigation.goBack()}>
-                <Thumbnail
-                  small
-                  source={require("../../icons/left_arrow.png")}
-                  style={styles.thumbnail}
-                />
+                <Ionicon name="arrow-back-outline" color="#fff" size={28} />
               </TouchableOpacity>
             </View>
             <View>
@@ -127,7 +117,7 @@ export default class ClassifiedDetail extends Component {
         {loading == false ? (
           <Content>
             <Slideshow dataSource={dataSource} />
-            <Card style={{ flex: 0, marginTop: 5 }} transparent>
+            <Card style={{flex: 0, marginTop: 5}} transparent>
               {/* <CardItem style={styles.carditem}>
                 <Body />
               </CardItem> */}
@@ -153,18 +143,18 @@ export default class ClassifiedDetail extends Component {
                 <Left>
                   <Thumbnail
                     //source={require("../../icons/Avatar.png")}
-                    defaultSource={{ uri: "avatar" }}
+                    defaultSource={{uri: 'avatar'}}
                     source={{
                       uri:
                         constant.BASE_URL +
-                        "api/avatars/getimage/" +
+                        'api/avatars/getimage/' +
                         classified.createByEmail +
-                        "?random_number=" +
-                        new Date().getTime()
+                        '?random_number=' +
+                        new Date().getTime(),
                     }}
                   />
                 </Left>
-                <Body style={{ marginLeft: -100 }}>
+                <Body style={{marginLeft: -100}}>
                   <Text style={styles.normal}>Email:{classified.email}</Text>
                   <Text style={styles.normal}>Phone:{classified.phone}</Text>
                 </Body>
@@ -181,7 +171,7 @@ export default class ClassifiedDetail extends Component {
                   </Text>
                 </Body>
               </CardItem>
-              <CardItem style={{ height: 60, backgroundColor: "#1F2426" }} />
+              <CardItem style={{height: 60, backgroundColor: '#1F2426'}} />
             </Card>
           </Content>
         ) : (
@@ -189,11 +179,10 @@ export default class ClassifiedDetail extends Component {
             <Spinner color="red" />
             <Text
               style={{
-                textAlign: "center",
-                color: "white",
-                fontWeight: "bold"
-              }}
-            >
+                textAlign: 'center',
+                color: 'white',
+                fontWeight: 'bold',
+              }}>
               Loading
             </Text>
           </View>
@@ -203,9 +192,9 @@ export default class ClassifiedDetail extends Component {
           transparent
           tabBarUnderlineStyle={styles.tabUnderLine}
           style={{
-            position: "absolute",
+            position: 'absolute',
             bottom: 0,
-            height: 60
+            height: 60,
           }}
           initialPage={5}
           tabBarPosition="bottom"
@@ -215,14 +204,12 @@ export default class ClassifiedDetail extends Component {
             heading={
               <TabHeading
                 style={styles.tabHeading}
-                onPress={() => Linking.openURL(`tel:${classified.phone}`)}
-              >
+                onPress={() => Linking.openURL(`tel:${classified.phone}`)}>
                 <TouchableOpacity
                   onPress={() => Linking.openURL(`tel:${classified.phone}`)}
-                  style={{ flexDirection: "row" }}
-                >
+                  style={{flexDirection: 'row'}}>
                   <Icon name="call" color="white" />
-                  <Text style={{ color: "white" }}>Call</Text>
+                  <Text style={{color: 'white'}}>Call</Text>
                 </TouchableOpacity>
               </TabHeading>
             }
@@ -233,10 +220,9 @@ export default class ClassifiedDetail extends Component {
               <TabHeading style={styles.tabHeading}>
                 <TouchableOpacity
                   onPress={() => Linking.openURL(`sms:${classified.phone}`)}
-                  style={{ flexDirection: "row" }}
-                >
+                  style={{flexDirection: 'row'}}>
                   <Icon name="send" color="white" />
-                  <Text style={{ color: "white" }}>SMS</Text>
+                  <Text style={{color: 'white'}}>SMS</Text>
                 </TouchableOpacity>
               </TabHeading>
             }
@@ -247,15 +233,14 @@ export default class ClassifiedDetail extends Component {
               <TabHeading style={styles.tabHeading}>
                 <TouchableOpacity
                   onPress={() =>
-                    this.props.navigation.navigate("Chat", {
+                    this.props.navigation.navigate('Chat', {
                       senderEmail: email,
-                      receiverEmail: classified.createByEmail
+                      receiverEmail: classified.createByEmail,
                     })
                   }
-                  style={{ flexDirection: "row" }}
-                >
+                  style={{flexDirection: 'row'}}>
                   <Icon name="chatboxes" />
-                  <Text style={{ color: "white" }}>Chat</Text>
+                  <Text style={{color: 'white'}}>Chat</Text>
                 </TouchableOpacity>
               </TabHeading>
             }
@@ -269,47 +254,47 @@ export default class ClassifiedDetail extends Component {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#1F2426"
+    backgroundColor: '#1F2426',
   },
   carditem: {
-    backgroundColor: "#1F2426"
+    backgroundColor: '#1F2426',
   },
   headerBodyText: {
-    justifyContent: "center",
+    justifyContent: 'center',
     //left: 30,
     fontSize: 20,
     marginTop: 5,
-    color: "#47BFB3"
+    color: '#47BFB3',
   },
   tabUnderLine: {
-    display: "none",
-    backgroundColor: "#D94526"
+    display: 'none',
+    backgroundColor: '#D94526',
   },
   tabHeading: {
-    backgroundColor: "#D94526"
+    backgroundColor: '#D94526',
     // borderBottomWidth: 1,
     // borderBottomColor: "white"
   },
   tabs: {
-    backgroundColor: "#D94526",
-    borderWidth: 0
+    backgroundColor: '#D94526',
+    borderWidth: 0,
   },
   title: {
-    color: "#D94526",
+    color: '#D94526',
     fontSize: 30,
-    fontWeight: "bold"
+    fontWeight: 'bold',
   },
   discount: {
-    color: "red",
-    fontSize: 15
+    color: 'red',
+    fontSize: 15,
   },
   normal: {
-    color: "white",
-    fontSize: 15
+    color: 'white',
+    fontSize: 15,
   },
   thumbnail: {
     width: 25,
     height: 25,
-    marginTop: 5
-  }
+    marginTop: 5,
+  },
 });

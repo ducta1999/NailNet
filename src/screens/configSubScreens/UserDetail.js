@@ -17,6 +17,7 @@ import {
   Form,
 } from 'native-base';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import Ionicon from 'react-native-vector-icons/Ionicons';
 // import { TouchableOpacity } from "react-native-gesture-handler";
 import * as dataService from '../../services/DataService';
 import * as toastService from '../../services/ToastService';
@@ -111,11 +112,7 @@ export default class UserDetail extends Component {
             }}>
             <View>
               <TouchableOpacity onPress={() => this.props.navigation.goBack()}>
-                <Thumbnail
-                  small
-                  source={require('../../icons/left_arrow.png')}
-                  style={styles.thumbnail}
-                />
+                <Ionicon name="arrow-back-outline" color="#fff" size={28} />
               </TouchableOpacity>
             </View>
             <View>

@@ -24,7 +24,6 @@ import * as dataSetvice from '../services/DataService';
 import * as toastService from '../services/ToastService';
 import Icon from 'react-native-vector-icons/Ionicons';
 import * as tinh_tp from '../json/tinh_tp.json';
-import SectionedMultiSelect from 'react-native-sectioned-multi-select';
 import LottieView from 'lottie-react-native';
 import MultiSelect from './Components/MultiSelect';
 import Carousel, {Pagination} from 'react-native-snap-carousel';

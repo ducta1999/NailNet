@@ -1,5 +1,5 @@
-import React, { Component } from "react";
-import { StyleSheet, TouchableOpacity, Image, ScrollView } from "react-native";
+import React, {Component} from 'react';
+import {StyleSheet, TouchableOpacity, Image, ScrollView} from 'react-native';
 import {
   Container,
   Content,
@@ -15,24 +15,26 @@ import {
   Header,
   Label,
   Spinner,
-  Textarea
-} from "native-base";
-import * as dataService from "../../services/DataService";
-import * as toastService from "../../services/ToastService";
-import * as authentication from "../../services/Authentication";
-import SectionedMultiSelect from "react-native-sectioned-multi-select";
-import Icon from "react-native-vector-icons/FontAwesome";
-import ImagePicker from "react-native-image-crop-picker";
+  Textarea,
+} from 'native-base';
+import * as dataService from '../../services/DataService';
+import * as toastService from '../../services/ToastService';
+import * as authentication from '../../services/Authentication';
+import SectionedMultiSelect from 'react-native-sectioned-multi-select';
+import MultiSelect from '../Components/MultiSelect';
+
+import Icon from 'react-native-vector-icons/Ionicons';
+import ImagePicker from 'react-native-image-crop-picker';
 
 export default class AddClassified extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      title: "",
-      address: "",
-      phone: "",
-      email: "",
-      description: "",
+      title: '',
+      address: '',
+      phone: '',
+      email: '',
+      description: '',
       price: 0,
       discount: 0,
       categories: [],
@@ -41,57 +43,57 @@ export default class AddClassified extends Component {
       avatarSource: [],
       buttonLoading: false,
       options: {
-        title: "Select Avatar",
+        title: 'Select Avatar',
         storageOptions: {
           skipBackup: true,
-          path: "images"
-        }
-      }
+          path: 'images',
+        },
+      },
     };
   }
 
   async componentDidMount() {
     var mainCategoriesInDB = await dataService.get(
-      "api/classifiedcategories/getallmain"
+      'api/classifiedcategories/getallmain',
     );
 
     var item = [];
 
     for (var i = mainCategoriesInDB.items.length - 1; i >= 0; i--) {
       var subCategory = await dataService.get(
-        "api/classifiedcategories/getall?parentid=" +
-          mainCategoriesInDB.items[i].id
+        'api/classifiedcategories/getall?parentid=' +
+          mainCategoriesInDB.items[i].id,
       );
 
       var children = [];
       for (var j = 0; j < subCategory.items.length; j++) {
         children.push({
           name: subCategory.items[j].description,
-          id: subCategory.items[j].id
+          id: subCategory.items[j].id,
         });
       }
 
       item.push({
         name: mainCategoriesInDB.items[i].description,
         id: mainCategoriesInDB.items[i].id,
-        children: children
+        children: children,
       });
     }
 
-    this.setState({ loading: false, categories: item });
+    this.setState({loading: false, categories: item});
   }
 
   async showImagePicker(options) {
     if (this.state.avatarSource && this.state.avatarSource.length >= 5) {
-      toastService.error("Error: " + "You only can add 5 image");
+      toastService.error('Error: ' + 'You only can add 5 image');
       return;
     }
     ImagePicker.openPicker({
       multiple: true,
-      includeBase64: true
+      includeBase64: true,
     }).then(images => {
       if (images.length > 5) {
-        toastService.error("Error: " + "You only can add 5 image");
+        toastService.error('Error: ' + 'You only can add 5 image');
         images = images.slice(0, 5);
         //  console.log(images);
       }
@@ -103,20 +105,20 @@ export default class AddClassified extends Component {
           base64: images[i].data,
           mime: images[i].mime,
           extension:
-            images[i].mime == null ? "png" : images[i].mime.split("/")[1]
+            images[i].mime == null ? 'png' : images[i].mime.split('/')[1],
         };
         imageSources.push(image);
       }
 
       this.setState({
-        avatarSource: imageSources
+        avatarSource: imageSources,
       });
     });
   }
 
   async submit() {
     var user = await authentication.getLoggedInUser();
-    this.setState({ buttonLoading: true });
+    this.setState({buttonLoading: true});
 
     const {
       selectedCategory,
@@ -127,18 +129,18 @@ export default class AddClassified extends Component {
       email,
       description,
       price,
-      discount
+      discount,
     } = this.state;
 
     if (
-      title.trim() == "" ||
-      address.trim() == "" ||
-      description.trim() == "" ||
-      email.trim() == "" ||
-      phone.trim() == "" ||
+      title.trim() == '' ||
+      address.trim() == '' ||
+      description.trim() == '' ||
+      email.trim() == '' ||
+      phone.trim() == '' ||
       selectedCategory.length == 0
     ) {
-      toastService.error("Error: " + "Input cannot be empty!");
+      toastService.error('Error: ' + 'Input cannot be empty!');
     } else {
       var data = {
         createByEmail: user.email,
@@ -149,41 +151,41 @@ export default class AddClassified extends Component {
         discount: discount,
         categoryID: selectedCategory[0],
         email: email,
-        phone: phone
+        phone: phone,
       };
 
-      var result = await dataService.post("api/classifieds/add", data);
+      var result = await dataService.post('api/classifieds/add', data);
 
       if (result.status === 200) {
         for (var i = 0; i < avatarSource.length; i++) {
           var image = avatarSource[i];
           var data = {
             classiFiedID: result.data.id,
-            createByEmail: user.email
+            createByEmail: user.email,
           };
 
           var classifiedimage = await dataService.post(
-            "api/classifiedimages/add",
-            data
+            'api/classifiedimages/add',
+            data,
           );
 
           dataService.post(
-            "api/classifiedimages/upload/" + classifiedimage.data.id,
+            'api/classifiedimages/upload/' + classifiedimage.data.id,
             {
-              extension: "." + image.extension,
-              base64: image.base64
-            }
+              extension: '.' + image.extension,
+              base64: image.base64,
+            },
           );
         }
-        toastService.success("Add classified successfully!");
+        toastService.success('Add classified successfully!');
       } else {
-        toastService.error("Error: " + result.data);
+        toastService.error('Error: ' + result.data);
       }
 
       this.props.navigation.goBack();
     }
 
-    this.setState({ buttonLoading: false });
+    this.setState({buttonLoading: false});
   }
 
   render() {
@@ -200,7 +202,7 @@ export default class AddClassified extends Component {
       options,
       buttonLoading,
       phone,
-      email
+      email,
     } = this.state;
     return (
       <Container style={styles.container}>
@@ -208,18 +210,13 @@ export default class AddClassified extends Component {
           <View
             style={{
               flex: 1,
-              flexDirection: "row",
-              justifyContent: "space-between",
-              marginTop: 8
-            }}
-          >
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              marginTop: 8,
+            }}>
             <View>
               <TouchableOpacity onPress={() => this.props.navigation.goBack()}>
-                <Thumbnail
-                  small
-                  source={require("../../icons/left_arrow.png")}
-                  style={styles.thumbnail}
-                />
+                <Icon name="arrow-back-outline" color="#fff" size={28} />
               </TouchableOpacity>
             </View>
             <View>
@@ -241,8 +238,7 @@ export default class AddClassified extends Component {
                       <Button
                         block
                         backgroundColor="#D94526"
-                        onPress={() => this.showImagePicker(options)}
-                      >
+                        onPress={() => this.showImagePicker(options)}>
                         <Text>Add image</Text>
                       </Button>
 
@@ -251,20 +247,19 @@ export default class AddClassified extends Component {
                           horizontal={true}
                           style={{
                             flex: 1,
-                            flexDirection: "row",
-                            marginTop: 10
-                          }}
-                        >
+                            flexDirection: 'row',
+                            marginTop: 10,
+                          }}>
                           {avatarSource.map((item, i) => (
                             <Image
                               //source={item.source}
                               source={{
-                                uri: `data:${item.mime};base64,${item.base64}`
+                                uri: `data:${item.mime};base64,${item.base64}`,
                               }}
                               style={{
                                 width: 100,
                                 height: 100,
-                                resizeMode: "contain"
+                                resizeMode: 'contain',
                               }}
                             />
                           ))}
@@ -277,7 +272,7 @@ export default class AddClassified extends Component {
                       <Input
                         placeholder="Please enter title..."
                         placeholderTextColor="#848484"
-                        onChangeText={text => this.setState({ title: text })}
+                        onChangeText={text => this.setState({title: text})}
                         value={title}
                         style={styles.input}
                       />
@@ -286,51 +281,26 @@ export default class AddClassified extends Component {
                     <View
                       style={{
                         marginLeft: 14,
-                        marginTop: 10
-                      }}
-                    >
+                        marginTop: 10,
+                      }}>
                       <View>
                         <Label style={styles.label}>Category</Label>
                       </View>
                       <View
                         style={{
                           marginLeft: 60,
-                          justifyContent: "center",
-                          marginTop: -43
-                        }}
-                      >
+                          justifyContent: 'center',
+                          marginTop: -43,
+                        }}>
                         {this.state.loading == false && (
-                          <SectionedMultiSelect
+                          <MultiSelect
+                            backgroundColor="#0065ff"
                             items={this.state.categories}
-                            uniqueKey="id"
-                            subKey="children"
-                            expandDropDowns={true}
-                            selectText="Choose Category..."
-                            showDropDowns={true}
-                            readOnlyHeadings={true}
-                            onSelectedItemsChange={value =>
-                              this.setState({ selectedCategory: value })
-                            }
-                            selectedItems={selectedCategory}
-                            single={true}
-                            selectToggleIconComponent={
-                              <Icon
-                                name="caret-down"
-                                color="#D94526"
-                                size={30}
-                                style={styles.caretIcon}
-                              />
-                            }
-                            searchIconComponent={
-                              <Icon
-                                name="search"
-                                color="#D94526"
-                                size={15}
-                                style={{ marginLeft: 15 }}
-                              />
-                            }
-                            colors={color}
-                            styles={multiSelectStyles}
+                            placeHolder="Choose category"
+                            selectedItems={this.state.selectedCategory}
+                            setSelectedItems={value => {
+                              this.setState({selectedCategory: value});
+                            }}
                           />
                         )}
                       </View>
@@ -341,7 +311,7 @@ export default class AddClassified extends Component {
                       <Input
                         placeholder="Please enter address.."
                         placeholderTextColor="#848484"
-                        onChangeText={text => this.setState({ address: text })}
+                        onChangeText={text => this.setState({address: text})}
                         value={address}
                         style={styles.input}
                       />
@@ -352,7 +322,7 @@ export default class AddClassified extends Component {
                       <Input
                         placeholder="Please enter email.."
                         placeholderTextColor="#848484"
-                        onChangeText={text => this.setState({ email: text })}
+                        onChangeText={text => this.setState({email: text})}
                         value={email}
                         style={styles.input}
                       />
@@ -363,7 +333,7 @@ export default class AddClassified extends Component {
                       <Input
                         placeholder="Please enter phone.."
                         placeholderTextColor="#848484"
-                        onChangeText={text => this.setState({ phone: text })}
+                        onChangeText={text => this.setState({phone: text})}
                         value={phone}
                         style={styles.input}
                       />
@@ -376,7 +346,7 @@ export default class AddClassified extends Component {
                         placeholderTextColor="#848484"
                         keyboardType="numeric"
                         onChangeText={
-                          text => this.setState({ price: parseFloat(text) })
+                          text => this.setState({price: parseFloat(text)})
                           //   this.setState({
                           //     price:
                           //       text.replace(/\D/, "") == ""
@@ -395,7 +365,7 @@ export default class AddClassified extends Component {
                         placeholderTextColor="#848484"
                         keyboardType="numeric"
                         onChangeText={
-                          text => this.setState({ discount: parseFloat(text) })
+                          text => this.setState({discount: parseFloat(text)})
                           //   this.setState({
                           //     price:
                           //       text.replace(/\D/, "") == ""
@@ -416,7 +386,7 @@ export default class AddClassified extends Component {
                         rowSpan={5}
                         //bordered
                         onChangeText={text =>
-                          this.setState({ description: text })
+                          this.setState({description: text})
                         }
                         value={description}
                         style={styles.textArea}
@@ -430,16 +400,14 @@ export default class AddClassified extends Component {
                 <View style={styles.cardFooter}>
                   <TouchableOpacity
                     onPress={() => this.props.navigation.goBack()}
-                    style={styles.cancel}
-                  >
+                    style={styles.cancel}>
                     <Text style={styles.cancelText}>CANCEL</Text>
                   </TouchableOpacity>
 
                   <Button
                     backgroundColor="#47BFB3"
                     style={styles.submitButton}
-                    onPress={() => this.submit()}
-                  >
+                    onPress={() => this.submit()}>
                     {buttonLoading == true && <Spinner color="green" />}
                     <Text style={styles.submitButtonText}>SUBMIT</Text>
                   </Button>
@@ -451,11 +419,10 @@ export default class AddClassified extends Component {
               <Spinner color="red" />
               <Text
                 style={{
-                  textAlign: "center",
-                  color: "white",
-                  fontWeight: "bold"
-                }}
-              >
+                  textAlign: 'center',
+                  color: 'white',
+                  fontWeight: 'bold',
+                }}>
                 Loading
               </Text>
             </View>
@@ -468,82 +435,82 @@ export default class AddClassified extends Component {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#1F2426"
+    backgroundColor: '#1F2426',
   },
   title: {
     fontSize: 15,
-    color: "#47BFB3",
+    color: '#47BFB3',
     marginTop: 5,
     //marginRight: 80,
-    marginTop: 10
+    marginTop: 10,
   },
   thumbnail: {
     width: 25,
     height: 25,
-    marginTop: 5
+    marginTop: 5,
   },
   carditem: {
-    backgroundColor: "#1F2426"
+    backgroundColor: '#1F2426',
   },
   item: {
     marginBottom: 20,
-    borderColor: "transparent"
+    borderColor: 'transparent',
   },
   input: {
-    color: "white"
+    color: 'white',
   },
   textArea: {
-    width: "100%",
-    color: "white"
+    width: '100%',
+    color: 'white',
   },
   label: {
     fontSize: 15,
-    color: "#D94526"
+    color: '#D94526',
   },
   cardFooter: {
     flex: 1,
-    flexDirection: "row",
-    justifyContent: "space-between"
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   buttonGroup: {
-    backgroundColor: "#1F2426"
+    backgroundColor: '#1F2426',
   },
   cancelText: {
-    color: "white",
+    color: 'white',
     fontSize: 20,
-    fontWeight: "bold"
+    fontWeight: 'bold',
   },
   cancel: {
     // flex: 1,
     // flexDirection: "row",
     // justifyContent: "flex-start",
     marginTop: 10,
-    marginLeft: 15
+    marginLeft: 15,
   },
   submitButton: {
     width: 150,
-    justifyContent: "center"
+    justifyContent: 'center',
   },
   submitButtonText: {
     fontSize: 20,
-    fontWeight: "bold"
-  }
+    fontWeight: 'bold',
+  },
 });
 
 //multiselect style
 const multiSelectStyles = StyleSheet.create({
   container: {
-    backgroundColor: "#1F2426"
+    backgroundColor: '#1F2426',
   },
-  selectToggleText: { color: "white" },
-  button: { backgroundColor: "#D94526" },
-  searchBar: { backgroundColor: "#1F2426" },
-  searchTextInput: { color: "#D94526" }
+  selectToggleText: {color: 'white'},
+  button: {backgroundColor: '#D94526'},
+  searchBar: {backgroundColor: '#1F2426'},
+  searchTextInput: {color: '#D94526'},
 });
 const color = {
-  text: "#D94526",
-  subText: "#47BFB3",
-  searchPlaceholderTextColor: "#D94526",
-  itemBackground: "#1F2426",
-  subItemBackground: "#1F2426"
+  text: '#D94526',
+  subText: '#47BFB3',
+  searchPlaceholderTextColor: '#D94526',
+  itemBackground: '#1F2426',
+  subItemBackground: '#1F2426',
 };

@@ -1,10 +1,10 @@
-import * as authentication from "../../services/Authentication";
-import * as dataService from "../../services/DataService";
-import * as constant from "../../services/Constant";
-import * as toastService from "../../services/ToastService";
-import React, { Component } from "react";
-import { StyleSheet, TouchableOpacity, Linking, Alert } from "react-native";
-import Slideshow from "react-native-image-slider-show";
+import * as authentication from '../../services/Authentication';
+import * as dataService from '../../services/DataService';
+import * as constant from '../../services/Constant';
+import * as toastService from '../../services/ToastService';
+import React, {Component} from 'react';
+import {StyleSheet, TouchableOpacity, Linking, Alert} from 'react-native';
+import Slideshow from 'react-native-image-slider-show';
 import {
   Container,
   Content,
@@ -28,9 +28,9 @@ import {
   Tabs,
   Tab,
   TabHeading,
-  Icon
-} from "native-base";
-//import Icon from "react-native-vector-icons/FontAwesome";
+  Icon,
+} from 'native-base';
+import Ionicon from 'react-native-vector-icons/Ionicons';
 
 export default class NailTVPostDetail extends Component {
   constructor(props) {
@@ -41,7 +41,7 @@ export default class NailTVPostDetail extends Component {
       nailTV: [],
       loading: true,
       email: [],
-      user: []
+      user: [],
     };
 
     if (props.navigation.state.params && props.navigation.state.params.id) {
@@ -54,47 +54,47 @@ export default class NailTVPostDetail extends Component {
     var user = await authentication.getLoggedInUser();
     var email = user.email;
 
-    var nailTV = await dataService.get("api/nailtvs/getnailtv/" + id);
+    var nailTV = await dataService.get('api/nailtvs/getnailtv/' + id);
 
     this.setState({
       nailTV: nailTV,
       loading: false,
       email: email,
-      user: user
+      user: user,
     });
   }
 
   async removeIconClick() {
     Alert.alert(
-      "Delete Confirm",
-      "Would you like to delete this item?",
+      'Delete Confirm',
+      'Would you like to delete this item?',
       [
         {
-          text: "NO, thanks"
+          text: 'NO, thanks',
         },
         {
-          text: "OK",
+          text: 'OK',
           onPress: async () => {
             var result = await dataService.remove(
-              `api/nailtvs/delete/${this.state.nailTV.id}`
+              `api/nailtvs/delete/${this.state.nailTV.id}`,
             );
 
             if (result.status == 200) {
-              toastService.success("Delete Nail TV successfully!");
+              toastService.success('Delete Nail TV successfully!');
               this.props.navigation.state.params.onGoBack();
               this.props.navigation.goBack();
             } else {
-              toastService.error("Error: " + result.data);
+              toastService.error('Error: ' + result.data);
             }
-          }
-        }
+          },
+        },
       ],
-      { cancelable: false }
+      {cancelable: false},
     );
   }
 
   render() {
-    const { loading, nailTV } = this.state;
+    const {loading, nailTV} = this.state;
 
     return (
       <Container style={styles.container}>
@@ -102,18 +102,13 @@ export default class NailTVPostDetail extends Component {
           <View
             style={{
               flex: 1,
-              flexDirection: "row",
-              justifyContent: "space-between",
-              marginTop: 8
-            }}
-          >
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              marginTop: 8,
+            }}>
             <View>
               <TouchableOpacity onPress={() => this.props.navigation.goBack()}>
-                <Thumbnail
-                  small
-                  source={require("../../icons/left_arrow.png")}
-                  style={styles.thumbnail}
-                />
+                <Ionicon name="arrow-back-outline" color="#fff" size={28} />
               </TouchableOpacity>
             </View>
             <View>
@@ -123,7 +118,7 @@ export default class NailTVPostDetail extends Component {
               <TouchableOpacity onPress={() => this.removeIconClick()}>
                 <Icon
                   name="trash"
-                  style={{ fontSize: 30, color: "white" }}
+                  style={{fontSize: 30, color: 'white'}}
                   //style={styles.caretIcon}
                 />
               </TouchableOpacity>
@@ -132,7 +127,7 @@ export default class NailTVPostDetail extends Component {
         </Header>
         {loading == false ? (
           <Content>
-            <Card style={{ flex: 0, marginTop: 5 }} transparent>
+            <Card style={{flex: 0, marginTop: 5}} transparent>
               {/* <CardItem style={styles.carditem}>
                 <Body />
               </CardItem> */}
@@ -145,8 +140,7 @@ export default class NailTVPostDetail extends Component {
                 <Body>
                   <Text
                     style={styles.link}
-                    onPress={() => Linking.openURL(nailTV.url)}
-                  >
+                    onPress={() => Linking.openURL(nailTV.url)}>
                     Url: {nailTV.url}
                   </Text>
                 </Body>
@@ -158,7 +152,7 @@ export default class NailTVPostDetail extends Component {
                 </Body>
               </CardItem>
 
-              <CardItem style={{ height: 60, backgroundColor: "#1F2426" }} />
+              <CardItem style={{height: 60, backgroundColor: '#1F2426'}} />
             </Card>
           </Content>
         ) : (
@@ -166,11 +160,10 @@ export default class NailTVPostDetail extends Component {
             <Spinner color="red" />
             <Text
               style={{
-                textAlign: "center",
-                color: "white",
-                fontWeight: "bold"
-              }}
-            >
+                textAlign: 'center',
+                color: 'white',
+                fontWeight: 'bold',
+              }}>
               Loading
             </Text>
           </View>
@@ -182,51 +175,51 @@ export default class NailTVPostDetail extends Component {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#1F2426"
+    backgroundColor: '#1F2426',
   },
   carditem: {
-    backgroundColor: "#1F2426"
+    backgroundColor: '#1F2426',
   },
   headerBodyText: {
-    justifyContent: "center",
+    justifyContent: 'center',
     //left: 30,
     fontSize: 20,
     marginTop: 5,
-    color: "#47BFB3"
+    color: '#47BFB3',
   },
   tabUnderLine: {
-    display: "none",
-    backgroundColor: "#D94526"
+    display: 'none',
+    backgroundColor: '#D94526',
   },
   tabHeading: {
-    backgroundColor: "#D94526"
+    backgroundColor: '#D94526',
     // borderBottomWidth: 1,
     // borderBottomColor: "white"
   },
   tabs: {
-    backgroundColor: "#D94526",
-    borderWidth: 0
+    backgroundColor: '#D94526',
+    borderWidth: 0,
   },
   title: {
-    color: "#D94526",
+    color: '#D94526',
     fontSize: 30,
-    fontWeight: "bold"
+    fontWeight: 'bold',
   },
   discount: {
-    color: "red",
-    fontSize: 15
+    color: 'red',
+    fontSize: 15,
   },
   normal: {
-    color: "white",
-    fontSize: 15
+    color: 'white',
+    fontSize: 15,
   },
   link: {
-    color: "blue",
-    fontSize: 15
+    color: 'blue',
+    fontSize: 15,
   },
   thumbnail: {
     width: 25,
     height: 25,
-    marginTop: 5
-  }
+    marginTop: 5,
+  },
 });

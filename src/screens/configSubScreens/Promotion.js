@@ -27,7 +27,6 @@ import * as authentication from '../../services/Authentication';
 import * as toastService from '../../services/ToastService';
 import * as constant from '../../services/Constant';
 import * as formatDate from '../../services/FormatDate';
-import SectionedMultiSelect from 'react-native-sectioned-multi-select';
 import NumericInput from 'react-native-numeric-input';
 
 export default class Promotion extends Component {

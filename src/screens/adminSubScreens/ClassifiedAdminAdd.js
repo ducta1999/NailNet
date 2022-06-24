@@ -1,11 +1,12 @@
-import * as authentication from "../../services/Authentication";
-import * as dataService from "../../services/DataService";
-import * as constant from "../../services/Constant";
-import * as toastService from "../../services/ToastService";
-import React, { Component } from "react";
-import { StyleSheet, TouchableOpacity, Linking, Alert } from "react-native";
-import Icon from "react-native-vector-icons/FontAwesome";
-import SectionedMultiSelect from "react-native-sectioned-multi-select";
+import * as authentication from '../../services/Authentication';
+import * as dataService from '../../services/DataService';
+import * as constant from '../../services/Constant';
+import * as toastService from '../../services/ToastService';
+import React, {Component} from 'react';
+import {StyleSheet, TouchableOpacity, Linking, Alert} from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
+import SectionedMultiSelect from 'react-native-sectioned-multi-select';
+import MultiSelect from '../Components/MultiSelect';
 import {
   Container,
   Content,
@@ -28,8 +29,8 @@ import {
   Spinner,
   Tabs,
   Tab,
-  TabHeading
-} from "native-base";
+  TabHeading,
+} from 'native-base';
 //import Icon from "react-native-vector-icons/FontAwesome";
 
 export default class ClassifiedAdminAdd extends Component {
@@ -38,28 +39,28 @@ export default class ClassifiedAdminAdd extends Component {
     this.state = {
       categories: [],
       selectedCategory: [],
-      loading: true
+      loading: true,
     };
   }
   async componentDidMount() {
     var categories = await dataService.get(
-      "api/classifiedcategories/getallmain"
+      'api/classifiedcategories/getallmain',
     );
-    var itemCategories = [{ name: "Category", id: 0, children: [] }];
+    var itemCategories = [{name: 'Category', id: 0, children: []}];
     itemCategories[0].children.push({
-      name: "No Main Category",
-      id: null
+      name: 'No Main Category',
+      id: null,
     });
     for (var j = categories.items.length - 1; j >= 0; j--) {
       itemCategories[0].children.push({
         name: categories.items[j].description,
-        id: categories.items[j].id
+        id: categories.items[j].id,
       });
     }
 
     this.setState({
       categories: itemCategories,
-      loading: false
+      loading: false,
     });
   }
 
@@ -70,18 +71,13 @@ export default class ClassifiedAdminAdd extends Component {
           <View
             style={{
               flex: 1,
-              flexDirection: "row",
-              justifyContent: "space-between",
-              marginTop: 8
-            }}
-          >
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              marginTop: 8,
+            }}>
             <View>
               <TouchableOpacity onPress={() => this.props.navigation.goBack()}>
-                <Thumbnail
-                  small
-                  source={require("../../icons/left_arrow.png")}
-                  style={styles.thumbnailArrow}
-                />
+                <Icon name="arrow-back-outline" color="#fff" size={28} />
               </TouchableOpacity>
             </View>
             <View>
@@ -99,41 +95,17 @@ export default class ClassifiedAdminAdd extends Component {
                 <View
                   style={{
                     marginLeft: 10,
-                    justifyContent: "center"
-                  }}
-                >
+                    justifyContent: 'center',
+                  }}>
                   {this.state.loading == false && (
-                    <SectionedMultiSelect
+                    <MultiSelect
+                      backgroundColor="#0065ff"
                       items={this.state.categories}
-                      uniqueKey="id"
-                      subKey="children"
-                      expandDropDowns={true}
-                      selectText="Choose category..."
-                      showDropDowns={true}
-                      readOnlyHeadings={true}
-                      onSelectedItemsChange={value =>
-                        this.setState({ selectedCategory: value })
-                      }
+                      placeHolder="Choose category"
                       selectedItems={this.state.selectedCategory}
-                      single={true}
-                      selectToggleIconComponent={
-                        <Icon
-                          name="caret-down"
-                          color="#D94526"
-                          size={30}
-                          style={styles.caretIcon}
-                        />
-                      }
-                      searchIconComponent={
-                        <Icon
-                          name="search"
-                          color="#D94526"
-                          size={15}
-                          style={{ marginLeft: 15 }}
-                        />
-                      }
-                      colors={color}
-                      styles={multiSelectStyles}
+                      setSelectedItems={value => {
+                        this.setState({selectedCategory: value});
+                      }}
                     />
                   )}
                 </View>
@@ -150,7 +122,7 @@ export default class ClassifiedAdminAdd extends Component {
                             placeholder="Enter your classified category decription"
                             placeholderTextColor="#D94526"
                             onChangeText={text =>
-                              this.setState({ description: text })
+                              this.setState({description: text})
                             }
                           />
                         </View>
@@ -165,11 +137,10 @@ export default class ClassifiedAdminAdd extends Component {
               <Spinner color="red" />
               <Text
                 style={{
-                  textAlign: "center",
-                  color: "white",
-                  fontWeight: "bold"
-                }}
-              >
+                  textAlign: 'center',
+                  color: 'white',
+                  fontWeight: 'bold',
+                }}>
                 Loading
               </Text>
             </View>
@@ -180,8 +151,7 @@ export default class ClassifiedAdminAdd extends Component {
               block
               backgroundColor="#47BFB3"
               style={styles.submitButton}
-              onPress={() => this.submit()}
-            >
+              onPress={() => this.submit()}>
               {this.state.buttonLoading == true && <Spinner color="red" />}
               <Text style={styles.submitButtonText}>SUBMIT</Text>
             </Button>
@@ -192,13 +162,13 @@ export default class ClassifiedAdminAdd extends Component {
   }
 
   async submit() {
-    this.setState({ buttonLoading: true });
-    const { description, selectedCategory } = this.state;
+    this.setState({buttonLoading: true});
+    const {description, selectedCategory} = this.state;
 
-    if (description.trim() == "") {
-      toastService.error("Error: " + "Description cannot be empty!");
+    if (description.trim() == '') {
+      toastService.error('Error: ' + 'Description cannot be empty!');
 
-      this.setState({ buttonLoading: false });
+      this.setState({buttonLoading: false});
       return;
     }
 
@@ -207,20 +177,20 @@ export default class ClassifiedAdminAdd extends Component {
     var data = {
       description: description,
       createByEmail: user.email,
-      parentID: selectedCategory ? selectedCategory[0] : null
+      parentID: selectedCategory ? selectedCategory[0] : null,
     };
 
-    var result = await dataService.post("api/classifiedcategories/add", data);
+    var result = await dataService.post('api/classifiedcategories/add', data);
     if (result.status === 200) {
-      toastService.success("Add classified category successfully!");
+      toastService.success('Add classified category successfully!');
 
-      this.setState({ buttonLoading: false });
+      this.setState({buttonLoading: false});
       this.props.navigation.state.params.onGoBack();
       this.props.navigation.goBack();
     } else {
-      this.setState({ buttonLoading: false });
+      this.setState({buttonLoading: false});
       toastService.error(
-        "Error: " + "Something wrong! Please check and try again"
+        'Error: ' + 'Something wrong! Please check and try again',
       );
     }
   }
@@ -228,95 +198,95 @@ export default class ClassifiedAdminAdd extends Component {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#1F2426"
+    backgroundColor: '#1F2426',
   },
   avatar: {
-    alignItems: "center"
+    alignItems: 'center',
   },
   informationView: {
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
     paddingLeft: 40,
-    paddingRight: 40
+    paddingRight: 40,
   },
   name: {
-    fontWeight: "bold",
-    color: "#D94526",
-    fontSize: 15
+    fontWeight: 'bold',
+    color: '#D94526',
+    fontSize: 15,
   },
   information: {
-    color: "white",
+    color: 'white',
     fontSize: 12,
-    textAlign: "center"
+    textAlign: 'center',
   },
   thumbnail: {
     width: 150,
-    height: 150
+    height: 150,
   },
 
   headerBodyText: {
-    justifyContent: "center",
+    justifyContent: 'center',
     //left: 30,
     fontSize: 20,
-    color: "#47BFB3",
-    marginTop: 5
+    color: '#47BFB3',
+    marginTop: 5,
   },
 
   descriptionView: {
     marginTop: 10,
-    marginLeft: 16
+    marginLeft: 16,
   },
   titleInput: {
     //marginLeft: -70
   },
   card: {
     //marginTop: 20,
-    padding: 10
+    padding: 10,
   },
   cardHeader: {
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#D94526"
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#D94526',
   },
   cardHeaderText: {
-    textAlign: "center",
-    color: "white",
-    fontWeight: "bold",
-    fontSize: 15
+    textAlign: 'center',
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 15,
   },
   cardTitle: {
     //marginTop: -20
   },
   submitButtonText: {
-    color: "white",
-    fontWeight: "bold"
+    color: 'white',
+    fontWeight: 'bold',
   },
   submitButtonView: {
     flex: 1,
-    alignItems: "center",
-    justifyContent: "center"
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   submitButton: {},
   thumbnailArrow: {
     width: 25,
     height: 25,
-    marginTop: 5
-  }
+    marginTop: 5,
+  },
 });
 //multiselect style
 const multiSelectStyles = StyleSheet.create({
   container: {
-    backgroundColor: "#1F2426"
+    backgroundColor: '#1F2426',
   },
-  selectToggleText: { color: "white" },
-  button: { backgroundColor: "#D94526" },
-  searchBar: { backgroundColor: "#1F2426" },
-  searchTextInput: { color: "#D94526" }
+  selectToggleText: {color: 'white'},
+  button: {backgroundColor: '#D94526'},
+  searchBar: {backgroundColor: '#1F2426'},
+  searchTextInput: {color: '#D94526'},
 });
 const color = {
-  text: "#D94526",
-  subText: "#47BFB3",
-  searchPlaceholderTextColor: "#D94526",
-  itemBackground: "#1F2426",
-  subItemBackground: "#1F2426"
+  text: '#D94526',
+  subText: '#47BFB3',
+  searchPlaceholderTextColor: '#D94526',
+  itemBackground: '#1F2426',
+  subItemBackground: '#1F2426',
 };

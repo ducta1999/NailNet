@@ -29,6 +29,7 @@ import Question from './adminSubScreens/Question';
 import Job from './adminSubScreens/Job';
 import Shop from './adminSubScreens/Shop';
 import Classified from './adminSubScreens/Classified';
+import Ionicon from 'react-native-vector-icons/Ionicons';
 
 export default class Admin extends Component {
   constructor(props) {
@@ -78,11 +79,7 @@ export default class Admin extends Component {
               )}
               {this.state.tabPage != 0 && (
                 <TouchableOpacity onPress={() => this.goTabBack()}>
-                  <Thumbnail
-                    small
-                    source={require('../icons/left_arrow.png')}
-                    style={styles.thumbnail}
-                  />
+                  <Ionicon name="arrow-back-outline" color="#fff" size={28} />
                 </TouchableOpacity>
               )}
             </View>

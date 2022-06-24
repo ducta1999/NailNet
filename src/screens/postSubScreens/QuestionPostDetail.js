@@ -1,5 +1,5 @@
-import React, { Component } from "react";
-import { StyleSheet, TouchableOpacity, Alert } from "react-native";
+import React, {Component} from 'react';
+import {StyleSheet, TouchableOpacity, Alert} from 'react-native';
 import {
   Container,
   Content,
@@ -20,13 +20,14 @@ import {
   Label,
   Input,
   Icon,
-  Spinner
-} from "native-base";
+  Spinner,
+} from 'native-base';
 //import Icon from "react-native-vector-icons/FontAwesome";
-import * as authentication from "../../services/Authentication";
-import * as dataService from "../../services/DataService";
-import * as toastService from "../../services/ToastService";
-import * as constant from "../../services/Constant";
+import * as authentication from '../../services/Authentication';
+import * as dataService from '../../services/DataService';
+import * as toastService from '../../services/ToastService';
+import * as constant from '../../services/Constant';
+import Ionicon from 'react-native-vector-icons/Ionicons';
 
 export default class QuestionPostDetail extends Component {
   constructor(props) {
@@ -37,7 +38,7 @@ export default class QuestionPostDetail extends Component {
       loading: true,
       question: [],
       email: [],
-      user: []
+      user: [],
     };
 
     if (props.navigation.state.params && props.navigation.state.params.id) {
@@ -53,13 +54,13 @@ export default class QuestionPostDetail extends Component {
     var email = user.email;
 
     var question = await dataService.get(
-      "api/faqquestions/getfaqquestion/" + id
+      'api/faqquestions/getfaqquestion/' + id,
     );
 
     for (var i = 0; i < question.answers.length; i++) {
       question.answers[i].like =
-        question.answers[i].like != null && question.answers[i].like != ""
-          ? question.answers[i].like.split("|")
+        question.answers[i].like != null && question.answers[i].like != ''
+          ? question.answers[i].like.split('|')
           : new Array();
     }
 
@@ -67,7 +68,7 @@ export default class QuestionPostDetail extends Component {
       question: question,
       loading: false,
       email: email,
-      user: user
+      user: user,
     });
   }
 
@@ -75,7 +76,7 @@ export default class QuestionPostDetail extends Component {
     if (nextProps.navigation.state.params != undefined) {
       if (nextProps.navigation.state.params.addQuestionSuccess == true) {
         this.setState({
-          loading: true
+          loading: true,
         });
         this.ensureDataFetched(this.state.id);
       }
@@ -83,7 +84,7 @@ export default class QuestionPostDetail extends Component {
   }
 
   render() {
-    const { loading, question, id, email, user } = this.state;
+    const {loading, question, id, email, user} = this.state;
 
     return (
       <Container style={styles.container}>
@@ -91,18 +92,13 @@ export default class QuestionPostDetail extends Component {
           <View
             style={{
               flex: 1,
-              flexDirection: "row",
-              justifyContent: "space-between",
-              marginTop: 8
-            }}
-          >
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              marginTop: 8,
+            }}>
             <View>
               <TouchableOpacity onPress={() => this.props.navigation.goBack()}>
-                <Thumbnail
-                  small
-                  source={require("../../icons/left_arrow.png")}
-                  style={styles.thumbnail}
-                />
+                <Ionicon name="arrow-back-outline" color="#fff" size={28} />
               </TouchableOpacity>
             </View>
             <View>
@@ -112,7 +108,7 @@ export default class QuestionPostDetail extends Component {
               <TouchableOpacity onPress={() => this.removeIconClick()}>
                 <Icon
                   name="trash"
-                  style={{ fontSize: 30, color: "white" }}
+                  style={{fontSize: 30, color: 'white'}}
                   //style={styles.caretIcon}
                 />
               </TouchableOpacity>
@@ -121,19 +117,19 @@ export default class QuestionPostDetail extends Component {
         </Header>
         {loading == false ? (
           <Content>
-            <Card style={{ flex: 0 }} transparent>
+            <Card style={{flex: 0}} transparent>
               <CardItem style={styles.carditem}>
                 <Left>
                   <Thumbnail
                     //source={require("../../icons/Avatar.png")}
-                    defaultSource={{ uri: "avatar" }}
+                    defaultSource={{uri: 'avatar'}}
                     source={{
                       uri:
                         constant.BASE_URL +
-                        "api/avatars/getimage/" +
+                        'api/avatars/getimage/' +
                         question.createByEmail +
-                        "?random_number=" +
-                        new Date().getTime()
+                        '?random_number=' +
+                        new Date().getTime(),
                     }}
                   />
                   <Body>
@@ -168,30 +164,29 @@ export default class QuestionPostDetail extends Component {
                         ? this.openPrivateQuestion(
                             answer.createBy,
                             question.industry.description,
-                            question.industry.id
+                            question.industry.id,
                           )
                         : null
-                    }
-                  >
+                    }>
                     <CardItem style={styles.carditemAnswer}>
                       <Left>
                         <Thumbnail
                           //source={require("../../icons/Avatar.png")}
-                          defaultSource={{ uri: "avatar" }}
+                          defaultSource={{uri: 'avatar'}}
                           source={{
                             uri:
                               constant.BASE_URL +
-                              "api/avatars/getimage/" +
+                              'api/avatars/getimage/' +
                               answer.createByEmail +
-                              "?random_number=" +
-                              new Date().getTime()
+                              '?random_number=' +
+                              new Date().getTime(),
                           }}
                         />
                         <Body>
                           <Text style={styles.questionDescription}>
                             {answer.answerDescription}
                           </Text>
-                          <View style={{ flex: 1, flexDirection: "row" }}>
+                          <View style={{flex: 1, flexDirection: 'row'}}>
                             <View>
                               <Text style={styles.createTime}>
                                 {answer.createTime}
@@ -209,20 +204,17 @@ export default class QuestionPostDetail extends Component {
                               light
                               transparent
                               style={{
-                                justifyContent: "flex-end",
-                                flex: 1
-                              }}
-                            >
+                                justifyContent: 'flex-end',
+                                flex: 1,
+                              }}>
                               {answer.like.includes(email) ? (
                                 <TouchableOpacity
-                                  onPress={() => this.likePress(answer)}
-                                >
+                                  onPress={() => this.likePress(answer)}>
                                   <Icon name="heart" />
                                 </TouchableOpacity>
                               ) : (
                                 <TouchableOpacity
-                                  onPress={() => this.likePress(answer)}
-                                >
+                                  onPress={() => this.likePress(answer)}>
                                   <Icon name="heart-empty" />
                                 </TouchableOpacity>
                               )}
@@ -244,29 +236,27 @@ export default class QuestionPostDetail extends Component {
                         ? this.openPrivateQuestion(
                             answer.createBy,
                             question.industry.description,
-                            question.industry.id
+                            question.industry.id,
                           )
                         : null
-                    }
-                  >
+                    }>
                     <CardItem
                       style={
                         answer.createByEmail != user.email
                           ? styles.carditemAnswerForNotOwn
                           : styles.carditemAnswerForOwn
-                      }
-                    >
+                      }>
                       <Left>
                         <Thumbnail
                           //source={require("../../icons/Avatar.png")}
-                          defaultSource={{ uri: "avatar" }}
+                          defaultSource={{uri: 'avatar'}}
                           source={{
                             uri:
                               constant.BASE_URL +
-                              "api/avatars/getimage/" +
+                              'api/avatars/getimage/' +
                               answer.createByEmail +
-                              "?random_number=" +
-                              new Date().getTime()
+                              '?random_number=' +
+                              new Date().getTime(),
                           }}
                         />
                         <Body>
@@ -275,11 +265,10 @@ export default class QuestionPostDetail extends Component {
                               answer.createByEmail != user.email
                                 ? styles.questionDescriptionForNotOwn
                                 : styles.questionDescriptionForOwn
-                            }
-                          >
+                            }>
                             {answer.answerDescription}
                           </Text>
-                          <View style={{ flex: 1, flexDirection: "row" }}>
+                          <View style={{flex: 1, flexDirection: 'row'}}>
                             <View>
                               <Text style={styles.createTime}>
                                 {answer.createTime}
@@ -293,18 +282,15 @@ export default class QuestionPostDetail extends Component {
                               iconLeft
                               light
                               transparent
-                              style={{ justifyContent: "flex-end", flex: 1 }}
-                            >
+                              style={{justifyContent: 'flex-end', flex: 1}}>
                               {answer.like.includes(email) ? (
                                 <TouchableOpacity
-                                  onPress={() => this.likePress(answer)}
-                                >
+                                  onPress={() => this.likePress(answer)}>
                                   <Icon name="heart" />
                                 </TouchableOpacity>
                               ) : (
                                 <TouchableOpacity
-                                  onPress={() => this.likePress(answer)}
-                                >
+                                  onPress={() => this.likePress(answer)}>
                                   <Icon name="heart-empty" />
                                 </TouchableOpacity>
                               )}
@@ -323,11 +309,10 @@ export default class QuestionPostDetail extends Component {
             <Spinner color="red" />
             <Text
               style={{
-                textAlign: "center",
-                color: "white",
-                fontWeight: "bold"
-              }}
-            >
+                textAlign: 'center',
+                color: 'white',
+                fontWeight: 'bold',
+              }}>
               Loading
             </Text>
           </View>
@@ -338,30 +323,30 @@ export default class QuestionPostDetail extends Component {
 
   async removeIconClick() {
     Alert.alert(
-      "Delete Confirm",
-      "Would you like to delete this item?",
+      'Delete Confirm',
+      'Would you like to delete this item?',
       [
         {
-          text: "NO, thanks"
+          text: 'NO, thanks',
         },
         {
-          text: "OK",
+          text: 'OK',
           onPress: async () => {
             var result = await dataService.remove(
-              `api/faqquestions/delete/${this.state.question.id}`
+              `api/faqquestions/delete/${this.state.question.id}`,
             );
 
             if (result.status == 200) {
-              toastService.success("Delete question successfully!");
+              toastService.success('Delete question successfully!');
               this.props.navigation.state.params.onGoBack();
               this.props.navigation.goBack();
             } else {
-              toastService.error("Error: " + result.data);
+              toastService.error('Error: ' + result.data);
             }
-          }
-        }
+          },
+        },
       ],
-      { cancelable: false }
+      {cancelable: false},
     );
   }
 
@@ -371,7 +356,7 @@ export default class QuestionPostDetail extends Component {
 
     if (newAnswer.like.includes(user.email)) {
       newAnswer.like = newAnswer.like.filter(l => l != user.email);
-      if (newAnswer.like == "") {
+      if (newAnswer.like == '') {
         newAnswer.like = new Array();
       }
     } else {
@@ -387,118 +372,118 @@ export default class QuestionPostDetail extends Component {
       }
     }
 
-    this.setState({ question: question });
+    this.setState({question: question});
   }
 
   async updateView(newAnswer, id) {
-    var like = newAnswer.like.join("|");
-    if (like.trim() == "") {
+    var like = newAnswer.like.join('|');
+    if (like.trim() == '') {
       like = null;
     }
     var res = await dataService.put(
       `api/faqanswers/updatelike/${id}/${like}`,
-      null
+      null,
     );
   }
 
   openPrivateQuestion(id, description, industryID) {
-    this.props.navigation.navigate("DoctorDetail", {
+    this.props.navigation.navigate('DoctorDetail', {
       id: id,
       description: description,
-      industryID: industryID
+      industryID: industryID,
     });
   }
 }
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#1F2426"
+    backgroundColor: '#1F2426',
   },
 
   headerBodyText: {
-    justifyContent: "center",
+    justifyContent: 'center',
     //left: 30,
     fontSize: 20,
     marginTop: 5,
-    color: "#47BFB3"
+    color: '#47BFB3',
   },
   carditem: {
-    backgroundColor: "#1F2426"
+    backgroundColor: '#1F2426',
   },
   carditemAnswer: {
     marginTop: 20,
-    backgroundColor: "#1F2426",
-    marginLeft: 20
+    backgroundColor: '#1F2426',
+    marginLeft: 20,
   },
   carditemAnswerForOwn: {
-    backgroundColor: "#38A1F3",
+    backgroundColor: '#38A1F3',
     borderRadius: 10,
     marginBottom: 10,
-    marginLeft: 80
+    marginLeft: 80,
     // borderColor: "red",
     // borderBottomWidth: 1,
     // borderTopWidth: 1,
     // bor
   },
   questionDescriptionForOwn: {
-    color: "black",
-    fontSize: 18
+    color: 'black',
+    fontSize: 18,
   },
   carditemAnswerForNotOwn: {
-    backgroundColor: "black",
+    backgroundColor: 'black',
     borderRadius: 10,
     marginBottom: 10,
-    marginRight: 80
+    marginRight: 80,
   },
   questionDescriptionForNotOwn: {
-    color: "#D94526",
-    fontSize: 18
+    color: '#D94526',
+    fontSize: 18,
   },
   title: {
-    color: "#D94526",
-    fontSize: 22
+    color: '#D94526',
+    fontSize: 22,
   },
   questionDescription: {
-    color: "#D94526",
-    fontSize: 18
+    color: '#D94526',
+    fontSize: 18,
   },
   createTime: {
-    color: "white",
+    color: 'white',
     fontSize: 15,
-    justifyContent: "flex-end"
+    justifyContent: 'flex-end',
   },
   isPro: {
-    color: "red",
+    color: 'red',
     fontSize: 12,
-    justifyContent: "flex-end"
+    justifyContent: 'flex-end',
   },
   asnwerNumber: {
-    color: "white",
+    color: 'white',
     fontSize: 15,
-    flexDirection: "row",
-    justifyContent: "flex-end"
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
   },
   category: {
-    color: "white",
+    color: 'white',
     fontSize: 15,
     flex: 1,
-    flexDirection: "row",
-    justifyContent: "flex-start"
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
   },
   view: {
-    color: "white",
+    color: 'white',
     fontSize: 15,
     flex: 1,
-    flexDirection: "row",
-    justifyContent: "center"
+    flexDirection: 'row',
+    justifyContent: 'center',
   },
   description: {
-    color: "white",
-    fontSize: 20
+    color: 'white',
+    fontSize: 20,
   },
   thumbnail: {
     width: 25,
     height: 25,
-    marginTop: 5
-  }
+    marginTop: 5,
+  },
 });

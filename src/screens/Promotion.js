@@ -24,12 +24,13 @@ import {
   TabHeading,
   ScrollableTab,
 } from 'native-base';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import Icon from 'react-native-vector-icons/Ionicons';
 // import {TouchableOpacity} from 'react-native-gesture-handler';
 import * as dataService from '../services/DataService';
 import * as authentication from '../services/Authentication';
 import * as constant from '../services/Constant';
 import SectionedMultiSelect from 'react-native-sectioned-multi-select';
+import MultiSelect from './Components/MultiSelect';
 let ScreenHeight = Dimensions.get('window').height;
 export default class Promotion extends Component {
   constructor(props) {
@@ -173,11 +174,7 @@ export default class Promotion extends Component {
             }}>
             <View>
               <TouchableOpacity onPress={() => this.props.navigation.goBack()}>
-                <Thumbnail
-                  small
-                  source={require('../icons/left_arrow.png')}
-                  style={styles.thumbnail}
-                />
+                <Icon name="arrow-back-outline" color="#fff" size={28} />
               </TouchableOpacity>
             </View>
             <View>
@@ -224,37 +221,11 @@ export default class Promotion extends Component {
                     marginBottom: -25,
                   }}>
                   {this.state.cities && (
-                    <SectionedMultiSelect
+                    <MultiSelect
                       items={this.state.cities}
-                      uniqueKey="id"
-                      subKey="children"
-                      expandDropDowns={true}
-                      selectText="Choose City..."
-                      showDropDowns={true}
-                      readOnlyHeadings={true}
-                      onSelectedItemsChange={value =>
-                        this.applyFilterByCity(value)
-                      }
+                      placeHolder="Choose City..."
                       selectedItems={this.state.selectedCity}
-                      single={true}
-                      selectToggleIconComponent={() => (
-                        <Icon
-                          name="caret-down"
-                          color="#D94526"
-                          size={30}
-                          style={styles.caretIcon}
-                        />
-                      )}
-                      searchIconComponent={
-                        <Icon
-                          name="search"
-                          color="#D94526"
-                          size={15}
-                          style={{marginLeft: 15}}
-                        />
-                      }
-                      colors={color}
-                      styles={multiSelectStyles}
+                      setSelectedItems={value => this.applyFilterByCity(value)}
                     />
                   )}
                 </View>

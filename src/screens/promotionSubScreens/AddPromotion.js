@@ -1,5 +1,5 @@
-import React, { Component } from "react";
-import { StyleSheet, TouchableOpacity, Image, ScrollView } from "react-native";
+import React, {Component} from 'react';
+import {StyleSheet, TouchableOpacity, Image, ScrollView} from 'react-native';
 import {
   Container,
   Content,
@@ -16,33 +16,34 @@ import {
   Header,
   Label,
   Spinner,
-  Textarea
-} from "native-base";
+  Textarea,
+} from 'native-base';
 // import ImagePicker from "react-native-image-picker";
-import ImagePicker from "react-native-image-crop-picker";
-import * as dataService from "../../services/DataService";
-import * as formatDate from "../../services/FormatDate";
-import * as toastService from "../../services/ToastService";
-import * as authentication from "../../services/Authentication";
-import DateTimePicker from "react-native-modal-datetime-picker";
-import Icon from "react-native-vector-icons/FontAwesome";
-import SectionedMultiSelect from "react-native-sectioned-multi-select";
+import ImagePicker from 'react-native-image-crop-picker';
+import * as dataService from '../../services/DataService';
+import * as formatDate from '../../services/FormatDate';
+import * as toastService from '../../services/ToastService';
+import * as authentication from '../../services/Authentication';
+import DateTimePicker from 'react-native-modal-datetime-picker';
+import Icon from 'react-native-vector-icons/Ionicons';
+import SectionedMultiSelect from 'react-native-sectioned-multi-select';
+import MultiSelect from '../Components/MultiSelect';
 
 export default class AddPromotion extends Component {
   constructor(props) {
     super(props);
     this.state = {
       loading: true,
-      title: "",
-      phone: "",
-      email: "",
-      location: "",
+      title: '',
+      phone: '',
+      email: '',
+      location: '',
       discount: 0,
-      description: "",
+      description: '',
       rawFromDate: null,
       rawToDate: null,
-      fromDate: "",
-      toDate: "",
+      fromDate: '',
+      toDate: '',
       cities: [],
       selectedCity: [],
       isFromDateTimePickerVisible: false,
@@ -51,14 +52,14 @@ export default class AddPromotion extends Component {
       categories: [],
       buttonLoading: false,
       options: {
-        title: "Select Avatar",
+        title: 'Select Avatar',
         //customButtons: [{ name: "fb", title: "Choose Photo from Facebook" }],
         storageOptions: {
           skipBackup: true,
-          path: "images"
-        }
+          path: 'images',
+        },
       },
-      avatarSource: []
+      avatarSource: [],
     };
   }
 
@@ -67,62 +68,62 @@ export default class AddPromotion extends Component {
     //   "https://thongtindoanhnghiep.co/api/city"
     // );
     var cities = await dataService.getProvince();
-    var itemCities = [{ name: "City", id: 0, children: [] }];
+    var itemCities = [{name: 'City', id: 0, children: []}];
 
     for (var j = 0; j < cities.length; j++) {
       itemCities[0].children.push({
         name: cities[j].name,
-        id: cities[j].name
+        id: cities[j].name,
       });
     }
 
-    var categories = await dataService.get("api/promotioncategories/getall");
-    var itemCategories = [{ name: "Category", id: 0, children: [] }];
+    var categories = await dataService.get('api/promotioncategories/getall');
+    var itemCategories = [{name: 'Category', id: 0, children: []}];
 
     for (var j = categories.items.length - 1; j >= 0; j--) {
       itemCategories[0].children.push({
         name: categories.items[j].description,
-        id: categories.items[j].id
+        id: categories.items[j].id,
       });
     }
 
     this.setState({
       loading: false,
       cities: itemCities,
-      categories: itemCategories
+      categories: itemCategories,
       //  selectedCategory: faqindustries.items[0].id
     });
   }
 
   showFromDateTimePicker = () => {
-    this.setState({ isFromDateTimePickerVisible: true });
+    this.setState({isFromDateTimePickerVisible: true});
   };
 
   hideFromDateTimePicker = () => {
-    this.setState({ isFromDateTimePickerVisible: false });
+    this.setState({isFromDateTimePickerVisible: false});
   };
 
   handleFromDatePicked = date => {
-    this.setState({ fromDate: formatDate.formatDate(date), rawFromDate: date });
+    this.setState({fromDate: formatDate.formatDate(date), rawFromDate: date});
     this.hideFromDateTimePicker();
   };
 
   showToDateTimePicker = () => {
-    this.setState({ isToDateTimePickerVisible: true });
+    this.setState({isToDateTimePickerVisible: true});
   };
 
   hideToDateTimePicker = () => {
-    this.setState({ isToDateTimePickerVisible: false });
+    this.setState({isToDateTimePickerVisible: false});
   };
 
   handleToDatePicked = date => {
-    this.setState({ toDate: formatDate.formatDate(date), rawToDate: date });
+    this.setState({toDate: formatDate.formatDate(date), rawToDate: date});
     this.hideToDateTimePicker();
   };
 
   async submit() {
     var user = await authentication.getLoggedInUser();
-    this.setState({ buttonLoading: true });
+    this.setState({buttonLoading: true});
 
     const {
       title,
@@ -134,23 +135,23 @@ export default class AddPromotion extends Component {
       rawFromDate,
       rawToDate,
       selectedCity,
-      avatarSource
+      avatarSource,
     } = this.state;
 
     if (
-      title.trim() == "" ||
-      phone.trim() == "" ||
-      email.trim() == "" ||
+      title.trim() == '' ||
+      phone.trim() == '' ||
+      email.trim() == '' ||
       selectedCity.length == 0 ||
       selectedCategory.length == 0 ||
-      description.trim() == "" ||
+      description.trim() == '' ||
       rawFromDate == null ||
       rawToDate == null
     ) {
-      toastService.error("Error: "+"Input cannot be empty!");
+      toastService.error('Error: ' + 'Input cannot be empty!');
     } else if (!formatDate.checkIsBefore(rawFromDate, rawToDate)) {
-      toastService.error("Error: "+
-        "From Date and To Date is not valid. Please check again"
+      toastService.error(
+        'Error: ' + 'From Date and To Date is not valid. Please check again',
       );
     } else {
       var data = {
@@ -163,53 +164,53 @@ export default class AddPromotion extends Component {
         toDate: formatDate.formatDateToSendAPI(rawToDate),
         location: selectedCity[0],
         categoryID: selectedCategory[0],
-        createByEmail: user.email
+        createByEmail: user.email,
       };
 
-      var result = await dataService.post("api/promotions/add", data);
+      var result = await dataService.post('api/promotions/add', data);
 
       if (result.status === 200) {
-        toastService.success("Add promotion successfully!");
+        toastService.success('Add promotion successfully!');
 
         for (var i = 0; i < avatarSource.length; i++) {
           var image = avatarSource[i];
           var data = {
             promotionID: result.data.id,
-            createByEmail: user.email
+            createByEmail: user.email,
           };
           var promotionpicture = await dataService.post(
-            "api/promotionpictures/add",
-            data
+            'api/promotionpictures/add',
+            data,
           );
 
           dataService.post(
-            "api/promotionpictures/upload/" + promotionpicture.data.id,
+            'api/promotionpictures/upload/' + promotionpicture.data.id,
             {
-              extension: "." + image.extension,
-              base64: image.base64
-            }
+              extension: '.' + image.extension,
+              base64: image.base64,
+            },
           );
         }
 
         this.props.navigation.goBack();
       } else {
-        toastService.error("Error: "+result.data);
+        toastService.error('Error: ' + result.data);
       }
     }
-    this.setState({ buttonLoading: false });
+    this.setState({buttonLoading: false});
   }
 
   async showImagePicker(options) {
     if (this.state.avatarSource && this.state.avatarSource.length >= 5) {
-      toastService.error("Error: "+"You only can add 5 image");
+      toastService.error('Error: ' + 'You only can add 5 image');
       return;
     }
     ImagePicker.openPicker({
       multiple: true,
-      includeBase64: true
+      includeBase64: true,
     }).then(images => {
       if (images.length > 5) {
-        toastService.error("Error: "+"You only can add 5 image");
+        toastService.error('Error: ' + 'You only can add 5 image');
         images = images.slice(0, 5);
         //  console.log(images);
       }
@@ -221,13 +222,13 @@ export default class AddPromotion extends Component {
           base64: images[i].data,
           mime: images[i].mime,
           extension:
-            images[i].mime == null ? "png" : images[i].mime.split("/")[1]
+            images[i].mime == null ? 'png' : images[i].mime.split('/')[1],
         };
         imageSources.push(image);
       }
 
       this.setState({
-        avatarSource: imageSources
+        avatarSource: imageSources,
       });
     });
     // ImagePicker.showImagePicker(options, response => {
@@ -280,7 +281,7 @@ export default class AddPromotion extends Component {
       isFromDateTimePickerVisible,
       isToDateTimePickerVisible,
       options,
-      avatarSource
+      avatarSource,
     } = this.state;
 
     return (
@@ -289,18 +290,13 @@ export default class AddPromotion extends Component {
           <View
             style={{
               flex: 1,
-              flexDirection: "row",
-              justifyContent: "space-between",
-              marginTop: 8
-            }}
-          >
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              marginTop: 8,
+            }}>
             <View>
               <TouchableOpacity onPress={() => this.props.navigation.goBack()}>
-                <Thumbnail
-                  small
-                  source={require("../../icons/left_arrow.png")}
-                  style={styles.thumbnail}
-                />
+                <Icon name="arrow-back-outline" color="#fff" size={28} />
               </TouchableOpacity>
             </View>
             <View>
@@ -322,8 +318,7 @@ export default class AddPromotion extends Component {
                       <Button
                         block
                         backgroundColor="#D94526"
-                        onPress={() => this.showImagePicker(options)}
-                      >
+                        onPress={() => this.showImagePicker(options)}>
                         <Text>Add image</Text>
                       </Button>
 
@@ -332,20 +327,19 @@ export default class AddPromotion extends Component {
                           horizontal={true}
                           style={{
                             flex: 1,
-                            flexDirection: "row",
-                            marginTop: 10
-                          }}
-                        >
+                            flexDirection: 'row',
+                            marginTop: 10,
+                          }}>
                           {avatarSource.map((item, i) => (
                             <Image
                               //source={item.source}
                               source={{
-                                uri: `data:${item.mime};base64,${item.base64}`
+                                uri: `data:${item.mime};base64,${item.base64}`,
                               }}
                               style={{
                                 width: 100,
                                 height: 100,
-                                resizeMode: "contain"
+                                resizeMode: 'contain',
                               }}
                             />
                           ))}
@@ -358,7 +352,7 @@ export default class AddPromotion extends Component {
                       <Input
                         placeholder="Please enter your title..."
                         placeholderTextColor="#848484"
-                        onChangeText={text => this.setState({ title: text })}
+                        onChangeText={text => this.setState({title: text})}
                         value={title}
                         style={styles.input}
                       />
@@ -369,7 +363,7 @@ export default class AddPromotion extends Component {
                       <Input
                         placeholder="Please enter your email..."
                         placeholderTextColor="#848484"
-                        onChangeText={text => this.setState({ email: text })}
+                        onChangeText={text => this.setState({email: text})}
                         value={email}
                         style={styles.input}
                       />
@@ -380,7 +374,7 @@ export default class AddPromotion extends Component {
                       <Input
                         placeholder="Please enter your phone..."
                         placeholderTextColor="#848484"
-                        onChangeText={text => this.setState({ phone: text })}
+                        onChangeText={text => this.setState({phone: text})}
                         value={phone}
                         style={styles.input}
                       />
@@ -389,51 +383,26 @@ export default class AddPromotion extends Component {
                     <View
                       style={{
                         marginLeft: 14,
-                        marginTop: 10
-                      }}
-                    >
+                        marginTop: 10,
+                      }}>
                       <View>
                         <Label style={styles.label}>Category</Label>
                       </View>
                       <View
                         style={{
                           marginLeft: 60,
-                          justifyContent: "center",
-                          marginTop: -43
-                        }}
-                      >
+                          justifyContent: 'center',
+                          marginTop: -43,
+                        }}>
                         {this.state.loading == false && (
-                          <SectionedMultiSelect
+                          <MultiSelect
+                            backgroundColor="#0065ff"
                             items={this.state.categories}
-                            uniqueKey="id"
-                            subKey="children"
-                            expandDropDowns={true}
-                            selectText="Choose category..."
-                            showDropDowns={true}
-                            readOnlyHeadings={true}
-                            onSelectedItemsChange={value =>
-                              this.setState({ selectedCategory: value })
-                            }
+                            placeHolder="Choose category"
                             selectedItems={this.state.selectedCategory}
-                            single={true}
-                            selectToggleIconComponent={
-                              <Icon
-                                name="caret-down"
-                                color="#D94526"
-                                size={30}
-                                style={styles.caretIcon}
-                              />
-                            }
-                            searchIconComponent={
-                              <Icon
-                                name="search"
-                                color="#D94526"
-                                size={15}
-                                style={{ marginLeft: 15 }}
-                              />
-                            }
-                            colors={color}
-                            styles={multiSelectStyles}
+                            setSelectedItems={value => {
+                              this.setState({selectedCategory: value});
+                            }}
                           />
                         )}
                       </View>
@@ -514,7 +483,7 @@ export default class AddPromotion extends Component {
                         placeholderTextColor="#848484"
                         keyboardType="numeric"
                         onChangeText={
-                          text => this.setState({ discount: parseFloat(text) })
+                          text => this.setState({discount: parseFloat(text)})
                           // this.setState({
                           //   discount:
                           //     text.replace(/\D*/, "") == ""
@@ -530,51 +499,26 @@ export default class AddPromotion extends Component {
                     <View
                       style={{
                         marginLeft: 14,
-                        marginTop: 10
-                      }}
-                    >
+                        marginTop: 10,
+                      }}>
                       <View>
                         <Label style={styles.label}>Location</Label>
                       </View>
                       <View
                         style={{
                           marginLeft: 60,
-                          justifyContent: "center",
-                          marginTop: -43
-                        }}
-                      >
+                          justifyContent: 'center',
+                          marginTop: -43,
+                        }}>
                         {this.state.loading == false && (
-                          <SectionedMultiSelect
+                          <MultiSelect
+                            backgroundColor="#0065ff"
                             items={this.state.cities}
-                            uniqueKey="id"
-                            subKey="children"
-                            expandDropDowns={true}
-                            selectText="Choose city..."
-                            showDropDowns={true}
-                            readOnlyHeadings={true}
-                            onSelectedItemsChange={value =>
-                              this.setState({ selectedCity: value })
-                            }
+                            placeHolder="Choose city"
                             selectedItems={this.state.selectedCity}
-                            single={true}
-                            selectToggleIconComponent={
-                              <Icon
-                                name="caret-down"
-                                color="#D94526"
-                                size={30}
-                                style={styles.caretIcon}
-                              />
-                            }
-                            searchIconComponent={
-                              <Icon
-                                name="search"
-                                color="#D94526"
-                                size={15}
-                                style={{ marginLeft: 15 }}
-                              />
-                            }
-                            colors={color}
-                            styles={multiSelectStyles}
+                            setSelectedItems={value => {
+                              this.setState({selectedCity: value});
+                            }}
                           />
                         )}
                       </View>
@@ -588,7 +532,7 @@ export default class AddPromotion extends Component {
                         rowSpan={5}
                         //bordered
                         onChangeText={text =>
-                          this.setState({ description: text })
+                          this.setState({description: text})
                         }
                         value={description}
                         style={styles.textArea}
@@ -602,16 +546,14 @@ export default class AddPromotion extends Component {
                 <View style={styles.cardFooter}>
                   <TouchableOpacity
                     onPress={() => this.props.navigation.goBack()}
-                    style={styles.cancel}
-                  >
+                    style={styles.cancel}>
                     <Text style={styles.cancelText}>CANCEL</Text>
                   </TouchableOpacity>
 
                   <Button
                     backgroundColor="#47BFB3"
                     style={styles.submitButton}
-                    onPress={() => this.submit()}
-                  >
+                    onPress={() => this.submit()}>
                     {this.state.buttonLoading == true && (
                       <Spinner color="green" />
                     )}
@@ -625,11 +567,10 @@ export default class AddPromotion extends Component {
               <Spinner color="red" />
               <Text
                 style={{
-                  textAlign: "center",
-                  color: "white",
-                  fontWeight: "bold"
-                }}
-              >
+                  textAlign: 'center',
+                  color: 'white',
+                  fontWeight: 'bold',
+                }}>
                 Loading
               </Text>
             </View>
@@ -642,88 +583,88 @@ export default class AddPromotion extends Component {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#1F2426"
+    backgroundColor: '#1F2426',
   },
   title: {
     fontSize: 15,
-    color: "#47BFB3",
+    color: '#47BFB3',
     //marginRight: 80,
-    marginTop: 10
+    marginTop: 10,
   },
   picker: {
     marginLeft: 20,
-    color: "white"
+    color: 'white',
   },
   caretIcon: {
-    right: 25
+    right: 25,
   },
   carditem: {
-    backgroundColor: "#1F2426"
+    backgroundColor: '#1F2426',
   },
   item: {
     marginBottom: 20,
-    borderColor: "transparent"
+    borderColor: 'transparent',
   },
   label: {
     fontSize: 15,
-    color: "#D94526"
+    color: '#D94526',
   },
   input: {
-    color: "white"
+    color: 'white',
   },
   textArea: {
-    width: "100%",
-    color: "white"
+    width: '100%',
+    color: 'white',
   },
   cardFooter: {
     flex: 1,
-    flexDirection: "row",
-    justifyContent: "space-between"
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   buttonGroup: {
-    backgroundColor: "#1F2426"
+    backgroundColor: '#1F2426',
   },
   cancelText: {
-    color: "white",
+    color: 'white',
     fontSize: 20,
-    fontWeight: "bold"
+    fontWeight: 'bold',
   },
   cancel: {
     // flex: 1,
     // flexDirection: "row",
     // justifyContent: "flex-start",
     marginTop: 10,
-    marginLeft: 15
+    marginLeft: 15,
   },
   submitButton: {
     width: 150,
-    justifyContent: "center"
+    justifyContent: 'center',
   },
   submitButtonText: {
     fontSize: 20,
-    fontWeight: "bold"
+    fontWeight: 'bold',
   },
   thumbnail: {
     width: 25,
     height: 25,
-    marginTop: 5
-  }
+    marginTop: 5,
+  },
 });
 
 //multiselect style
 const multiSelectStyles = StyleSheet.create({
   container: {
-    backgroundColor: "#1F2426"
+    backgroundColor: '#1F2426',
   },
-  selectToggleText: { color: "white" },
-  button: { backgroundColor: "#D94526" },
-  searchBar: { backgroundColor: "#1F2426" },
-  searchTextInput: { color: "#D94526" }
+  selectToggleText: {color: 'white'},
+  button: {backgroundColor: '#D94526'},
+  searchBar: {backgroundColor: '#1F2426'},
+  searchTextInput: {color: '#D94526'},
 });
 const color = {
-  text: "#D94526",
-  subText: "#47BFB3",
-  searchPlaceholderTextColor: "#D94526",
-  itemBackground: "#1F2426",
-  subItemBackground: "#1F2426"
+  text: '#D94526',
+  subText: '#47BFB3',
+  searchPlaceholderTextColor: '#D94526',
+  itemBackground: '#1F2426',
+  subItemBackground: '#1F2426',
 };

@@ -1,5 +1,5 @@
-import React, { Component } from "react";
-import { StyleSheet, TouchableOpacity } from "react-native";
+import React, {Component} from 'react';
+import {StyleSheet, TouchableOpacity} from 'react-native';
 import {
   Container,
   Content,
@@ -11,7 +11,6 @@ import {
   Left,
   Body,
   Right,
-  Icon,
   Title,
   Textarea,
   Card,
@@ -20,31 +19,32 @@ import {
   Form,
   Label,
   Input,
-  Spinner
-} from "native-base";
-import * as dataService from "../../services/DataService";
-import * as toastService from "../../services/ToastService";
-import * as authentication from "../../services/Authentication";
-import * as constant from "../../services/Constant";
+  Spinner,
+} from 'native-base';
+import * as dataService from '../../services/DataService';
+import * as toastService from '../../services/ToastService';
+import * as authentication from '../../services/Authentication';
+import * as constant from '../../services/Constant';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 export default class DoctorDetail extends Component {
   constructor(props) {
     super(props);
     this.state = {
       doctor: {
-        name: "Bui Duy Phuong",
-        information: "DC - Lindale Health Care Chiropractic & Rehab Clinic",
+        name: 'Bui Duy Phuong',
+        information: 'DC - Lindale Health Care Chiropractic & Rehab Clinic',
         moreInformation:
-          "(Bác sĩ Chỉnh khoa - Các chứng đau nhức, phong thấp, tai nạn xe cộ, thể thao, nghề nghiệp)"
+          '(Bác sĩ Chỉnh khoa - Các chứng đau nhức, phong thấp, tai nạn xe cộ, thể thao, nghề nghiệp)',
       },
       loading: true,
       profile: [],
       description: props.navigation.state.params.description,
-      descriptionQuestion: "",
+      descriptionQuestion: '',
       industryID: props.navigation.state.params.industryID,
-      title: "",
+      title: '',
       buttonLoading: false,
-      profileProID: props.navigation.state.params.id
+      profileProID: props.navigation.state.params.id,
     };
 
     if (props.navigation.state.params && props.navigation.state.params.id) {
@@ -54,35 +54,35 @@ export default class DoctorDetail extends Component {
   }
 
   async ensureDataFetched(id) {
-    var profile = await dataService.get("api/profiles/getprofile/" + id);
+    var profile = await dataService.get('api/profiles/getprofile/' + id);
 
     this.setState({
       profile: profile,
       loading: false,
       uri:
         constant.BASE_URL +
-        "api/avatars/getimage/" +
+        'api/avatars/getimage/' +
         profile.email +
-        "?random_number=" +
-        new Date().getTime()
+        '?random_number=' +
+        new Date().getTime(),
     });
   }
 
   async submit() {
-    this.setState({ buttonLoading: true });
-    const { title, descriptionQuestion, industryID, profileProID } = this.state;
+    this.setState({buttonLoading: true});
+    const {title, descriptionQuestion, industryID, profileProID} = this.state;
 
-    if (title.trim() == "") {
-      toastService.error("Error: " + "Title cannot be empty!");
+    if (title.trim() == '') {
+      toastService.error('Error: ' + 'Title cannot be empty!');
 
-      this.setState({ buttonLoading: false });
+      this.setState({buttonLoading: false});
       return;
     }
 
-    if (descriptionQuestion.trim() == "") {
-      toastService.error("Error: " + "Decription cannot be empty!");
+    if (descriptionQuestion.trim() == '') {
+      toastService.error('Error: ' + 'Decription cannot be empty!');
 
-      this.setState({ buttonLoading: false });
+      this.setState({buttonLoading: false});
       return;
     }
 
@@ -96,31 +96,26 @@ export default class DoctorDetail extends Component {
       createByEmail: user.email,
       title: title,
       description: descriptionQuestion,
-      view: 0
+      view: 0,
     };
     console.log(data);
-    var result = await dataService.post("api/faqquestions/add", data);
+    var result = await dataService.post('api/faqquestions/add', data);
     if (result.status === 200) {
-      toastService.success("Add question successfully!");
+      toastService.success('Add question successfully!');
 
-      this.setState({ buttonLoading: false });
+      this.setState({buttonLoading: false});
       this.props.navigation.goBack();
     } else {
-      this.setState({ buttonLoading: false });
+      this.setState({buttonLoading: false});
       toastService.error(
-        "Error: " + "Something wrong! Please check and try again"
+        'Error: ' + 'Something wrong! Please check and try again',
       );
     }
   }
 
   render() {
-    const {
-      profile,
-      loading,
-      description,
-      descriptionQuestion,
-      uri
-    } = this.state;
+    const {profile, loading, description, descriptionQuestion, uri} =
+      this.state;
 
     return (
       <Container style={styles.container}>
@@ -128,18 +123,13 @@ export default class DoctorDetail extends Component {
           <View
             style={{
               flex: 1,
-              flexDirection: "row",
-              justifyContent: "space-between",
-              marginTop: 8
-            }}
-          >
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              marginTop: 8,
+            }}>
             <View>
               <TouchableOpacity onPress={() => this.goTabBack()}>
-                <Thumbnail
-                  small
-                  source={require("../../icons/left_arrow.png")}
-                  style={styles.thumbnailArrow}
-                />
+                <Icon name="arrow-back-outline" color="#fff" size={28} />
               </TouchableOpacity>
             </View>
             <View>
@@ -156,8 +146,8 @@ export default class DoctorDetail extends Component {
               <Thumbnail
                 large
                 //source={require("../../icons/Avatar.png")}
-                defaultSource={{ uri: "avatar" }}
-                source={{ uri: this.state.uri }}
+                defaultSource={{uri: 'avatar'}}
+                source={{uri: this.state.uri}}
                 style={styles.thumbnail}
                 // onError={() =>
                 //   this.setState({
@@ -192,7 +182,7 @@ export default class DoctorDetail extends Component {
                           style={styles.titleInput}
                           placeholder="Title"
                           placeholderTextColor="#D94526"
-                          onChangeText={text => this.setState({ title: text })}
+                          onChangeText={text => this.setState({title: text})}
                         />
                       </Item>
 
@@ -203,7 +193,7 @@ export default class DoctorDetail extends Component {
                           placeholder="Description"
                           placeholderTextColor="#D94526"
                           onChangeText={text =>
-                            this.setState({ descriptionQuestion: text })
+                            this.setState({descriptionQuestion: text})
                           }
                         />
                       </View>
@@ -219,8 +209,7 @@ export default class DoctorDetail extends Component {
                 block
                 backgroundColor="#47BFB3"
                 style={styles.submitButton}
-                onPress={() => this.submit()}
-              >
+                onPress={() => this.submit()}>
                 {this.state.buttonLoading == true && <Spinner color="red" />}
                 <Text style={styles.submitButtonText}>SUBMIT</Text>
               </Button>
@@ -231,11 +220,10 @@ export default class DoctorDetail extends Component {
             <Spinner color="red" />
             <Text
               style={{
-                textAlign: "center",
-                color: "white",
-                fontWeight: "bold"
-              }}
-            >
+                textAlign: 'center',
+                color: 'white',
+                fontWeight: 'bold',
+              }}>
               Loading
             </Text>
           </View>
@@ -251,43 +239,43 @@ export default class DoctorDetail extends Component {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#1F2426"
+    backgroundColor: '#1F2426',
   },
   avatar: {
-    alignItems: "center"
+    alignItems: 'center',
   },
   informationView: {
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
     paddingLeft: 40,
-    paddingRight: 40
+    paddingRight: 40,
   },
   name: {
-    fontWeight: "bold",
-    color: "#D94526",
-    fontSize: 15
+    fontWeight: 'bold',
+    color: '#D94526',
+    fontSize: 15,
   },
   information: {
-    color: "white",
+    color: 'white',
     fontSize: 12,
-    textAlign: "center"
+    textAlign: 'center',
   },
   thumbnail: {
     width: 150,
-    height: 150
+    height: 150,
   },
 
   headerBodyText: {
     // justifyContent: "center",
     //left: 30,
     fontSize: 20,
-    color: "#47BFB3",
-    marginTop: 5
+    color: '#47BFB3',
+    marginTop: 5,
   },
 
   descriptionView: {
     marginTop: 10,
-    marginLeft: 16
+    marginLeft: 16,
   },
   titleInput: {
     //marginLeft: -70
@@ -295,35 +283,35 @@ const styles = StyleSheet.create({
   card: {
     left: 0,
     //marginTop: 20,
-    padding: 10
+    padding: 10,
   },
   cardHeader: {
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#D94526"
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#D94526',
   },
   cardHeaderText: {
-    textAlign: "center",
-    color: "white",
-    fontWeight: "bold",
-    fontSize: 15
+    textAlign: 'center',
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 15,
   },
   cardTitle: {
     //marginTop: -20
   },
   submitButtonText: {
-    color: "white",
-    fontWeight: "bold"
+    color: 'white',
+    fontWeight: 'bold',
   },
   submitButtonView: {
     flex: 1,
-    alignItems: "center",
-    justifyContent: "center"
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   submitButton: {},
   thumbnailArrow: {
     width: 25,
     height: 25,
-    marginTop: 5
-  }
+    marginTop: 5,
+  },
 });

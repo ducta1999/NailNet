@@ -19,7 +19,7 @@ import {
   TabHeading,
   ScrollableTab,
 } from 'native-base';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import Icon from 'react-native-vector-icons/Ionicons';
 // import { TouchableOpacity } from "react-native-gesture-handler";
 import * as dataService from '../services/DataService';
 import * as authentication from '../services/Authentication';
@@ -61,11 +61,7 @@ export default class NailTV extends Component {
             }}>
             <View>
               <TouchableOpacity onPress={() => this.props.navigation.goBack()}>
-                <Thumbnail
-                  small
-                  source={require('../icons/left_arrow.png')}
-                  style={styles.thumbnail}
-                />
+                <Icon name="arrow-back-outline" color="#fff" size={28} />
               </TouchableOpacity>
             </View>
             <View>

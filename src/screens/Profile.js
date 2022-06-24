@@ -16,14 +16,15 @@ import {
   Button,
   Form,
 } from 'native-base';
-import Icon from 'react-native-vector-icons/FontAwesome';
 import SectionedMultiSelect from 'react-native-sectioned-multi-select';
+import MultiSelect from './Components/MultiSelect';
 // import { TouchableOpacity } from "react-native-gesture-handler";
 import * as dataService from '../services/DataService';
 import * as toastService from '../services/ToastService';
 import * as authentication from '../services/Authentication';
 import * as constant from '../services/Constant';
 import ImagePicker from 'react-native-image-crop-picker';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 export default class Promotion extends Component {
   constructor(props) {
@@ -269,11 +270,7 @@ export default class Promotion extends Component {
             }}>
             <View>
               <TouchableOpacity onPress={() => this.props.navigation.goBack()}>
-                <Thumbnail
-                  small
-                  source={require('../icons/left_arrow.png')}
-                  style={styles.thumbnail}
-                />
+                <Icon name="arrow-back-outline" color="#fff" size={28} />
               </TouchableOpacity>
             </View>
             <View>
@@ -289,10 +286,7 @@ export default class Promotion extends Component {
                 </TouchableOpacity>
               ) : (
                 <TouchableOpacity onPress={() => this.cancel()}>
-                  <Thumbnail
-                    source={require('../icons/left_arrow2.png')}
-                    style={styles.thumbnail}
-                  />
+                  <Icon name="arrow-back-outline" color="#fff" size={28} />
                 </TouchableOpacity>
               )}
             </View>
@@ -482,38 +476,14 @@ export default class Promotion extends Component {
                           marginTop: -50,
                         }}>
                         {loading == false && cities && (
-                          <SectionedMultiSelect
+                          <MultiSelect
                             items={cities}
-                            uniqueKey="id"
-                            subKey="children"
-                            expandDropDowns={true}
-                            selectText="Choose City..."
-                            showDropDowns={true}
-                            readOnlyHeadings={true}
-                            onSelectedItemsChange={value =>
+                            placeHolder="Choose City..."
+                            selectedItems={selectedCity}
+                            setSelectedItems={value =>
                               edit == true &&
                               this.setState({selectedCity: value})
                             }
-                            selectedItems={selectedCity}
-                            single={true}
-                            selectToggleIconComponent={
-                              <Icon
-                                name="caret-down"
-                                color="#D94526"
-                                size={30}
-                                style={styles.caretIcon}
-                              />
-                            }
-                            searchIconComponent={
-                              <Icon
-                                name="search"
-                                color="#D94526"
-                                size={15}
-                                style={{marginLeft: 15}}
-                              />
-                            }
-                            colors={color}
-                            styles={multiSelectStyles}
                           />
                         )}
                       </View>

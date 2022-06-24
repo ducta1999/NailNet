@@ -30,6 +30,7 @@ import Job from './postSubScreens/Job';
 import Shop from './postSubScreens/Shop';
 import Classified from './postSubScreens/Classified';
 import NailTV from './postSubScreens/NailTV';
+import Ionicon from 'react-native-vector-icons/Ionicons';
 
 export default class Post extends Component {
   constructor(props) {
@@ -78,11 +79,7 @@ export default class Post extends Component {
               )}
               {this.state.tabPage != 0 && (
                 <TouchableOpacity onPress={() => this.goTabBack()}>
-                  <Thumbnail
-                    small
-                    source={require('../icons/left_arrow.png')}
-                    style={styles.thumbnail}
-                  />
+                  <Ionicon name="arrow-back-outline" color="#fff" size={28} />
                 </TouchableOpacity>
               )}
             </View>

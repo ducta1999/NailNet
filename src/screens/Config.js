@@ -31,6 +31,7 @@ import Job from './configSubScreens/Job';
 import Shop from './configSubScreens/Shop';
 import Classified from './configSubScreens/Classified';
 import NailTV from './configSubScreens/NailTV';
+import Ionicon from 'react-native-vector-icons/Ionicons';
 
 export default class Config extends Component {
   constructor(props) {
@@ -79,11 +80,7 @@ export default class Config extends Component {
               )}
               {this.state.tabPage != 0 && (
                 <TouchableOpacity onPress={() => this.goTabBack()}>
-                  <Thumbnail
-                    small
-                    source={require('../icons/left_arrow.png')}
-                    style={styles.thumbnail}
-                  />
+                  <Ionicon name="arrow-back-outline" color="#fff" size={28} />
                 </TouchableOpacity>
               )}
             </View>

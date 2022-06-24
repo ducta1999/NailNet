@@ -19,11 +19,12 @@ import {
   Body,
   Right,
 } from 'native-base';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import Icon from 'react-native-vector-icons/Ionicons';
 // import { TouchableOpacity } from "react-native-gesture-handler";
 import * as dataService from './../services/DataService';
 import * as constant from './../services/Constant';
 import SectionedMultiSelect from 'react-native-sectioned-multi-select';
+import MultiSelect from './Components/MultiSelect';
 
 export default class Classified extends Component {
   constructor(props) {
@@ -128,11 +129,7 @@ export default class Classified extends Component {
                   this.setState({loading: true});
                   this.props.navigation.goBack();
                 }}>
-                <Thumbnail
-                  small
-                  source={require('../icons/left_arrow.png')}
-                  style={styles.thumbnail}
-                />
+                <Icon name="arrow-back-outline" color="#fff" size={28} />
               </TouchableOpacity>
             </View>
             <View>
@@ -171,38 +168,15 @@ export default class Classified extends Component {
 
                         <View style={styles.multiselect}>
                           {loading == false && (
-                            <SectionedMultiSelect
+                            <MultiSelect
                               items={item.subCategories}
-                              uniqueKey="id"
-                              subKey="children"
-                              expandDropDowns={true}
-                              selectText="Choose sub category..."
-                              showDropDowns={true}
-                              readOnlyHeadings={true}
-                              onSelectedItemsChange={value =>
+                              placeHolder="Choose sub category..."
+                              selectedItems={item.selectedCategory}
+                              setSelectedItems={value =>
                                 this.selectCategory(value, item.mainCategory.id)
                               }
-                              selectedItems={item.selectedCategory}
-                              single={true}
-                              selectToggleIconComponent={
-                                <Icon
-                                  name="caret-down"
-                                  color="#D94526"
-                                  size={30}
-                                  style={styles.caretIcon}
-                                />
-                              }
-                              searchIconComponent={
-                                <Icon
-                                  name="search"
-                                  color="#D94526"
-                                  size={15}
-                                  style={{marginLeft: 15}}
-                                />
-                              }
-                              colors={color}
-                              styles={multiSelectStyles}
                             />
+
                             // <Picker
                             //   mode="dropdown"
                             //   placeholder="GUEST"

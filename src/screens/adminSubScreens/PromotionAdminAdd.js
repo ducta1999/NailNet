@@ -1,12 +1,12 @@
-import * as authentication from "../../services/Authentication";
-import * as dataService from "../../services/DataService";
-import * as toastService from "../../services/ToastService";
-import * as constant from "../../services/Constant";
-import React, { Component } from "react";
-import * as formatDate from "../../services/FormatDate";
-import { StyleSheet, TouchableOpacity, Linking, Alert } from "react-native";
-import Slideshow from "react-native-image-slider-show";
-import NumericInput from "react-native-numeric-input";
+import * as authentication from '../../services/Authentication';
+import * as dataService from '../../services/DataService';
+import * as toastService from '../../services/ToastService';
+import * as constant from '../../services/Constant';
+import React, {Component} from 'react';
+import * as formatDate from '../../services/FormatDate';
+import {StyleSheet, TouchableOpacity, Linking, Alert} from 'react-native';
+import Slideshow from 'react-native-image-slider-show';
+import NumericInput from 'react-native-numeric-input';
 import {
   Container,
   Content,
@@ -30,8 +30,8 @@ import {
   Tabs,
   Tab,
   Icon,
-  TabHeading
-} from "native-base";
+  TabHeading,
+} from 'native-base';
 //import Icon from "react-native-vector-icons/FontAwesome";
 
 export default class PromotionAdminAdd extends Component {
@@ -47,18 +47,13 @@ export default class PromotionAdminAdd extends Component {
           <View
             style={{
               flex: 1,
-              flexDirection: "row",
-              justifyContent: "space-between",
-              marginTop: 8
-            }}
-          >
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              marginTop: 8,
+            }}>
             <View>
               <TouchableOpacity onPress={() => this.props.navigation.goBack()}>
-                <Thumbnail
-                  small
-                  source={require("../../icons/left_arrow.png")}
-                  style={styles.thumbnailArrow}
-                />
+                <Icon name="arrow-back-outline" color="#fff" size={28} />
               </TouchableOpacity>
             </View>
             <View>
@@ -82,7 +77,7 @@ export default class PromotionAdminAdd extends Component {
                         placeholder="Enter your promotion category decription"
                         placeholderTextColor="#D94526"
                         onChangeText={text =>
-                          this.setState({ description: text })
+                          this.setState({description: text})
                         }
                       />
                     </View>
@@ -97,8 +92,7 @@ export default class PromotionAdminAdd extends Component {
               block
               backgroundColor="#47BFB3"
               style={styles.submitButton}
-              onPress={() => this.submit()}
-            >
+              onPress={() => this.submit()}>
               {this.state.buttonLoading == true && <Spinner color="red" />}
               <Text style={styles.submitButtonText}>SUBMIT</Text>
             </Button>
@@ -109,13 +103,13 @@ export default class PromotionAdminAdd extends Component {
   }
 
   async submit() {
-    this.setState({ buttonLoading: true });
-    const { description } = this.state;
+    this.setState({buttonLoading: true});
+    const {description} = this.state;
 
-    if (description.trim() == "") {
-      toastService.error("Error: " + "Description cannot be empty!");
+    if (description.trim() == '') {
+      toastService.error('Error: ' + 'Description cannot be empty!');
 
-      this.setState({ buttonLoading: false });
+      this.setState({buttonLoading: false});
       return;
     }
 
@@ -123,20 +117,20 @@ export default class PromotionAdminAdd extends Component {
 
     var data = {
       description: description,
-      createByEmail: user.email
+      createByEmail: user.email,
     };
 
-    var result = await dataService.post("api/promotioncategories/add", data);
+    var result = await dataService.post('api/promotioncategories/add', data);
     if (result.status === 200) {
-      toastService.success("Add promotion category successfully!");
+      toastService.success('Add promotion category successfully!');
 
-      this.setState({ buttonLoading: false });
+      this.setState({buttonLoading: false});
       this.props.navigation.state.params.onGoBack();
       this.props.navigation.goBack();
     } else {
-      this.setState({ buttonLoading: false });
+      this.setState({buttonLoading: false});
       toastService.error(
-        "Error: " + "Something wrong! Please check and try again"
+        'Error: ' + 'Something wrong! Please check and try again',
       );
     }
   }
@@ -144,78 +138,78 @@ export default class PromotionAdminAdd extends Component {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#1F2426"
+    backgroundColor: '#1F2426',
   },
   avatar: {
-    alignItems: "center"
+    alignItems: 'center',
   },
   informationView: {
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
     paddingLeft: 40,
-    paddingRight: 40
+    paddingRight: 40,
   },
   name: {
-    fontWeight: "bold",
-    color: "#D94526",
-    fontSize: 15
+    fontWeight: 'bold',
+    color: '#D94526',
+    fontSize: 15,
   },
   information: {
-    color: "white",
+    color: 'white',
     fontSize: 12,
-    textAlign: "center"
+    textAlign: 'center',
   },
   thumbnail: {
     width: 150,
-    height: 150
+    height: 150,
   },
 
   headerBodyText: {
-    justifyContent: "center",
+    justifyContent: 'center',
     //left: 30,
     fontSize: 20,
-    color: "#47BFB3",
-    marginTop: 5
+    color: '#47BFB3',
+    marginTop: 5,
   },
 
   descriptionView: {
     marginTop: 10,
-    marginLeft: 16
+    marginLeft: 16,
   },
   titleInput: {
     //marginLeft: -70
   },
   card: {
     //marginTop: 20,
-    padding: 10
+    padding: 10,
   },
   cardHeader: {
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#D94526"
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#D94526',
   },
   cardHeaderText: {
-    textAlign: "center",
-    color: "white",
-    fontWeight: "bold",
-    fontSize: 15
+    textAlign: 'center',
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 15,
   },
   cardTitle: {
     //marginTop: -20
   },
   submitButtonText: {
-    color: "white",
-    fontWeight: "bold"
+    color: 'white',
+    fontWeight: 'bold',
   },
   submitButtonView: {
     flex: 1,
-    alignItems: "center",
-    justifyContent: "center"
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   submitButton: {},
   thumbnailArrow: {
     width: 25,
     height: 25,
-    marginTop: 5
-  }
+    marginTop: 5,
+  },
 });

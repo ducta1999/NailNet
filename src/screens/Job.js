@@ -19,12 +19,11 @@ import {
   TabHeading,
   ScrollableTab,
 } from 'native-base';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import Icon from 'react-native-vector-icons/Ionicons';
 // import { TouchableOpacity } from "react-native-gesture-handler";
 import * as dataService from '../services/DataService';
 import * as authentication from '../services/Authentication';
 import * as constant from '../services/Constant';
-import SectionedMultiSelect from 'react-native-sectioned-multi-select';
 
 export default class Job extends Component {
   constructor(props) {
@@ -77,11 +76,7 @@ export default class Job extends Component {
             }}>
             <View>
               <TouchableOpacity onPress={() => this.props.navigation.goBack()}>
-                <Thumbnail
-                  small
-                  source={require('../icons/left_arrow.png')}
-                  style={styles.thumbnail}
-                />
+                <Icon name="arrow-back-outline" color="#fff" size={28} />
               </TouchableOpacity>
             </View>
             <View>

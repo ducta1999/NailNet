@@ -32,7 +32,6 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import * as dataService from '../../services/DataService';
 import * as authentication from '../../services/Authentication';
 import * as constant from '../../services/Constant';
-import SectionedMultiSelect from 'react-native-sectioned-multi-select';
 import LinearGradient from 'react-native-linear-gradient';
 import MultiSelect from '../Components/MultiSelect';
 

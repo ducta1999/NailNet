@@ -5,6 +5,7 @@ import {
   Alert,
   TouchableOpacity,
   ImageBackground,
+  Dimensions,
 } from 'react-native';
 import {
   Container,
@@ -27,6 +28,9 @@ import {
   getAnimatingBottomBar,
   AnimationType,
 } from 'react-native-animating-bottom-tab-bar';
+import Profile from './Profile';
+import Shop from './Shop';
+import Conversation from './Conversation';
 
 export default class Home extends Component {
   constructor(props) {
@@ -46,12 +50,6 @@ export default class Home extends Component {
           uri: require('../icons/icon_promotion.png'),
         },
         {
-          name: 'Order Equipment',
-          description: 'ORDER EQUIPMENT SUPPLIES',
-          screenName: 'Shop',
-          uri: require('../icons/icon_supplies.png'),
-        },
-        {
           name: 'Classifieds',
           description: 'BUY & SELL',
           screenName: 'Classified',
@@ -68,6 +66,30 @@ export default class Home extends Component {
           description: 'Nail TV',
           screenName: 'NailTV',
           uri: require('../icons/icon_nailtv.png'),
+        },
+        {
+          name: 'Conversation',
+          description: 'Conversation',
+          screenName: 'Conversation',
+          uri: require('../icons/icon_conversation.png'),
+        },
+        {
+          name: 'Your Post',
+          description: 'Your Post',
+          screenName: 'Post',
+          uri: require('../icons/icon_post.png'),
+        },
+        {
+          name: 'Administrator',
+          description: 'Administrator',
+          screenName: 'Admin',
+          uri: require('../icons/icon_admin.png'),
+        },
+        {
+          name: 'Configuration',
+          description: 'Configuration',
+          screenName: 'Config',
+          uri: require('../icons/icon_config.png'),
         },
       ],
     };
@@ -103,59 +125,25 @@ export default class Home extends Component {
   }
 
   render() {
+    const {height} = Dimensions.get('window');
     const BottomBarStack = getAnimatingBottomBar({
       type: AnimationType.SvgBottomBar,
       navigationScreens: {
         ['Home']: () => (
-          <>
-            <Header transparent style={{marginTop: 18}}>
-              <View
-                style={{
-                  flex: 1,
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  marginTop: 8,
-                }}>
-                <View style={{marginLeft: 9}}>
-                  <TouchableOpacity onPress={() => this.onpenDrawer()}>
-                    <Thumbnail
-                      small
-                      source={require('../icons/menu.png')}
-                      style={styles.thumbnail}
-                    />
-                  </TouchableOpacity>
-                </View>
-                <View
-                  style={{
-                    backgroundColor: 'rgba(102, 155, 188, 0.2)',
-                    width: 48,
-                    height: 48,
-                    borderRadius: 24,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    marginRight: 9,
-                  }}>
-                  <Thumbnail
-                    small
-                    square
-                    source={require('../icons/customer-service.png')}
-                    style={styles.thumbnail}
-                  />
-                </View>
-              </View>
-            </Header>
-            <Content>
-              <FlatList
-                data={this.state.GridListItems}
-                renderItem={this.renderItem}
-                numColumns={2}
-              />
-            </Content>
-          </>
+          <FlatList
+            data={this.state.GridListItems}
+            renderItem={this.renderItem}
+            numColumns={3}
+            contentContainerStyle={{
+              minHeight: height,
+              paddingTop: 24,
+              paddingBottom: 111,
+            }}
+          />
         ),
-        ['Shop']: () => <></>,
-        ['Chat']: () => <></>,
-        ['Profile']: () => <></>,
+        ['Shop']: Shop,
+        ['Chat']: Conversation,
+        ['Profile']: Profile,
       },
       navigationParameter: [
         {
@@ -203,8 +191,8 @@ export default class Home extends Component {
         bottomBarConfig: {
           backgroundColor: '#fff',
           // height: 79,
-          // curveDepth: 36,
-          // curveWidth: 99,
+          curveDepth: 48,
+          curveWidth: 99,
         },
       },
     });
@@ -224,24 +212,17 @@ export default class Home extends Component {
         style={styles.GridViewContainer}
         onPress={() => this.navigateTo(item.screenName)}>
         <TouchableOpacity
+          activeOpacity={0.79}
           style={{justifyContent: 'center', alignItems: 'center'}}
           onPress={() => this.navigateTo(item.screenName)}>
           {/* <Text style={styles.GridViewTextLayoutName}>{item.name}</Text> */}
 
-          <View
-            style={{
-              width: 90,
-              height: 90,
-              alignItems: 'center',
-              justifyContent: 'center',
-              borderRadius: 45,
-              backgroundColor: 'white',
-            }}>
+          <View style={styles.thumbnailView}>
             <Thumbnail
               small
               square
               source={item.uri}
-              style={{width: 39, height: 39}}
+              style={{width: 36, height: 36}}
             />
           </View>
 
@@ -264,13 +245,30 @@ export default class Home extends Component {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#dee5e7b3',
+    backgroundColor: 'rgba(102, 155, 188, 0.123)',
+  },
+  thumbnailView: {
+    width: 80,
+    height: 80,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 40,
+    backgroundColor: 'white',
+    shadowColor: '#495057',
+    shadowOffset: {
+      width: 1,
+      height: 9,
+    },
+    shadowRadius: 40,
+    shadowOpacity: 1.0,
+    elevation: 12,
   },
   GridViewContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-    height: 168,
-    width: '48%',
+    width: '33.3%',
+    marginVertical: 12,
+    padding: 12,
   },
   GridViewTextLayoutName: {
     fontSize: 30,
@@ -281,10 +279,10 @@ const styles = StyleSheet.create({
   GridViewTextLayoutDescription: {
     fontSize: 12,
     justifyContent: 'center',
-    color: '#555b6e',
+    color: '#6c757d',
     fontFamily: 'Montserrat-SemiBold',
     textAlign: 'center',
-    marginTop: 9,
+    marginTop: 18,
   },
   title: {
     color: '#47BFB3',

@@ -74,130 +74,116 @@ export default class Menu extends Component {
   }
 
   render() {
+    const menuData = [
+      {title: 'Home', route: 'Home'},
+      {title: 'FAQs', route: 'Question'},
+      {title: 'Promotion', route: 'Promotion'},
+      {title: 'Shop', route: 'Shop'},
+      {title: 'Classifields', route: 'Classifield'},
+      {title: 'Classifields', route: 'Classifield'},
+      {title: 'Job', route: 'Job'},
+      {title: 'NailTV', route: 'NailTV'},
+      {title: 'Conversation', route: 'Conversation'},
+      {title: 'Conversation', route: 'Conversation'},
+      {title: 'Your post', route: 'Post'},
+      {title: 'Profile', route: 'Profile'},
+      {title: 'Administrator', route: 'Admin'},
+      {title: 'Configuration', route: 'Config'},
+    ];
     return (
-      <Container style={styles.container}>
-        <Content>
-          <ImageBackground
-            source={require('../icons/menu_bg.png')}
-            style={{
-              width: '100%',
-              height: '100%',
-              alignItems: 'center',
-              //borderRadius: 10
-            }}>
-            <ScrollView>
-              <List>
-                <ListItem style={styles.thumbnail} noBorder>
-                  <Thumbnail
-                    small
-                    square
-                    source={{uri: this.state.uri}}
-                    style={{width: 70, height: 70, borderRadius: 150}}
-                    onError={() =>
-                      this.setState({
-                        uri: 'avatar',
-                        //uriValid: false
-                      })
-                    }
-                  />
-                </ListItem>
-                <ListItem
-                  selected
-                  // onPress={() => this.props.navigation.navigate("Home")}
-                  //  noBorder
-                >
-                  <View
-                    style={{flex: 1, flexDirection: 'row', flexWrap: 'wrap'}}>
-                    <View>
-                      <Text style={{color: 'white', fontSize: 10}}>
-                        {this.state.user ? this.state.user.email : ''}
-                      </Text>
-                    </View>
+      <ScrollView>
+        <List>
+          <ListItem
+            selected
+            // onPress={() => this.props.navigation.navigate("Home")}
+            //  noBorder
+          >
+            <View style={{flex: 1, flexDirection: 'row', flexWrap: 'wrap'}}>
+              <View>
+                <Text style={{color: 'white', fontSize: 10}}>
+                  {this.state.user ? this.state.user.email : ''}
+                </Text>
+              </View>
 
-                    <View>
-                      <Text style={styles.menuText}>
-                        {this.state.occupation
-                          ? this.state.occupation.description
-                          : ''}
-                      </Text>
-                    </View>
-                  </View>
-                </ListItem>
-                <ListItem
-                  selected
-                  onPress={() => this.props.navigation.navigate('Home')}
-                  noBorder>
-                  <Text style={styles.menuText}>Home</Text>
-                </ListItem>
-                <ListItem
-                  onPress={() => this.props.navigation.navigate('Question')}
-                  noBorder>
-                  <Text style={styles.menuText}>FAQs</Text>
-                </ListItem>
-                <ListItem
-                  noBorder
-                  onPress={() => this.props.navigation.navigate('Promotion')}>
-                  <Text style={styles.menuText}>Promotion</Text>
-                </ListItem>
-                <ListItem
-                  noBorder
-                  onPress={() => this.props.navigation.navigate('Shop')}>
-                  <Text style={styles.menuText}>Shop</Text>
-                </ListItem>
-                <ListItem
-                  noBorder
-                  onPress={() => this.props.navigation.navigate('Classifield')}>
-                  <Text style={styles.menuText}>Classifields</Text>
-                </ListItem>
-                <ListItem
-                  noBorder
-                  onPress={() => this.props.navigation.navigate('Job')}>
-                  <Text style={styles.menuText}>Job</Text>
-                </ListItem>
-                <ListItem
-                  noBorder
-                  onPress={() => this.props.navigation.navigate('NailTV')}>
-                  <Text style={styles.menuText}>NailTV</Text>
-                </ListItem>
-                <ListItem
-                  noBorder
-                  onPress={() =>
-                    this.props.navigation.navigate('Conversation')
-                  }>
-                  <Text style={styles.menuText}>Conversation</Text>
-                </ListItem>
-                <ListItem
-                  noBorder
-                  onPress={() => this.props.navigation.navigate('Post')}>
-                  <Text style={styles.menuText}>Your Post</Text>
-                </ListItem>
-                <ListItem
-                  noBorder
-                  onPress={() => this.props.navigation.navigate('Profile')}>
-                  <Text style={styles.menuText}>Profile</Text>
-                </ListItem>
-                {this.state.user && this.state.user.occupationID == 2 && (
-                  <ListItem
-                    noBorder
-                    onPress={() => this.props.navigation.navigate('Admin')}>
-                    <Text style={styles.menuText}>Admin</Text>
-                  </ListItem>
-                )}
-                {this.state.user && this.state.user.occupationID == 2 && (
-                  <ListItem
-                    noBorder
-                    onPress={() => this.props.navigation.navigate('Config')}>
-                    <Text style={styles.menuText}>Config</Text>
-                  </ListItem>
-                )}
-                <ListItem onPress={() => this.logout()}>
-                  <Text style={styles.menuText}>Logout</Text>
-                </ListItem>
-              </List>
-            </ScrollView>
-          </ImageBackground>
-        </Content>
-      </Container>
+              <View>
+                <Text style={styles.menuText}>
+                  {this.state.occupation
+                    ? this.state.occupation.description
+                    : ''}
+                </Text>
+              </View>
+            </View>
+          </ListItem>
+          <ListItem
+            selected
+            onPress={() => this.props.navigation.navigate('Home')}
+            noBorder>
+            <Text style={styles.menuText}>Home</Text>
+          </ListItem>
+          <ListItem
+            onPress={() => this.props.navigation.navigate('Question')}
+            noBorder>
+            <Text style={styles.menuText}>FAQs</Text>
+          </ListItem>
+          <ListItem
+            noBorder
+            onPress={() => this.props.navigation.navigate('Promotion')}>
+            <Text style={styles.menuText}>Promotion</Text>
+          </ListItem>
+          <ListItem
+            noBorder
+            onPress={() => this.props.navigation.navigate('Shop')}>
+            <Text style={styles.menuText}>Shop</Text>
+          </ListItem>
+          <ListItem
+            noBorder
+            onPress={() => this.props.navigation.navigate('Classifield')}>
+            <Text style={styles.menuText}>Classifields</Text>
+          </ListItem>
+          <ListItem
+            noBorder
+            onPress={() => this.props.navigation.navigate('Job')}>
+            <Text style={styles.menuText}>Job</Text>
+          </ListItem>
+          <ListItem
+            noBorder
+            onPress={() => this.props.navigation.navigate('NailTV')}>
+            <Text style={styles.menuText}>NailTV</Text>
+          </ListItem>
+          <ListItem
+            noBorder
+            onPress={() => this.props.navigation.navigate('Conversation')}>
+            <Text style={styles.menuText}>Conversation</Text>
+          </ListItem>
+          <ListItem
+            noBorder
+            onPress={() => this.props.navigation.navigate('Post')}>
+            <Text style={styles.menuText}>Your Post</Text>
+          </ListItem>
+          <ListItem
+            noBorder
+            onPress={() => this.props.navigation.navigate('Profile')}>
+            <Text style={styles.menuText}>Profile</Text>
+          </ListItem>
+          {this.state.user && this.state.user.occupationID == 2 && (
+            <ListItem
+              noBorder
+              onPress={() => this.props.navigation.navigate('Admin')}>
+              <Text style={styles.menuText}>Admin</Text>
+            </ListItem>
+          )}
+          {this.state.user && this.state.user.occupationID == 2 && (
+            <ListItem
+              noBorder
+              onPress={() => this.props.navigation.navigate('Config')}>
+              <Text style={styles.menuText}>Config</Text>
+            </ListItem>
+          )}
+          <ListItem onPress={() => this.logout()}>
+            <Text style={styles.menuText}>Logout</Text>
+          </ListItem>
+        </List>
+      </ScrollView>
     );
   }
 }
@@ -210,7 +196,7 @@ const styles = StyleSheet.create({
   },
   menuText: {
     fontSize: 15,
-    color: 'white',
+    color: '#000',
     marginBottom: 20,
     fontWeight: 'bold',
   },
@@ -219,6 +205,6 @@ const styles = StyleSheet.create({
     marginBottom: -10,
   },
   container: {
-    backgroundColor: '#D3D3DE',
+    backgroundColor: '#fff',
   },
 });

@@ -26,6 +26,8 @@ import * as dataService from '../../services/DataService';
 import * as toastService from '../../services/ToastService';
 import * as constant from '../../services/Constant';
 import SectionedMultiSelect from 'react-native-sectioned-multi-select';
+import MultiSelect from '../Components/MultiSelect';
+
 import NumericInput from 'react-native-numeric-input';
 
 export default class Shop extends Component {
@@ -141,38 +143,47 @@ export default class Shop extends Component {
 
                         <View style={styles.multiselect}>
                           {loading == false && (
-                            <SectionedMultiSelect
+                            <MultiSelect
+                              backgroundColor="#0065ff"
                               items={item.subCategories}
-                              uniqueKey="id"
-                              subKey="children"
-                              expandDropDowns={true}
-                              selectText="Choose sub category..."
-                              showDropDowns={true}
-                              readOnlyHeadings={true}
-                              onSelectedItemsChange={value =>
+                              placeHolder="Choose sub category"
+                              selectedItems={item.selectedCategory}
+                              setSelectedItems={value =>
                                 this.selectCategory(value, item.mainCategory.id)
                               }
-                              selectedItems={item.selectedCategory}
-                              single={true}
-                              selectToggleIconComponent={
-                                <Icon
-                                  name="caret-down"
-                                  color="#D94526"
-                                  size={30}
-                                  style={styles.caretIcon}
-                                />
-                              }
-                              searchIconComponent={
-                                <Icon
-                                  name="search"
-                                  color="#D94526"
-                                  size={15}
-                                  style={{marginLeft: 15}}
-                                />
-                              }
-                              colors={color}
-                              styles={multiSelectStyles}
                             />
+                            //   <SectionedMultiSelect
+                            //    items={item.subCategories}
+                            //    uniqueKey="id"
+                            //   subKey="children"
+                            //   expandDropDowns={true}
+                            //  selectText="Choose sub category..."
+                            //    showDropDowns={true}
+                            //    readOnlyHeadings={true}
+                            //   onSelectedItemsChange={value =>
+                            //     this.selectCategory(value, item.mainCategory.id)
+                            //    }
+                            //     selectedItems={item.selectedCategory}
+                            //    single={true}
+                            //    selectToggleIconComponent={
+                            //     <Icon
+                            //      name="caret-down"
+                            //      color="#D94526"
+                            //      size={30}
+                            //     style={styles.caretIcon}
+                            //   />
+                            //}
+                            //  searchIconComponent={
+                            //   <Icon
+                            //    name="search"
+                            //     color="#D94526"
+                            //     size={15}
+                            //     style={{marginLeft: 15}}
+                            //   />
+                            //  }
+                            //  colors={color}
+                            // styles={multiSelectStyles}
+                            ///>
                             // <Picker
                             //   mode="dropdown"
                             //   placeholder="GUEST"
