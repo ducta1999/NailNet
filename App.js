@@ -371,7 +371,7 @@ export const SideMenu = createDrawerNavigator(
   },
   {
     drawerWidth: 230,
-    drawerPosition: 'left',
+    overlayColor: '#00000099',
     contentComponent: props => <Menu {...props} />,
   },
 );

@@ -26,14 +26,14 @@ import {
   Picker,
   Header,
 } from 'native-base';
-import Icon from 'react-native-vector-icons/FontAwesome';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import Icon from 'react-native-vector-icons/Ionicons';
 // import { TouchableOpacity } from "react-native-gesture-handler";
 import * as dataService from '../../services/DataService';
 import * as authentication from '../../services/Authentication';
 import * as constant from '../../services/Constant';
 import LinearGradient from 'react-native-linear-gradient';
 import MultiSelect from '../Components/MultiSelect';
+import LottieView from 'lottie-react-native';
 
 export default class ListFAQ extends Component {
   constructor(props) {
@@ -177,7 +177,7 @@ export default class ListFAQ extends Component {
   render() {
     const {industries, loading} = this.state;
     return (
-      <Content style={{backgroundColor: '#001d3d'}}>
+      <Content style={{backgroundColor: '#fff'}}>
         <Header hasTabs searchBar transparent>
           <View
             style={{
@@ -210,10 +210,13 @@ export default class ListFAQ extends Component {
             <View>
               <View>
                 <TouchableOpacity onPress={() => this.openAddQuestionPage()}>
-                  <Thumbnail
-                    source={require('../../icons/edit.png')}
-                    style={styles.thumbnail}
-                  />
+                  <View style={{width: 55, height: 55}}>
+                    <LottieView
+                      source={require('../../json/create.json')}
+                      autoPlay
+                      loop
+                    />
+                  </View>
                 </TouchableOpacity>
               </View>
             </View>
@@ -229,34 +232,6 @@ export default class ListFAQ extends Component {
             />
           )}
         </View>
-        {/* <Item>
-          <Thumbnail
-            small
-            source={require("../../icons/signupicon_city.png")}
-          />
-
-          {this.state.loading == false && this.state.cities && (
-            <Picker
-              mode="dropdown"
-              placeholder="GUEST"
-              iosIcon={<Icon name="arrow-down" />}
-              style={styles.picker}
-              selectedValue={this.state.selectedCity}
-              onValueChange={value => this.applyFilterByCity(value)}
-            >
-              <Picker.Item label={"Please choose your city"} value={null} />
-              {this.state.cities.map((city, i) => (
-                <Picker.Item label={city.name} value={city.name} key={i} />
-              ))}
-            </Picker>
-          )}
-          <Icon
-            name="caret-down"
-            color="#FFFFFF"
-            size={30}
-            style={styles.caretIcon}
-          />
-        </Item> */}
 
         {loading == false ? (
           <Tabs
@@ -280,28 +255,20 @@ export default class ListFAQ extends Component {
                 </View>
               </Tab>
             ))}
-            {/* <Tab
-              heading={
-                <TabHeading style={styles.tabHeading}>
-                  <Text>DOCTOR</Text>
-                </TabHeading>
-              }
-              style={styles.tabs}
-            >
-              {this.renderListItem(this.state.list)}
-            </Tab> */}
           </Tabs>
         ) : (
-          <View>
-            <Spinner color="red" />
-            <Text
-              style={{
-                textAlign: 'center',
-                color: 'white',
-                fontWeight: 'bold',
-              }}>
-              Loading
-            </Text>
+          <View
+            style={{
+              width: '100%',
+              justifyContent: 'center',
+            }}>
+            <View style={{height: 168}}>
+              <LottieView
+                source={require('../../json/loading.json')}
+                autoPlay
+                loop
+              />
+            </View>
           </View>
         )}
       </Content>
@@ -387,65 +354,11 @@ export default class ListFAQ extends Component {
             </LinearGradient>
           </TouchableOpacity>
         ))}
-        {/* <List>
-          {list.map((item, i) => (
-            <ListItem
-              onPress={() => this.openPrivateQuestion(item.id, description, id)}
-              avatar
-              key={i}
-              noBorder>
-              <Left>
-                <Thumbnail
-                  large
-                  // source={require('../../icons/Avatar.png')}
-                  defaultSource={{uri: 'avatar'}}
-                  source={{
-                    uri:
-                      constant.BASE_URL +
-                      'api/avatars/getimage/' +
-                      item.email +
-                      '?random_number=' +
-                      new Date().getTime(),
-                  }}
-                  style={styles.avatar}
-                />
-              </Left>
-              <Body style={styles.body}>
-                <Text style={styles.name}>
-                  {item.firstName} {item.lastName}
-                </Text>
-                <Text>
-                  <Text style={styles.titleLeft}>Company: </Text>
-                  <Text style={styles.titleRight}> {item.businessAddress}</Text>
-                </Text>
-
-                <Text>
-                  <Text style={styles.titleLeft}>Email: {'        '}</Text>
-                  <Text style={styles.titleRight}>{item.email}</Text>
-                </Text>
-
-                <Text>
-                  <Text style={styles.titleLeft}>Phone: {'      '}</Text>
-                  <Text style={styles.titleRight}> {item.phone}</Text>
-                </Text>
-              </Body>
-              <Right>
-                <View style={styles.right}>
-                  <Thumbnail
-                    small
-                    source={require('../../icons/right_arrow.png')}
-                  />
-                </View>
-              </Right>
-            </ListItem>
-          ))}
-        </List> */}
       </ScrollView>
     );
   }
 
   openPrivateQuestion(id, description, industryID) {
-    //console.log(description);
     this.props.navigation.navigate('DoctorDetail', {
       id: id,
       description: description,
@@ -469,7 +382,6 @@ const styles = StyleSheet.create({
   },
   picker: {
     marginLeft: 40,
-    //alignItems: "center",
     color: 'white',
   },
   tabHeading: {

@@ -71,7 +71,7 @@ export default class Home extends Component {
           routeName: 'ListFAQ',
           icons: {
             unselected: require('../icons/listquestion_off.png'),
-            selected: require('../icons/listquestion_off.png'),
+            selected: require('../icons/listquestion_on.png'),
           },
           inactiveTextStyle: styles.text,
           activeTextStyle: styles.text,
@@ -81,7 +81,7 @@ export default class Home extends Component {
           routeName: 'PublicQuestion',
           icons: {
             unselected: require('../icons/publicquestion_off.png'),
-            selected: require('../icons/publicquestion_off.png'),
+            selected: require('../icons/publicquestion_on.png'),
           },
           inactiveTextStyle: styles.text,
           activeTextStyle: styles.text,
@@ -93,7 +93,7 @@ export default class Home extends Component {
           routeName: 'PrivateQuestion',
           icons: {
             unselected: require('../icons/privatequestion_off.png'),
-            selected: require('../icons/privatequestion_off.png'),
+            selected: require('../icons/privatequestion_on.png'),
           },
           inactiveTextStyle: styles.text,
           activeTextStyle: styles.text,
@@ -102,9 +102,6 @@ export default class Home extends Component {
       configData: {
         bottomBarConfig: {
           backgroundColor: '#001d3d',
-          // height: 79,
-          // curveDepth: 36,
-          // curveWidth: 99,
         },
       },
     });

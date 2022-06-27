@@ -1,5 +1,12 @@
 import React, {Component} from 'react';
-import {StyleSheet, ImageBackground, Image, ScrollView} from 'react-native';
+import {
+  StyleSheet,
+  Dimensions,
+  Image,
+  ScrollView,
+  TouchableWithoutFeedback,
+  TouchableOpacity,
+} from 'react-native';
 import {
   Container,
   Content,
@@ -9,6 +16,8 @@ import {
   Thumbnail,
   View,
 } from 'native-base';
+import Icon from 'react-native-vector-icons/Ionicons';
+
 import * as authentication from '../services/Authentication';
 import * as dataService from '../services/DataService';
 import * as constant from '../services/Constant';
@@ -72,139 +81,130 @@ export default class Menu extends Component {
     await authentication.removeAccount();
     this.props.navigation.navigate('LogIn', {logout: true});
   }
-
   render() {
+    const activeTab =
+      this.props?.navigation?.state?.routes[0]?.routes?.slice(-1)[0]?.routeName;
+
+    const {height} = Dimensions.get('window');
     const menuData = [
-      {title: 'Home', route: 'Home'},
-      {title: 'FAQs', route: 'Question'},
-      {title: 'Promotion', route: 'Promotion'},
-      {title: 'Shop', route: 'Shop'},
-      {title: 'Classifields', route: 'Classifield'},
-      {title: 'Classifields', route: 'Classifield'},
-      {title: 'Job', route: 'Job'},
-      {title: 'NailTV', route: 'NailTV'},
-      {title: 'Conversation', route: 'Conversation'},
-      {title: 'Conversation', route: 'Conversation'},
-      {title: 'Your post', route: 'Post'},
-      {title: 'Profile', route: 'Profile'},
-      {title: 'Administrator', route: 'Admin'},
-      {title: 'Configuration', route: 'Config'},
+      {title: 'Home', route: 'Home', icon: 'home-outline'},
+      {title: 'FAQs', route: 'Question', icon: 'help-circle-outline'},
+      {title: 'Promotion', route: 'Promotion', icon: 'cash-outline'},
+      {title: 'Shop', route: 'Shop', icon: 'storefront-outline'},
+      {title: 'Classifields', route: 'Classifield', icon: 'albums-outline'},
+      {title: 'Job', route: 'Job', icon: 'medkit-outline'},
+      {title: 'NailTV', route: 'NailTV', icon: 'tv-outline'},
+      {
+        title: 'Conversation',
+        route: 'Conversation',
+        icon: 'chatbubbles-outline',
+      },
+      {title: 'Your post', route: 'Post', icon: 'document-outline'},
+      {title: 'Profile', route: 'Profile', icon: 'person-outline'},
     ];
+    const menu =
+      this.state.user && this.state.user.occupationID === 2
+        ? [
+            ...menuData,
+            {title: 'Administrator', route: 'Admin'},
+            {title: 'Configuration', route: 'Config'},
+          ]
+        : menuData;
     return (
-      <ScrollView>
-        <List>
-          <ListItem
-            selected
-            // onPress={() => this.props.navigation.navigate("Home")}
-            //  noBorder
-          >
-            <View style={{flex: 1, flexDirection: 'row', flexWrap: 'wrap'}}>
-              <View>
-                <Text style={{color: 'white', fontSize: 10}}>
+      <ScrollView style={styles.container}>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'space-between',
+            minHeight: height - 136,
+          }}>
+          <View style={styles.menuView}>
+            {menu.map((item, index) => (
+              <TouchableOpacity
+                style={{
+                  marginBottom: 6,
+                  borderBottomWidth: item.route === activeTab ? 1.68 : 0,
+                  borderColor: item.route === activeTab ? '#003566' : '#adb5bd',
+                }}
+                key={`menu ${index}`}
+                onPress={() => this.props.navigation.navigate(item.route)}>
+                <Text
+                  style={[
+                    styles.menuTxt,
+                    {
+                      color: item.route === activeTab ? '#003566' : '#adb5bd',
+                      fontFamily:
+                        item.route === activeTab
+                          ? 'Montserrat-SemiBold'
+                          : 'Montserrat-Regular',
+                    },
+                  ]}>
+                  {item.title}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+          <View style={styles.row}>
+            <View style={styles.row}>
+              <Thumbnail
+                source={require('../icons/Avatar.png')}
+                style={{width: 36, height: 36}}
+              />
+              <View style={{paddingLeft: 12}}>
+                <Text style={styles.userTxt}>
                   {this.state.user ? this.state.user.email : ''}
                 </Text>
-              </View>
-
-              <View>
-                <Text style={styles.menuText}>
+                <Text style={styles.roleTxt}>
                   {this.state.occupation
                     ? this.state.occupation.description
                     : ''}
                 </Text>
               </View>
             </View>
-          </ListItem>
-          <ListItem
-            selected
-            onPress={() => this.props.navigation.navigate('Home')}
-            noBorder>
-            <Text style={styles.menuText}>Home</Text>
-          </ListItem>
-          <ListItem
-            onPress={() => this.props.navigation.navigate('Question')}
-            noBorder>
-            <Text style={styles.menuText}>FAQs</Text>
-          </ListItem>
-          <ListItem
-            noBorder
-            onPress={() => this.props.navigation.navigate('Promotion')}>
-            <Text style={styles.menuText}>Promotion</Text>
-          </ListItem>
-          <ListItem
-            noBorder
-            onPress={() => this.props.navigation.navigate('Shop')}>
-            <Text style={styles.menuText}>Shop</Text>
-          </ListItem>
-          <ListItem
-            noBorder
-            onPress={() => this.props.navigation.navigate('Classifield')}>
-            <Text style={styles.menuText}>Classifields</Text>
-          </ListItem>
-          <ListItem
-            noBorder
-            onPress={() => this.props.navigation.navigate('Job')}>
-            <Text style={styles.menuText}>Job</Text>
-          </ListItem>
-          <ListItem
-            noBorder
-            onPress={() => this.props.navigation.navigate('NailTV')}>
-            <Text style={styles.menuText}>NailTV</Text>
-          </ListItem>
-          <ListItem
-            noBorder
-            onPress={() => this.props.navigation.navigate('Conversation')}>
-            <Text style={styles.menuText}>Conversation</Text>
-          </ListItem>
-          <ListItem
-            noBorder
-            onPress={() => this.props.navigation.navigate('Post')}>
-            <Text style={styles.menuText}>Your Post</Text>
-          </ListItem>
-          <ListItem
-            noBorder
-            onPress={() => this.props.navigation.navigate('Profile')}>
-            <Text style={styles.menuText}>Profile</Text>
-          </ListItem>
-          {this.state.user && this.state.user.occupationID == 2 && (
-            <ListItem
-              noBorder
-              onPress={() => this.props.navigation.navigate('Admin')}>
-              <Text style={styles.menuText}>Admin</Text>
-            </ListItem>
-          )}
-          {this.state.user && this.state.user.occupationID == 2 && (
-            <ListItem
-              noBorder
-              onPress={() => this.props.navigation.navigate('Config')}>
-              <Text style={styles.menuText}>Config</Text>
-            </ListItem>
-          )}
-          <ListItem onPress={() => this.logout()}>
-            <Text style={styles.menuText}>Logout</Text>
-          </ListItem>
-        </List>
+            <TouchableWithoutFeedback onPress={() => this.logout()}>
+              <Icon name="exit-outline" color="#f94144" size={22} />
+            </TouchableWithoutFeedback>
+          </View>
+        </View>
       </ScrollView>
     );
   }
 }
 
 const styles = StyleSheet.create({
-  menuTextUser: {
-    fontSize: 13,
-    color: '#D94526',
-    fontWeight: 'bold',
-  },
-  menuText: {
-    fontSize: 15,
-    color: '#000',
-    marginBottom: 20,
-    fontWeight: 'bold',
-  },
-  thumbnail: {
-    marginTop: 10,
-    marginBottom: -10,
-  },
   container: {
+    flex: 1,
     backgroundColor: '#fff',
+    padding: 24,
+    paddingBottom: 99,
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  userTxt: {
+    fontFamily: 'Montserrat-Regular',
+    fontSize: 14,
+    color: '#03071e',
+  },
+  roleTxt: {
+    fontFamily: 'Montserrat-SemiBold',
+    fontSize: 10,
+    color: '#adb5bd',
+  },
+  menuView: {
+    flexDirection: 'column',
+    flex: 1,
+    paddingVertical: 12,
+    borderColor: '#e5e5e568',
+    borderBottomWidth: 1.111,
+    marginVertical: 24,
+  },
+  menuTxt: {
+    fontFamily: 'Montserrat-SemiBold',
+    fontSize: 14,
+    color: '#6c757d',
+    padding: 12,
   },
 });
