@@ -261,7 +261,7 @@ const styles = StyleSheet.create({
     },
     shadowRadius: 40,
     shadowOpacity: 1.0,
-    elevation: 12,
+    elevation: 9,
   },
   GridViewContainer: {
     justifyContent: 'center',

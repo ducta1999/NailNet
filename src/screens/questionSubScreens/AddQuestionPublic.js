@@ -287,7 +287,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   title: {
-    fontFamily: 'Montserrat-Bold',
+    fontFamily: 'Montserrat-SemiBold',
     fontSize: 17,
     textAlign: 'center',
     marginBottom: 9,

@@ -4,6 +4,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Dimensions,
+  Image,
 } from 'react-native';
 import {
   View,
@@ -27,13 +28,12 @@ import {
   Header,
 } from 'native-base';
 import Icon from 'react-native-vector-icons/Ionicons';
-// import { TouchableOpacity } from "react-native-gesture-handler";
 import * as dataService from '../../services/DataService';
 import * as authentication from '../../services/Authentication';
-import * as constant from '../../services/Constant';
 import LinearGradient from 'react-native-linear-gradient';
 import MultiSelect from '../Components/MultiSelect';
 import LottieView from 'lottie-react-native';
+import AnimatedSearchBox from '../Components/AnimatedSearchBox';
 
 export default class ListFAQ extends Component {
   constructor(props) {
@@ -45,6 +45,7 @@ export default class ListFAQ extends Component {
       cities: [],
       searchText: null,
     };
+    this.refSearchBox = React.createRef();
 
     this.openPrivateQuestion = this.openPrivateQuestion.bind(this);
   }
@@ -174,6 +175,10 @@ export default class ListFAQ extends Component {
   openAddQuestionPage() {
     this.props.navigation.navigate('AddQuestionPublic');
   }
+
+  openSearchBox = () => this.refSearchBox.open();
+
+  closeSearchBox = () => this.refSearchBox.close();
   render() {
     const {industries, loading} = this.state;
     return (
@@ -184,69 +189,85 @@ export default class ListFAQ extends Component {
               flex: 1,
               flexDirection: 'row',
               justifyContent: 'space-between',
+              alignItems: 'center',
               marginTop: 8,
             }}>
-            <View>
-              <TouchableOpacity onPress={() => this.onpenDrawer()}>
-                <Thumbnail
-                  small
-                  source={require('../../icons/menu.png')}
-                  style={styles.thumbnail}
-                />
-              </TouchableOpacity>
-            </View>
-            <View>
-              <Input
-                placeholder="Enter name to search"
-                placeholderTextColor="#848484"
-                style={styles.input}
-                onSubmitEditing={event => {
-                  console.log(event.nativeEvent.text);
-                  this.setState({searchText: event.nativeEvent.text});
-                }}
+            <TouchableOpacity onPress={() => this.onpenDrawer()}>
+              <Image
+                source={require('../../icons/menu.png')}
+                style={{width: 28, height: 28}}
               />
-            </View>
-
-            <View>
-              <View>
-                <TouchableOpacity onPress={() => this.openAddQuestionPage()}>
-                  <View style={{width: 55, height: 55}}>
-                    <LottieView
-                      source={require('../../json/create.json')}
-                      autoPlay
-                      loop
-                    />
-                  </View>
-                </TouchableOpacity>
-              </View>
+            </TouchableOpacity>
+            <View style={{flex: 0.96}}>
+              <AnimatedSearchBox
+                ref={ref => (this.refSearchBox = ref)}
+                placeholder={'Search by Name'}
+                placeholderTextColor="#848484"
+                backgroundColor="#f6f6f7"
+                searchIconColor="#000"
+                focusAfterOpened
+                searchIconSize={18}
+                borderRadius={12}
+                onChangeText={text => {
+                  this.setState({searchText: text});
+                  this.ensureDataFetched(text, this.state.selectedCity);
+                }}
+                onBlur={() => this.closeSearchBox()}
+              />
             </View>
           </View>
         </Header>
-        <View style={{paddingHorizontal: 16, marginBottom: 9}}>
-          {this.state.cities && (
-            <MultiSelect
-              items={this.state.cities}
-              placeHolder="Choose City..."
-              selectedItems={this.state.selectedCity}
-              setSelectedItems={value => this.setState({selectedCity: value})}
-            />
-          )}
+        <View
+          style={{
+            paddingHorizontal: 12,
+            marginBottom: 9,
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}>
+          <View style={{width: '84%'}}>
+            {this.state.cities && (
+              <MultiSelect
+                items={this.state.cities}
+                placeHolder="Choose City..."
+                selectedItems={this.state.selectedCity}
+                setSelectedItems={value => {
+                  this.setState({selectedCity: value});
+                  this.ensureDataFetched(this.state.searchText, value);
+                }}
+              />
+            )}
+          </View>
+
+          <TouchableOpacity onPress={() => this.openAddQuestionPage()}>
+            <View style={{width: 68, height: 68}}>
+              <LottieView
+                source={require('../../json/create.json')}
+                autoPlay
+                loop
+              />
+            </View>
+          </TouchableOpacity>
         </View>
 
         {loading == false ? (
           <Tabs
-            transparent
             tabBarUnderlineStyle={styles.tabUnderLine}
             renderTabBar={() => <ScrollableTab />}>
             {industries.map((item, i) => (
               <Tab
                 heading={
                   <TabHeading style={styles.tabHeading}>
-                    <Text>{item.industry.description}</Text>
+                    <Text
+                      style={{
+                        color: 'black',
+                      }}>
+                      {item.industry.description}
+                    </Text>
                   </TabHeading>
                 }
                 style={styles.tabs}>
-                <View style={{flex: 1, backgroundColor: '#003566'}}>
+                <View style={{flex: 1, backgroundColor: '#fff'}}>
                   {this.renderListItem(
                     item.profiles,
                     item.industry.description,
@@ -284,17 +305,17 @@ export default class ListFAQ extends Component {
           <TouchableOpacity
             activeOpacity={0.79}
             onPress={() => this.openPrivateQuestion(item.id, description, id)}>
-            <LinearGradient
-              start={{x: 0.0, y: 0.25}}
-              end={{x: 0.5, y: 1.0}}
-              colors={['#002945', '#003a61', '#00406c']}
+            <View
               style={{
+                borderRadius: 12,
+                overflow: 'hidden',
                 margin: 9,
               }}>
-              <View
+              <LinearGradient
+                start={{x: 0.0, y: 0.25}}
+                end={{x: 0.5, y: 1.0}}
+                colors={['#0a1128', '#12437c', '#0a1128']}
                 style={{
-                  borderRadius: 4,
-                  overflow: 'hidden',
                   padding: 12,
                 }}>
                 <View
@@ -341,7 +362,7 @@ export default class ListFAQ extends Component {
                   </Text>
 
                   <Text style={styles.pd9}>
-                    <Text style={styles.titleLeft}>Email: {'        '}</Text>
+                    <Text style={styles.titleLeft}>Email: {'         '}</Text>
                     <Text style={styles.titleRight}>{item.email}</Text>
                   </Text>
 
@@ -350,8 +371,8 @@ export default class ListFAQ extends Component {
                     <Text style={styles.titleRight}> {item.phone}</Text>
                   </Text>
                 </View>
-              </View>
-            </LinearGradient>
+              </LinearGradient>
+            </View>
           </TouchableOpacity>
         ))}
       </ScrollView>
@@ -369,9 +390,12 @@ export default class ListFAQ extends Component {
 
 const styles = StyleSheet.create({
   input: {
-    marginTop: -30,
-    alignItems: 'center',
-    padding: 25,
+    backgroundColor: '#f6f6f7',
+    borderRadius: 12,
+    width: 222,
+    paddingLeft: 18,
+    fontSize: 14,
+    fontFamily: 'Montserrat-Regular',
   },
   caretIcon: {
     right: 25,
@@ -385,20 +409,17 @@ const styles = StyleSheet.create({
     color: 'white',
   },
   tabHeading: {
-    backgroundColor: '#002945',
+    backgroundColor: '#fff',
     fontFamily: 'Montserrat-Medium',
     // borderBottomWidth: 1,
     // borderBottomColor: "white"
   },
   tabUnderLine: {
-    // display: 'none',
-    backgroundColor: '#fff',
-    height: 1.68,
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
+    backgroundColor: '#003566',
+    height: 2.68,
   },
   name: {
-    color: '#bce3fa',
+    color: '#FFFFFF',
     fontFamily: 'Montserrat-SemiBold',
     fontSize: 16,
   },
@@ -438,21 +459,3 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
 });
-
-//multiselect style
-const multiSelectStyles = StyleSheet.create({
-  container: {
-    backgroundColor: '#1F2426',
-  },
-  selectToggleText: {color: 'white'},
-  button: {backgroundColor: '#D94526'},
-  searchBar: {backgroundColor: '#1F2426'},
-  searchTextInput: {color: '#D94526'},
-});
-const color = {
-  text: '#D94526',
-  subText: '#47BFB3',
-  searchPlaceholderTextColor: '#D94526',
-  itemBackground: '#1F2426',
-  subItemBackground: '#1F2426',
-};

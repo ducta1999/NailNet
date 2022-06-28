@@ -152,7 +152,12 @@ export default class Menu extends Component {
               />
               <View style={{paddingLeft: 12}}>
                 <Text style={styles.userTxt}>
-                  {this.state.user ? this.state.user.email : ''}
+                  {this.state.user && this.state.user?.email
+                    ? this.state.user?.email?.slice(
+                        0,
+                        this.state.user?.email?.indexOf('@'),
+                      )
+                    : ''}
                 </Text>
                 <Text style={styles.roleTxt}>
                   {this.state.occupation
@@ -187,6 +192,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Montserrat-Regular',
     fontSize: 14,
     color: '#03071e',
+    maxWidth: 88,
   },
   roleTxt: {
     fontFamily: 'Montserrat-SemiBold',
