@@ -21,6 +21,7 @@ import * as toastService from '../services/ToastService';
 import * as authentication from '../services/Authentication';
 import AnimatedSplash from 'react-native-animated-splash-screen';
 import Icon from 'react-native-vector-icons/Ionicons';
+import Loading from './Components/Loading';
 
 export default class LogIn extends Component {
   constructor(props) {
@@ -194,19 +195,7 @@ export default class LogIn extends Component {
               </CardItem>
             </Card>
           ) : (
-            <View
-              style={{
-                width: '100%',
-                justifyContent: 'center',
-              }}>
-              <View style={{height: 168}}>
-                <LottieView
-                  source={require('../json/loading.json')}
-                  autoPlay
-                  loop
-                />
-              </View>
-            </View>
+            <Loading />
           )}
           <CardItem
             footer

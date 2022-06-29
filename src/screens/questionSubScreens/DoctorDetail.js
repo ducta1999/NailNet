@@ -28,6 +28,7 @@ import * as constant from '../../services/Constant';
 import Icon from 'react-native-vector-icons/Ionicons';
 import LinearGradient from 'react-native-linear-gradient';
 import LottieView from 'lottie-react-native';
+import Loading from '../Components/Loading';
 
 export default class DoctorDetail extends Component {
   constructor(props) {
@@ -100,8 +101,8 @@ export default class DoctorDetail extends Component {
       description: descriptionQuestion,
       view: 0,
     };
-    console.log(data);
     var result = await dataService.post('api/faqquestions/add', data);
+    console.log(JSON.stringify(result, 0, 2));
     if (result.status === 200) {
       toastService.success('Add question successfully!');
 
@@ -211,7 +212,22 @@ export default class DoctorDetail extends Component {
                 justifyContent: 'center',
                 padding: 10,
               }}>
-              <View style={{height: 79}}>
+              <View
+                style={{
+                  padding: 16,
+                  borderRadius: 12,
+                  borderColor: '#e5e5e5',
+                  borderWidth: 1.68,
+                }}>
+                <Text
+                  style={{
+                    fontFamily: 'Montserrat-SemiBold',
+                    fontSize: 16,
+                    textAlign: 'center',
+                    color: '#343a40',
+                  }}>
+                  Send your question
+                </Text>
                 <Text style={styles.subTitle}>Title</Text>
                 <Input
                   style={styles.titleInput}
@@ -219,8 +235,6 @@ export default class DoctorDetail extends Component {
                   placeholderTextColor="#D94526"
                   onChangeText={text => this.setState({title: text})}
                 />
-              </View>
-              <View>
                 <Text style={styles.subTitle}>Description</Text>
                 <Textarea
                   style={[styles.titleInput, {paddingTop: 12}]}
@@ -230,13 +244,6 @@ export default class DoctorDetail extends Component {
                     this.setState({descriptionQuestion: text})
                   }
                 />
-              </View>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                }}>
                 <Button
                   block
                   backgroundColor="#184e77"
@@ -249,19 +256,7 @@ export default class DoctorDetail extends Component {
             </View>
           </Content>
         ) : (
-          <View
-            style={{
-              width: '100%',
-              justifyContent: 'center',
-            }}>
-            <View style={{height: 168}}>
-              <LottieView
-                source={require('../../json/loading.json')}
-                autoPlay
-                loop
-              />
-            </View>
-          </View>
+          <Loading />
         )}
       </Container>
     );

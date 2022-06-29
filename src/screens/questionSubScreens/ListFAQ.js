@@ -34,6 +34,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import MultiSelect from '../Components/MultiSelect';
 import LottieView from 'lottie-react-native';
 import AnimatedSearchBox from '../Components/AnimatedSearchBox';
+import Loading from '../Components/Loading';
 
 export default class ListFAQ extends Component {
   constructor(props) {
@@ -278,19 +279,7 @@ export default class ListFAQ extends Component {
             ))}
           </Tabs>
         ) : (
-          <View
-            style={{
-              width: '100%',
-              justifyContent: 'center',
-            }}>
-            <View style={{height: 168}}>
-              <LottieView
-                source={require('../../json/loading.json')}
-                autoPlay
-                loop
-              />
-            </View>
-          </View>
+          <Loading />
         )}
       </Content>
     );
@@ -303,6 +292,7 @@ export default class ListFAQ extends Component {
       <ScrollView style={{minHeight: height}}>
         {list.map((item, i) => (
           <TouchableOpacity
+            key={i}
             activeOpacity={0.79}
             onPress={() => this.openPrivateQuestion(item.id, description, id)}>
             <View

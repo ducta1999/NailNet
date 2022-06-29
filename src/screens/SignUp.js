@@ -27,6 +27,7 @@ import * as tinh_tp from '../json/tinh_tp.json';
 import LottieView from 'lottie-react-native';
 import MultiSelect from './Components/MultiSelect';
 import Carousel, {Pagination} from 'react-native-snap-carousel';
+import Loading from './Components/Loading';
 
 export default class LogIn extends Component {
   constructor(props) {
@@ -724,19 +725,7 @@ export default class LogIn extends Component {
             </Text>
           </View>
         ) : (
-          <View
-            style={{
-              width: '100%',
-              justifyContent: 'center',
-            }}>
-            <View style={{height: 111}}>
-              <LottieView
-                source={require('../json/loading.json')}
-                autoPlay
-                loop
-              />
-            </View>
-          </View>
+          <Loading />
         )}
       </View>
     );
