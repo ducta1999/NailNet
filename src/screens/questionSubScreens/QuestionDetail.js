@@ -1,5 +1,11 @@
 import React, {Component} from 'react';
-import {Image, StyleSheet, TouchableOpacity} from 'react-native';
+import {
+  Image,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  Dimensions,
+} from 'react-native';
 import {
   Container,
   Content,
@@ -28,6 +34,8 @@ import * as constant from '../../services/Constant';
 import Ionicon from 'react-native-vector-icons/Ionicons';
 import Loading from '../Components/Loading';
 import moment from 'moment';
+import ExplodingHeart from '../Components/ExplodingHeart';
+import * as toastService from '../../services/ToastService';
 
 export default class QuestionDetail extends Component {
   constructor(props) {
@@ -39,6 +47,8 @@ export default class QuestionDetail extends Component {
       question: [],
       email: [],
       user: [],
+      comment: '',
+      buttonLoading: false,
     };
 
     if (props.navigation.state.params && props.navigation.state.params.id) {
@@ -72,20 +82,49 @@ export default class QuestionDetail extends Component {
     });
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.navigation.state.params != undefined) {
-      if (nextProps.navigation.state.params.addQuestionSuccess == true) {
+  async submit() {
+    try {
+      this.setState({buttonLoading: true});
+      const {comment, id} = this.state;
+
+      if (comment.trim() == '') {
+        toastService.error('Error: ' + 'Description cannot be empty!');
+
+        this.setState({buttonLoading: false});
+        return;
+      }
+
+      var user = await authentication.getLoggedInUser();
+
+      var data = {
+        answerDescription: comment,
+        createByEmail: user.email,
+        questionID: id,
+      };
+
+      var result = await dataService.post('api/faqanswers/add', data);
+      if (result.status === 200) {
+        toastService.success('Add answer successfully!');
+
         this.setState({
           loading: true,
         });
         this.ensureDataFetched(this.state.id);
+      } else {
+        toastService.error(
+          'Error: ' + 'Something wrong! Please check and try again',
+        );
       }
+    } catch (error) {
+      toastService.error('Error: ' + error);
+    } finally {
+      this.setState({buttonLoading: false});
     }
   }
 
   render() {
     const {loading, question, id, email, user} = this.state;
-
+    const {width} = Dimensions.get('window');
     return (
       <Container style={styles.container}>
         <Header transparent>
@@ -101,24 +140,10 @@ export default class QuestionDetail extends Component {
                 <Ionicon name="arrow-back-outline" color="#000" size={28} />
               </TouchableOpacity>
             </View>
-
-            <View>
-              <TouchableOpacity
-                onPress={() =>
-                  this.props.navigation.navigate('AddAnswer', {
-                    id: id,
-                  })
-                }>
-                <Thumbnail
-                  source={require('../../icons/edit.png')}
-                  style={styles.thumbnail}
-                />
-              </TouchableOpacity>
-            </View>
           </View>
         </Header>
         {loading == false ? (
-          <View style={{padding: 12}}>
+          <ScrollView style={{padding: 12}}>
             <View style={[styles.row]}>
               <View style={[styles.row]}>
                 <Image
@@ -131,184 +156,182 @@ export default class QuestionDetail extends Component {
                   //     '?random_number=' +
                   //     new Date().getTime(),
                   // }}
-                  style={{width: 28, height: 28}}
+                  style={{width: 36, height: 36}}
                 />
-                <Text style={styles.nameTxt}>{question.fullName}</Text>
+                <View style={{marginLeft: 14}}>
+                  <Text style={styles.nameTxt}>{question.fullName}</Text>
+                  <Text style={styles.timeTxt}>
+                    {moment(question.createTime, 'DD/MM/YYYY').fromNow()}
+                  </Text>
+                </View>
               </View>
-
-              <Text style={styles.timeTxt}>
-                {moment(question.createTime, 'DD/MM/YYYY').fromNow()}
-              </Text>
+              <Ionicon name="ellipsis-horizontal" size={22} color="#212529" />
             </View>
-            <Text style={styles.title}>{question.title}</Text>
 
-            <CardItem style={styles.carditem}>
-              <Body>
+            <View style={styles.questionCard}>
+              <View style={[styles.row, styles.cardHeader]}>
+                <Text style={styles.title}>{question.title}</Text>
+                <Text style={styles.category}>
+                  {question.industry.description}
+                </Text>
+              </View>
+              <View style={styles.cardBody}>
                 <Text style={styles.description}>{question.description}</Text>
-              </Body>
-            </CardItem>
-            <CardItem style={styles.carditem}>
-              <Text style={styles.category}>
-                Category: {question.industry.description}
-              </Text>
-
-              <Text style={styles.view}>View: {question.view}</Text>
-
-              <Text style={styles.asnwerNumber}>
-                Answer: {question.answers.length}
-              </Text>
-            </CardItem>
-            {/* answer for public */}
-            {question.private == false &&
-              question.answers.map((answer, i) => (
-                <TouchableOpacity
-                  onPress={() =>
-                    answer.isPro
-                      ? this.openPrivateQuestion(
-                          answer.createBy,
-                          question.industry.description,
-                          question.industry.id,
-                        )
-                      : null
-                  }>
-                  <CardItem style={styles.carditemAnswer}>
-                    <Left>
+              </View>
+              <View style={styles.row}>
+                <View style={styles.row}>
+                  <Ionicon name="eye" size={19.68} color="#343a40" />
+                  <Text style={[styles.txtReact, {marginRight: 19}]}>
+                    {question.view}
+                  </Text>
+                  <Ionicon
+                    name="chatbox-ellipses"
+                    size={19.68}
+                    color="#343a40"
+                    style={{marginBottom: -2}}
+                  />
+                  <Text style={styles.txtReact}>{question.answers.length}</Text>
+                </View>
+              </View>
+            </View>
+            <View
+              style={{
+                width: '100%',
+                height: 1,
+                backgroundColor: '#21252924',
+                marginVertical: 24,
+              }}
+            />
+            <View
+              style={[
+                styles.row,
+                {justifyContent: 'flex-start', marginBottom: 12},
+              ]}>
+              <Text style={styles.headerTxt}>Comments</Text>
+              <Ionicon color="#001219" name="chevron-down" size={22} />
+            </View>
+            {question.answers.map((answer, i) => (
+              <View
+                key={i}
+                style={[
+                  styles.answerView,
+                  {
+                    borderBottomWidth:
+                      i === question.answers.length - 1 ? 0 : 1,
+                  },
+                ]}>
+                <View style={[styles.row]}>
+                  <View style={styles.row}>
+                    <View style={{flex: 0.1}}>
                       <Thumbnail
                         defaultSource={{uri: 'avatar'}}
-                        source={{
-                          uri:
-                            constant.BASE_URL +
-                            'api/avatars/getimage/' +
-                            answer.createByEmail +
-                            '?random_number=' +
-                            new Date().getTime(),
-                        }}
-                        //source={require("../../icons/Avatar.png")}
+                        // source={{
+                        //   uri:
+                        //     constant.BASE_URL +
+                        //     'api/avatars/getimage/' +
+                        //     answer.createByEmail +
+                        //     '?random_number=' +
+                        //     new Date().getTime(),
+                        // }}
+                        source={require('../../icons/Avatar.png')}
+                        style={{width: 36, height: 36}}
                       />
-                      <Body>
-                        <Text style={styles.questionDescription}>
+                      {answer.isPro ? (
+                        <View
+                          style={{
+                            width: '100%',
+                            backgroundColor: '#ffbe0b',
+                            borderRadius: 4,
+                            marginTop: 4,
+                          }}>
+                          <Text style={styles.proTxt}>PRO</Text>
+                        </View>
+                      ) : null}
+                    </View>
+
+                    <View style={{marginLeft: 14, flex: 0.9}}>
+                      <Text style={[styles.nameTxt]}>
+                        {answer.fullName}
+                        {'  '}
+                        <Text style={styles.answerTxt}>
                           {answer.answerDescription}
                         </Text>
-                        <View style={{flex: 1, flexDirection: 'row'}}>
-                          <View>
-                            <Text style={styles.createTime}>
-                              {answer.createTime}
-                            </Text>
-                            <Text style={styles.createTime}>
-                              {answer.fullName}
-                            </Text>
-                            {answer.isPro && (
-                              <Text style={styles.isPro}>Pro</Text>
-                            )}
-                          </View>
+                      </Text>
 
-                          <Button
-                            iconLeft
-                            light
-                            transparent
-                            style={{
-                              justifyContent: 'flex-end',
-                              flex: 1,
-                            }}>
-                            {answer.like.includes(email) ? (
-                              <TouchableOpacity
-                                onPress={() => this.likePress(answer)}>
-                                <Icon name="heart" />
-                              </TouchableOpacity>
-                            ) : (
-                              <TouchableOpacity
-                                onPress={() => this.likePress(answer)}>
-                                <Icon name="heart-empty" />
-                              </TouchableOpacity>
-                            )}
-                            <Text>{answer.like.length}</Text>
-                          </Button>
-                        </View>
-                      </Body>
-                    </Left>
-                  </CardItem>
-                </TouchableOpacity>
-              ))}
-
-            {/* answer for private */}
-            {question.private == true &&
-              question.answers.map((answer, i) => (
-                <TouchableOpacity
-                  onPress={() =>
-                    answer.isPro
-                      ? this.openPrivateQuestion(
-                          answer.createBy,
-                          question.industry.description,
-                          question.industry.id,
-                        )
-                      : null
-                  }>
-                  <CardItem
-                    style={
-                      answer.createByEmail != user.email
-                        ? styles.carditemAnswerForNotOwn
-                        : styles.carditemAnswerForOwn
+                      <Text style={styles.timeTxt}>
+                        {moment(answer.createTime, 'DD/MM/YYYY').fromNow()}
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+                <View style={[styles.row]}>
+                  <TouchableOpacity
+                    style={{opacity: answer.isPro ? 1 : 0}}
+                    activeOpacity={0.79}
+                    onPress={() =>
+                      answer.isPro
+                        ? this.openPrivateQuestion(
+                            answer.createBy,
+                            question.industry.description,
+                            question.industry.id,
+                          )
+                        : null
                     }>
-                    <Left>
-                      <Thumbnail
-                        //source={require("../../icons/Avatar.png")}
-                        defaultSource={{uri: 'avatar'}}
-                        source={{
-                          uri:
-                            constant.BASE_URL +
-                            'api/avatars/getimage/' +
-                            answer.createByEmail +
-                            '?random_number=' +
-                            new Date().getTime(),
-                        }}
-                      />
-                      <Body>
-                        <Text
-                          style={
-                            answer.createByEmail != user.email
-                              ? styles.questionDescriptionForNotOwn
-                              : styles.questionDescriptionForOwn
-                          }>
-                          {answer.answerDescription}
-                        </Text>
-                        <View style={{flex: 1, flexDirection: 'row'}}>
-                          <View>
-                            <Text style={styles.createTime}>
-                              {answer.createTime}
-                            </Text>
-                            <Text style={styles.createTime}>
-                              {answer.fullName}
-                            </Text>
-                          </View>
-
-                          <Button
-                            iconLeft
-                            light
-                            transparent
-                            style={{justifyContent: 'flex-end', flex: 1}}>
-                            {answer.like.includes(email) ? (
-                              <TouchableOpacity
-                                onPress={() => this.likePress(answer)}>
-                                <Icon name="heart" />
-                              </TouchableOpacity>
-                            ) : (
-                              <TouchableOpacity
-                                onPress={() => this.likePress(answer)}>
-                                <Icon name="heart-empty" />
-                              </TouchableOpacity>
-                            )}
-                            <Text>{answer.like.length}</Text>
-                          </Button>
-                        </View>
-                      </Body>
-                    </Left>
-                  </CardItem>
-                </TouchableOpacity>
-              ))}
-          </View>
+                    <Text
+                      style={{
+                        fontFamily: 'Montserrat-SemiBold',
+                        fontSize: 14.68,
+                        color: '#2ec4b6',
+                        letterSpacing: -0.68,
+                        textDecorationLine: 'underline',
+                      }}>
+                      Contact
+                    </Text>
+                  </TouchableOpacity>
+                  <View style={styles.row}>
+                    <ExplodingHeart
+                      width={48}
+                      status={answer.like.includes(email)}
+                      onPress={() => this.likePress(answer)}
+                      activeOpacity={0.68}
+                      type="heart"
+                      onAnimationFinish={() => console.log('?')}
+                    />
+                    <Text
+                      style={{
+                        fontFamily: 'Montserrat-SemiBold',
+                        fontSize: 12.68,
+                        color: '#495057',
+                      }}>
+                      {answer.like.length}
+                    </Text>
+                  </View>
+                </View>
+              </View>
+            ))}
+          </ScrollView>
         ) : (
           <Loading />
         )}
+        <View
+          style={{
+            width: width,
+            height: 99,
+            backgroundColor: '#20212f',
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            borderTopLeftRadius: 24,
+            borderTopRightRadius: 24,
+          }}>
+          <View style={styles.row}>
+            <Input
+              placeholder="Type your answer"
+              placeholderTextColor="#fff"
+              onChangeText={text => this.setState({comment: text})}
+            />
+          </View>
+        </View>
       </Container>
     );
   }
@@ -361,6 +384,7 @@ export default class QuestionDetail extends Component {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#ffffff',
+    paddingBottom: 99,
   },
 
   headerBodyText: {
@@ -403,8 +427,10 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   title: {
-    color: '#D94526',
-    fontSize: 22,
+    fontFamily: 'Montserrat-SemiBold',
+    fontSize: 18,
+    color: '#212529',
+    letterSpacing: -1,
   },
   questionDescription: {
     color: '#D94526',
@@ -427,11 +453,9 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   category: {
-    color: 'white',
-    fontSize: 15,
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
+    color: '#2a6f97',
+    fontSize: 14,
+    fontFamily: 'Montserrat-SemiBold',
   },
   view: {
     color: 'white',
@@ -439,10 +463,6 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'center',
-  },
-  description: {
-    color: 'white',
-    fontSize: 20,
   },
   thumbnail: {
     width: 25,
@@ -459,12 +479,80 @@ const styles = StyleSheet.create({
     color: '#212529',
     fontSize: 15,
     letterSpacing: -1,
-    marginLeft: 14,
   },
   timeTxt: {
-    fontFamily: 'Montserrat-SemiBoldItalic',
+    fontFamily: 'Montserrat-Regular',
     color: '#adb5bd',
-    fontSize: 12.68,
+    fontSize: 12,
+    letterSpacing: -0.68,
+    marginTop: 4,
+  },
+  questionCard: {
+    backgroundColor: '#fff',
+    padding: 16,
+    borderRadius: 2,
+    borderWidth: 0.2,
+    borderColor: '#ccc',
+    marginTop: 19,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.32,
+    shadowRadius: 5.46,
+
+    elevation: 9,
+  },
+  cardHeader: {
+    paddingBottom: 9,
+    borderBottomWidth: 1,
+    borderBottomColor: '#979dacb5',
+    borderStyle: 'dotted',
+    borderRadius: 1,
+  },
+  description: {
+    fontFamily: 'Montserrat-Regular',
+    color: '#212529',
+    fontSize: 16,
     letterSpacing: -1,
+  },
+  cardBody: {
+    marginVertical: 9,
+    paddingBottom: 9,
+    borderBottomWidth: 1,
+    borderBottomColor: '#979dacb5',
+    borderStyle: 'dotted',
+    borderRadius: 1,
+  },
+  txtReact: {
+    fontFamily: 'Montserrat-SemiBold',
+    fontSize: 12.68,
+    color: '#343a40',
+    marginLeft: 4,
+  },
+  answerTxt: {
+    fontFamily: 'Montserrat-Regular',
+    fontSize: 14,
+    color: '#001219',
+    marginLeft: 4,
+  },
+  proTxt: {
+    fontFamily: 'Montserrat-SemiBold',
+    fontSize: 11,
+    color: '#fff',
+    textAlign: 'center',
+  },
+  answerView: {
+    padding: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#343a4012',
+    marginHorizontal: 4,
+  },
+  headerTxt: {
+    fontFamily: 'Montserrat-SemiBold',
+    letterSpacing: -1,
+    color: '#001219',
+    marginRight: 6,
   },
 });

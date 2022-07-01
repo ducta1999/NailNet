@@ -425,7 +425,7 @@ export default class LogIn extends Component {
             <Text style={styles.subTitle}>Enter account details</Text>
             <View style={styles.item}>
               <Icon
-                name="mail-open-outline"
+                name="mail-open"
                 color="#6c757d"
                 size={24}
                 style={styles.icon}
@@ -450,7 +450,7 @@ export default class LogIn extends Component {
             </View>
             <View style={styles.item}>
               <Icon
-                name="person-outline"
+                name="person"
                 color="#6c757d"
                 size={24}
                 style={styles.icon}
@@ -465,7 +465,7 @@ export default class LogIn extends Component {
 
             <View style={styles.item}>
               <Icon
-                name="person-outline"
+                name="person"
                 color="#6c757d"
                 size={24}
                 style={styles.icon}
@@ -508,7 +508,7 @@ export default class LogIn extends Component {
             <Text style={styles.subTitle}>Enter your password</Text>
             <View style={styles.item}>
               <Icon
-                name="lock-closed-outline"
+                name="lock-closed"
                 color="#6c757d"
                 size={24}
                 style={styles.icon}
@@ -548,7 +548,7 @@ export default class LogIn extends Component {
 
             <View style={styles.item}>
               <Icon
-                name="lock-closed-outline"
+                name="lock-closed"
                 color="#6c757d"
                 size={24}
                 style={styles.icon}
