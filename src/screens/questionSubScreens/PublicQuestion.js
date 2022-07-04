@@ -45,18 +45,20 @@ export default class PublicQuestion extends Component {
   }
 
   async ensureDataFetched() {
-    var user = await authentication.getLoggedInUser();
+    try {
+      var user = await authentication.getLoggedInUser();
 
-    var items = await dataService.get(
-      `api/faqquestions/getall?isApproved=true&private=false&sortby=createtime`,
-    );
+      var items = await dataService.get(
+        `api/faqquestions/getall?isApproved=true&private=false&sortby=createtime`,
+      );
 
-    console.log(items);
-
-    this.setState({
-      questions: items,
-      loading: false,
-    });
+      this.setState({
+        questions: items,
+        loading: false,
+      });
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   openAddQuestionPage() {
@@ -81,7 +83,7 @@ export default class PublicQuestion extends Component {
               onPress={() => this.props.navigation.openDrawer()}>
               <Image
                 source={require('../../icons/menu.png')}
-                style={{width: 29, height: 29}}
+                style={{width: 28, height: 28}}
               />
             </TouchableOpacity>
             <TouchableOpacity onPress={() => this.openAddQuestionPage()}>

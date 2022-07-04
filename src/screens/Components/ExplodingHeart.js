@@ -10,7 +10,6 @@ const ExplodingHeart = ({
   width = 48,
   containerStyle,
   type = 'heart',
-  onAnimationFinish = () => {},
   ...props
 }) => {
   const [isFavorite, setFavorite] = useState(status);
@@ -49,7 +48,6 @@ const ExplodingHeart = ({
           style={{width}}
           ref={animation => setAnimation(animation)}
           source={lottieFile[type]}
-          onAnimationFinish={() => onAnimationFinish()}
         />
       </TouchableOpacity>
     </View>

@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {StyleSheet, TouchableOpacity, Image, ScrollView} from 'react-native';
+import {StyleSheet, TouchableOpacity, Dimensions} from 'react-native';
 import {
   Container,
   Content,
@@ -24,10 +24,14 @@ import * as dataService from '../../services/DataService';
 import * as formatDate from '../../services/FormatDate';
 import * as toastService from '../../services/ToastService';
 import * as authentication from '../../services/Authentication';
-import DateTimePicker from 'react-native-modal-datetime-picker';
 import Icon from 'react-native-vector-icons/Ionicons';
 import SectionedMultiSelect from 'react-native-sectioned-multi-select';
 import MultiSelect from '../Components/MultiSelect';
+import Carousel from 'react-native-snap-carousel';
+import Loading from '../Components/Loading';
+import LottieView from 'lottie-react-native';
+import DatePicker from 'react-native-date-picker';
+import moment from 'moment';
 
 export default class AddPromotion extends Component {
   constructor(props) {
@@ -35,15 +39,13 @@ export default class AddPromotion extends Component {
     this.state = {
       loading: true,
       title: '',
-      phone: '',
-      email: '',
       location: '',
       discount: 0,
       description: '',
-      rawFromDate: null,
-      rawToDate: null,
-      fromDate: '',
-      toDate: '',
+      rawFromDate: new Date(),
+      rawToDate: new Date(),
+      fromDate: new Date(),
+      toDate: new Date(),
       cities: [],
       selectedCity: [],
       isFromDateTimePickerVisible: false,
@@ -60,6 +62,15 @@ export default class AddPromotion extends Component {
         },
       },
       avatarSource: [],
+      paginationData: [
+        {title: 'Category', isCompleted: false},
+        {title: 'Information', isCompleted: false},
+        {title: 'Date Expire', isCompleted: false},
+      ],
+      success: false,
+      openFromDate: false,
+      openToDate: false,
+      currentIndex: 0,
     };
   }
 
@@ -127,8 +138,6 @@ export default class AddPromotion extends Component {
 
     const {
       title,
-      phone,
-      email,
       selectedCategory,
       discount,
       description,
@@ -140,8 +149,6 @@ export default class AddPromotion extends Component {
 
     if (
       title.trim() == '' ||
-      phone.trim() == '' ||
-      email.trim() == '' ||
       selectedCity.length == 0 ||
       selectedCategory.length == 0 ||
       description.trim() == '' ||
@@ -156,8 +163,8 @@ export default class AddPromotion extends Component {
     } else {
       var data = {
         title: title,
-        phone: phone,
-        email: email,
+        phone: '',
+        email: user.email,
         discount: discount,
         description: description,
         fromDate: formatDate.formatDateToSendAPI(rawFromDate),
@@ -266,405 +273,487 @@ export default class AddPromotion extends Component {
     // });
   }
 
+  swapSlide = value => {
+    this.setState({carousel: value});
+  };
+
   render() {
-    const {
-      title,
-      phone,
-      email,
-      location,
-      discount,
-      description,
-      fromDate,
-      toDate,
-      cities,
-      loading,
-      isFromDateTimePickerVisible,
-      isToDateTimePickerVisible,
-      options,
-      avatarSource,
-    } = this.state;
+    const {width} = Dimensions.get('window');
+
+    const dataCarousel = [
+      {
+        key: 'category',
+        view: (
+          <>
+            <Text style={styles.subTitle}>Choose Your Category</Text>
+            <View style={{marginBottom: 9}}>
+              {this.state.loading === false && (
+                <MultiSelect
+                  backgroundColor="#0065ff"
+                  items={this.state.categories}
+                  placeHolder="Choose Category"
+                  selectedItems={this.state.selectedCategory}
+                  setSelectedItems={value => {
+                    this.setState({
+                      selectedCategory: value,
+                      paginationData: [
+                        {title: 'Category', isCompleted: true},
+                        ...this.state.paginationData.slice(1),
+                      ],
+                    });
+                  }}
+                />
+              )}
+            </View>
+            <View style={{marginBottom: 9}}>
+              <MultiSelect
+                backgroundColor="#0065ff"
+                items={this.state.cities}
+                placeHolder="Choose City"
+                selectedItems={this.state.selectedCity}
+                setSelectedItems={value => {
+                  this.setState({
+                    selectedCity: value,
+                  });
+                }}
+              />
+            </View>
+
+            <Button
+              block
+              backgroundColor="#212121"
+              style={styles.submitButton}
+              onPress={() => this.swapSlide.snapToNext()}>
+              <Text style={styles.submitButtonText}>Continue</Text>
+            </Button>
+          </>
+        ),
+      },
+      {
+        key: 'information',
+        view: (
+          <>
+            <Text style={styles.subTitle}>Enter promote information</Text>
+            <View style={styles.item}>
+              <Icon
+                name="information-circle"
+                color="#6c757d"
+                size={24}
+                style={styles.icon}
+              />
+              <Input
+                placeholder="Title"
+                placeholderTextColor="#6c757d"
+                onChangeText={text => {
+                  this.setState({
+                    title: text,
+                    paginationData: [
+                      ...this.state.paginationData.slice(0, 1),
+                      {title: 'Information', isCompleted: text.trim() !== ''},
+                      ...this.state.paginationData.slice(2),
+                    ],
+                  });
+                }}
+                style={styles.input}
+              />
+            </View>
+            <View style={styles.item}>
+              <Icon
+                name="information-circle"
+                color="#6c757d"
+                size={24}
+                style={styles.icon}
+              />
+              <Input
+                placeholder="Description"
+                placeholderTextColor="#6c757d"
+                onChangeText={text => {
+                  this.setState({
+                    description: text,
+                    paginationData: [
+                      ...this.state.paginationData.slice(0, 1),
+                      {title: 'Information', isCompleted: text.trim() !== ''},
+                      ...this.state.paginationData.slice(2),
+                    ],
+                  });
+                }}
+                style={styles.input}
+              />
+            </View>
+
+            <View style={styles.item}>
+              <Icon
+                name="information-circle"
+                color="#6c757d"
+                size={24}
+                style={styles.icon}
+              />
+              <Input
+                keyboardType="numeric"
+                placeholder="Discount"
+                placeholderTextColor="#6c757d"
+                onChangeText={text => {
+                  this.setState({
+                    description: text,
+                    paginationData: [
+                      ...this.state.paginationData.slice(0, 1),
+                      {title: 'Information', isCompleted: text.trim() !== ''},
+                      ...this.state.paginationData.slice(2),
+                    ],
+                  });
+                }}
+                style={styles.input}
+              />
+            </View>
+
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}>
+              <Button
+                block
+                backgroundColor="#4c5c68"
+                style={[styles.submitButton, {width: '48%'}]}
+                onPress={() => this.swapSlide.snapToPrev()}>
+                <Icon name="arrow-back-circle-outline" color="#fff" size={28} />
+              </Button>
+              <Button
+                block
+                backgroundColor="#212121"
+                style={[styles.submitButton, {width: '48%'}]}
+                onPress={() => this.swapSlide.snapToNext()}>
+                <Text style={styles.submitButtonText}>Continue</Text>
+              </Button>
+            </View>
+          </>
+        ),
+      },
+      {
+        key: 'date',
+        view: (
+          <>
+            <Text style={styles.subTitle}>Select expire date</Text>
+            <Text style={[styles.dateTxt, {color: '#6c757d'}]}>From</Text>
+            <TouchableOpacity
+              activeOpacity={0.79}
+              onPress={() => this.setState({openFromDate: true})}>
+              <View style={[styles.row, styles.dateInput]}>
+                <Text style={styles.dateTxt}>
+                  {moment(this.state.rawFromDate).format('LLL')}
+                </Text>
+                <Icon name="calendar" size={22} color="#3a86ff" />
+              </View>
+            </TouchableOpacity>
+            <Text style={[styles.dateTxt, {color: '#6c757d'}]}>To</Text>
+            <TouchableOpacity
+              activeOpacity={0.79}
+              onPress={() => this.setState({openToDate: true})}>
+              <View style={[styles.row, styles.dateInput]}>
+                <Text style={styles.dateTxt}>
+                  {moment(this.state.rawToDate).format('LLL')}
+                </Text>
+                <Icon name="calendar" size={22} color="#3a86ff" />
+              </View>
+            </TouchableOpacity>
+            <DatePicker
+              modal
+              open={this.state.openFromDate}
+              date={this.state.rawFromDate}
+              onConfirm={date => {
+                this.setState({
+                  openFromDate: false,
+                  fromDate: moment(date).format('DD-MM-yyyy'),
+                  rawFromDate: date,
+                });
+              }}
+              onCancel={() => {
+                this.setState({openFromDate: false});
+              }}
+            />
+            <DatePicker
+              modal
+              open={this.state.openToDate}
+              date={this.state.rawToDate}
+              onConfirm={date => {
+                this.setState({
+                  openToDate: false,
+                  toDate: moment(date).format('DD-MM-yyyy'),
+                  rawToDate: date,
+                });
+              }}
+              onCancel={() => {
+                this.setState({openToDate: false});
+              }}
+            />
+
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}>
+              <Button
+                block
+                backgroundColor="#4c5c68"
+                style={[styles.submitButton, {width: '48%'}]}
+                onPress={() => this.swapSlide.snapToPrev()}>
+                <Icon name="arrow-back-circle-outline" color="#fff" size={28} />
+              </Button>
+              <Button
+                block
+                backgroundColor="#0466c8"
+                style={[
+                  styles.submitButton,
+                  {
+                    width: '48%',
+                  },
+                ]}
+                onPress={() => this.submit()}>
+                {this.state.buttonLoading ? (
+                  <View style={{height: 99, width: 99}}>
+                    <LottieView
+                      source={require('../../json/dotLoading.json')}
+                      autoPlay
+                    />
+                  </View>
+                ) : this.state.success === true ? (
+                  <View style={{height: 99, width: 99}}>
+                    <LottieView
+                      speed={2.5}
+                      source={require('../../json/success.json')}
+                      autoPlay
+                    />
+                  </View>
+                ) : (
+                  <Text style={styles.submitButtonText}>Create</Text>
+                )}
+              </Button>
+            </View>
+          </>
+        ),
+      },
+    ];
 
     return (
-      <Container style={styles.container}>
-        <Header hasTabs transparent>
-          <View
-            style={{
-              flex: 1,
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              marginTop: 8,
-            }}>
-            <View>
-              <TouchableOpacity onPress={() => this.props.navigation.goBack()}>
-                <Icon name="arrow-back-outline" color="#fff" size={28} />
-              </TouchableOpacity>
-            </View>
-            <View>
-              <View>
-                <Text style={styles.title}>ADD PROMOTION</Text>
-              </View>
-            </View>
-            <View />
-          </View>
-        </Header>
-
-        <Content>
-          {loading == false ? (
-            <Card transparent>
-              <CardItem style={styles.carditem}>
-                <Content>
-                  <Form>
-                    <View style={styles.item}>
-                      <Button
-                        block
-                        backgroundColor="#D94526"
-                        onPress={() => this.showImagePicker(options)}>
-                        <Text>Add image</Text>
-                      </Button>
-
-                      {avatarSource && (
-                        <ScrollView
-                          horizontal={true}
-                          style={{
-                            flex: 1,
-                            flexDirection: 'row',
-                            marginTop: 10,
-                          }}>
-                          {avatarSource.map((item, i) => (
-                            <Image
-                              //source={item.source}
-                              source={{
-                                uri: `data:${item.mime};base64,${item.base64}`,
-                              }}
-                              style={{
-                                width: 100,
-                                height: 100,
-                                resizeMode: 'contain',
-                              }}
-                            />
-                          ))}
-                        </ScrollView>
-                      )}
-                    </View>
-
-                    <Item style={styles.item}>
-                      <Label style={styles.label}>Title</Label>
-                      <Input
-                        placeholder="Please enter your title..."
-                        placeholderTextColor="#848484"
-                        onChangeText={text => this.setState({title: text})}
-                        value={title}
-                        style={styles.input}
-                      />
-                    </Item>
-
-                    <Item style={styles.item}>
-                      <Label style={styles.label}>Email</Label>
-                      <Input
-                        placeholder="Please enter your email..."
-                        placeholderTextColor="#848484"
-                        onChangeText={text => this.setState({email: text})}
-                        value={email}
-                        style={styles.input}
-                      />
-                    </Item>
-
-                    <Item style={styles.item}>
-                      <Label style={styles.label}>Phone</Label>
-                      <Input
-                        placeholder="Please enter your phone..."
-                        placeholderTextColor="#848484"
-                        onChangeText={text => this.setState({phone: text})}
-                        value={phone}
-                        style={styles.input}
-                      />
-                    </Item>
-
-                    <View
-                      style={{
-                        marginLeft: 14,
-                        marginTop: 10,
-                      }}>
-                      <View>
-                        <Label style={styles.label}>Category</Label>
-                      </View>
-                      <View
-                        style={{
-                          marginLeft: 60,
-                          justifyContent: 'center',
-                          marginTop: -43,
-                        }}>
-                        {this.state.loading == false && (
-                          <MultiSelect
-                            backgroundColor="#0065ff"
-                            items={this.state.categories}
-                            placeHolder="Choose category"
-                            selectedItems={this.state.selectedCategory}
-                            setSelectedItems={value => {
-                              this.setState({selectedCategory: value});
-                            }}
-                          />
-                        )}
-                      </View>
-                    </View>
-
-                    {/* <Item style={styles.item}>
-                      <Label style={styles.label}>category</Label>
-                      {this.state.loading == false &&
-                        this.state.faqindustries &&
-                        this.state.faqindustries.items && (
-                          <Picker
-                            mode="dropdown"
-                            placeholder="Choose category"
-                            iosIcon={<Icon name="arrow-down" />}
-                            style={styles.picker}
-                            selectedValue={this.state.selectedCategory}
-                            onValueChange={value =>
-                              this.setState({ selectedCategory: value })
-                            }
-                          >
-                            {this.state.faqindustries.items.map(
-                              (category, i) => (
-                                <Picker.Item
-                                  label={category.description}
-                                  value={category.id}
-                                  key={i}
-                                />
-                              )
-                            )}
-                          </Picker>
-                        )}
-                    </Item> */}
-
-                    <Item style={styles.item}>
-                      <Label style={styles.label}>From Date</Label>
-                      <TouchableOpacity onPress={this.showFromDateTimePicker}>
-                        <Input
-                          disabled={true}
-                          placeholder="Please choose your from date..."
-                          placeholderTextColor="#848484"
-                          //onChangeText={text => this.setState({ phone: text })}
-                          value={fromDate}
-                          style={styles.input}
-                        />
-                      </TouchableOpacity>
-
-                      <DateTimePicker
-                        isVisible={this.state.isFromDateTimePickerVisible}
-                        onConfirm={this.handleFromDatePicked}
-                        onCancel={this.hideFromDateTimePicker}
-                      />
-                    </Item>
-
-                    <Item style={styles.item}>
-                      <Label style={styles.label}>To Date</Label>
-                      <TouchableOpacity onPress={this.showToDateTimePicker}>
-                        <Input
-                          disabled={true}
-                          placeholder="Please choose your to date..."
-                          placeholderTextColor="#848484"
-                          //onChangeText={text => this.setState({ phone: text })}
-                          value={toDate}
-                          style={styles.input}
-                        />
-                      </TouchableOpacity>
-
-                      <DateTimePicker
-                        isVisible={this.state.isToDateTimePickerVisible}
-                        onConfirm={this.handleToDatePicked}
-                        onCancel={this.hideToDateTimePicker}
-                      />
-                    </Item>
-
-                    <Item style={styles.item}>
-                      <Label style={styles.label}>Discount</Label>
-                      <Input
-                        placeholder="Please enter your discount..."
-                        placeholderTextColor="#848484"
-                        keyboardType="numeric"
-                        onChangeText={
-                          text => this.setState({discount: parseFloat(text)})
-                          // this.setState({
-                          //   discount:
-                          //     text.replace(/\D*/, "") == ""
-                          //       ? ""
-                          //       : parseInt(text.replace(/\D*/, ""))
-                          // })
-                        }
-                        value={discount}
-                        style={styles.input}
-                      />
-                    </Item>
-
-                    <View
-                      style={{
-                        marginLeft: 14,
-                        marginTop: 10,
-                      }}>
-                      <View>
-                        <Label style={styles.label}>Location</Label>
-                      </View>
-                      <View
-                        style={{
-                          marginLeft: 60,
-                          justifyContent: 'center',
-                          marginTop: -43,
-                        }}>
-                        {this.state.loading == false && (
-                          <MultiSelect
-                            backgroundColor="#0065ff"
-                            items={this.state.cities}
-                            placeHolder="Choose city"
-                            selectedItems={this.state.selectedCity}
-                            setSelectedItems={value => {
-                              this.setState({selectedCity: value});
-                            }}
-                          />
-                        )}
-                      </View>
-                    </View>
-
-                    <Item style={styles.item} stackedLabel>
-                      <Label style={styles.label}>Description</Label>
-                      <Textarea
-                        placeholder="Please enter your description..."
-                        placeholderTextColor="#848484"
-                        rowSpan={5}
-                        //bordered
-                        onChangeText={text =>
-                          this.setState({description: text})
-                        }
-                        value={description}
-                        style={styles.textArea}
-                      />
-                    </Item>
-                  </Form>
-                </Content>
-              </CardItem>
-
-              <CardItem footer style={styles.buttonGroup}>
-                <View style={styles.cardFooter}>
-                  <TouchableOpacity
-                    onPress={() => this.props.navigation.goBack()}
-                    style={styles.cancel}>
-                    <Text style={styles.cancelText}>CANCEL</Text>
-                  </TouchableOpacity>
-
-                  <Button
-                    backgroundColor="#47BFB3"
-                    style={styles.submitButton}
-                    onPress={() => this.submit()}>
-                    {this.state.buttonLoading == true && (
-                      <Spinner color="green" />
-                    )}
-                    <Text style={styles.submitButtonText}>SUBMIT</Text>
-                  </Button>
-                </View>
-              </CardItem>
-            </Card>
-          ) : (
-            <View>
-              <Spinner color="red" />
+      <View style={styles.container}>
+        <View
+          style={{
+            width: '100%',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            paddingVertical: 28,
+            paddingHorizontal: 10,
+          }}>
+          <Text style={styles.title}>Add Promotion</Text>
+          <TouchableOpacity onPress={() => this.props.navigation.goBack()}>
+            <Icon name="close-outline" color="#01161e" size={36} />
+          </TouchableOpacity>
+        </View>
+        <View style={styles.pagination}>
+          {this.state.paginationData.map((item, index) => (
+            <TouchableOpacity
+              activeOpacity={0.79}
+              key={`pagination ${index}`}
+              onPress={() => this.swapSlide.snapToItem(index)}
+              style={{width: '28%', marginBottom: 36}}>
               <Text
-                style={{
-                  textAlign: 'center',
-                  color: 'white',
-                  fontWeight: 'bold',
-                }}>
-                Loading
+                style={[
+                  styles.progressTitle,
+                  {
+                    color:
+                      index === this.state.currentIndex
+                        ? '#1db25b'
+                        : item.isCompleted
+                        ? '#686868'
+                        : '#cacaca',
+                  },
+                ]}>
+                {item.title}
               </Text>
-            </View>
-          )}
-        </Content>
-      </Container>
+              <View
+                style={[
+                  styles.progressBar,
+                  {
+                    backgroundColor:
+                      index === this.state.currentIndex || item.isCompleted
+                        ? '#1db25b'
+                        : '#cacaca',
+                  },
+                ]}></View>
+            </TouchableOpacity>
+          ))}
+        </View>
+        {this.state.loading == false ? (
+          <View style={styles.carditem}>
+            <Carousel
+              ref={value => (this.swapSlide = value)}
+              data={dataCarousel}
+              renderItem={({item}) => item.view}
+              sliderWidth={width - 68}
+              itemWidth={width - 68}
+              onSnapToItem={index => this.setState({currentIndex: index})}
+            />
+          </View>
+        ) : (
+          <Loading />
+        )}
+      </View>
     );
   }
 }
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#1F2426',
+    backgroundColor: '#f2f2f2',
+    flex: 1,
   },
-  title: {
-    fontSize: 15,
-    color: '#47BFB3',
-    //marginRight: 80,
-    marginTop: 10,
-  },
-  picker: {
-    marginLeft: 20,
-    color: 'white',
-  },
-  caretIcon: {
-    right: 25,
-  },
-  carditem: {
-    backgroundColor: '#1F2426',
-  },
-  item: {
-    marginBottom: 20,
-    borderColor: 'transparent',
-  },
-  label: {
-    fontSize: 15,
-    color: '#D94526',
-  },
-  input: {
-    color: 'white',
-  },
-  textArea: {
+  pagination: {
     width: '100%',
-    color: 'white',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 10,
   },
   cardFooter: {
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
-  buttonGroup: {
-    backgroundColor: '#1F2426',
+  caretIcon: {
+    right: 25,
+  },
+  carditem: {
+    backgroundColor: '#fff',
+    flex: 1,
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderTopLeftRadius: 36,
+    borderTopRightRadius: 36,
+    paddingVertical: 24,
+  },
+  input: {
+    fontSize: 14,
+    fontFamily: 'Montserrat-Medium',
+    borderRadius: 4,
+    overflow: 'hidden',
+    backgroundColor: '#fff',
+    color: '#343a40',
+    borderBottomWidth: 1.1,
+    borderColor: 'rgba(108, 117, 125, 0.5)',
+  },
+  item: {
+    marginBottom: 20,
+    marginLeft: 0,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  icon: {
+    marginRight: 19,
+  },
+  title: {
+    fontFamily: 'Montserrat-SemiBold',
+    color: '#01161e',
+    fontSize: 18,
+    letterSpacing: -1,
+  },
+
+  logoView: {
+    flex: 1,
+    height: 268,
+  },
+  logo: {
+    width: 300,
+    height: 100,
+    resizeMode: 'contain',
+    marginTop: 20,
+  },
+  submitButton: {
+    borderRadius: 9,
+    marginTop: 15,
+  },
+  submitButtonText: {
+    color: 'white',
+    fontFamily: 'Montserrat-Bold',
+    textTransform: 'capitalize',
   },
   cancelText: {
-    color: 'white',
-    fontSize: 20,
-    fontWeight: 'bold',
+    color: '#000',
+    fontSize: 16,
+    fontFamily: 'Montserrat-Bold',
   },
   cancel: {
     // flex: 1,
     // flexDirection: "row",
     // justifyContent: "flex-start",
-    marginTop: 10,
     marginLeft: 15,
+    marginTop: 10,
   },
-  submitButton: {
-    width: 150,
-    justifyContent: 'center',
+  buttonGroup: {
+    backgroundColor: '#fff',
   },
-  submitButtonText: {
-    fontSize: 20,
-    fontWeight: 'bold',
+  signupText: {
+    fontSize: 12,
+    fontFamily: 'Montserrat-SemiBoldItalic',
+    color: '#46494c',
+    marginVertical: 9,
   },
-  thumbnail: {
-    width: 25,
-    height: 25,
-    marginTop: 5,
+  linkText: {
+    fontSize: 12,
+    fontFamily: 'Montserrat-SemiBold',
+    color: '#0065ff',
+  },
+  progressBar: {
+    backgroundColor: '#cacaca',
+    height: 3,
+    width: '100%',
+    borderRadius: 24,
+  },
+  progressTitle: {
+    fontFamily: 'Montserrat-Bold',
+    fontSize: 12,
+    marginBottom: 9,
+    textAlign: 'center',
+    color: '#cacaca',
+  },
+  errorTxt: {
+    color: '#e71d36',
+    fontFamily: 'Montserrat-SemiBold',
+    fontSize: 11,
+    marginVertical: 9,
+  },
+  subTitle: {
+    fontFamily: 'Montserrat-SemiBold',
+    fontSize: 16,
+    color: '#000814',
+    marginTop: 9,
+    marginBottom: 19,
+    textTransform: 'capitalize',
+  },
+  signupText: {
+    color: '#6c757d',
+    fontSize: 14,
+    fontFamily: 'Montserrat-Medium',
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  dateTxt: {
+    fontFamily: 'Montserrat-SemiBold',
+    fontSize: 12.68,
+    color: '#343a40',
+  },
+  dateInput: {
+    borderRadius: 9,
+    borderWidth: 1,
+    borderColor: '#49505739',
+    padding: 12,
+    marginBottom: 9,
   },
 });
-
-//multiselect style
-const multiSelectStyles = StyleSheet.create({
-  container: {
-    backgroundColor: '#1F2426',
-  },
-  selectToggleText: {color: 'white'},
-  button: {backgroundColor: '#D94526'},
-  searchBar: {backgroundColor: '#1F2426'},
-  searchTextInput: {color: '#D94526'},
-});
-const color = {
-  text: '#D94526',
-  subText: '#47BFB3',
-  searchPlaceholderTextColor: '#D94526',
-  itemBackground: '#1F2426',
-  subItemBackground: '#1F2426',
-};

@@ -36,6 +36,7 @@ import Loading from '../Components/Loading';
 import moment from 'moment';
 import ExplodingHeart from '../Components/ExplodingHeart';
 import * as toastService from '../../services/ToastService';
+import LottieView from 'lottie-react-native';
 
 export default class QuestionDetail extends Component {
   constructor(props) {
@@ -50,6 +51,7 @@ export default class QuestionDetail extends Component {
       comment: '',
       buttonLoading: false,
     };
+    this.scrollViewRef = React.createRef();
 
     if (props.navigation.state.params && props.navigation.state.params.id) {
       this.ensureDataFetched(props.navigation.state.params.id);
@@ -79,6 +81,7 @@ export default class QuestionDetail extends Component {
       loading: false,
       email: email,
       user: user,
+      comment: '',
     });
   }
 
@@ -88,9 +91,6 @@ export default class QuestionDetail extends Component {
       const {comment, id} = this.state;
 
       if (comment.trim() == '') {
-        toastService.error('Error: ' + 'Description cannot be empty!');
-
-        this.setState({buttonLoading: false});
         return;
       }
 
@@ -104,12 +104,8 @@ export default class QuestionDetail extends Component {
 
       var result = await dataService.post('api/faqanswers/add', data);
       if (result.status === 200) {
-        toastService.success('Add answer successfully!');
-
-        this.setState({
-          loading: true,
-        });
-        this.ensureDataFetched(this.state.id);
+        await this.ensureDataFetched(this.state.id);
+        this.scrollViewRef?.scrollToEnd({animated: true});
       } else {
         toastService.error(
           'Error: ' + 'Something wrong! Please check and try again',
@@ -133,17 +129,17 @@ export default class QuestionDetail extends Component {
               flex: 1,
               flexDirection: 'row',
               justifyContent: 'space-between',
-              marginTop: 8,
+              marginTop: 12,
             }}>
-            <View>
-              <TouchableOpacity onPress={() => this.props.navigation.goBack()}>
-                <Ionicon name="arrow-back-outline" color="#000" size={28} />
-              </TouchableOpacity>
-            </View>
+            <TouchableOpacity onPress={() => this.props.navigation.goBack()}>
+              <Ionicon name="close" color="#00081499" size={27} />
+            </TouchableOpacity>
           </View>
         </Header>
         {loading == false ? (
-          <ScrollView style={{padding: 12}}>
+          <ScrollView
+            ref={ref => (this.scrollViewRef = ref)}
+            style={{padding: 12}}>
             <View style={[styles.row]}>
               <View style={[styles.row]}>
                 <Image
@@ -295,7 +291,6 @@ export default class QuestionDetail extends Component {
                       onPress={() => this.likePress(answer)}
                       activeOpacity={0.68}
                       type="heart"
-                      onAnimationFinish={() => console.log('?')}
                     />
                     <Text
                       style={{
@@ -313,23 +308,44 @@ export default class QuestionDetail extends Component {
         ) : (
           <Loading />
         )}
-        <View
-          style={{
-            width: width,
-            height: 99,
-            backgroundColor: '#20212f',
-            position: 'absolute',
-            bottom: 0,
-            left: 0,
-            borderTopLeftRadius: 24,
-            borderTopRightRadius: 24,
-          }}>
-          <View style={styles.row}>
-            <Input
-              placeholder="Type your answer"
-              placeholderTextColor="#fff"
-              onChangeText={text => this.setState({comment: text})}
-            />
+        <View style={[styles.bottomAbsolute, {width: width}]}>
+          <View
+            style={[
+              styles.row,
+              {flex: 1, paddingVertical: 12, paddingHorizontal: 22},
+            ]}>
+            <View style={{width: '88%'}}>
+              <Input
+                value={this.state.comment}
+                style={styles.input}
+                placeholder="Type your answer..."
+                placeholderTextColor="#5c677d"
+                onChangeText={text => this.setState({comment: text})}
+              />
+            </View>
+            <TouchableOpacity
+              activeOpacity={0.79}
+              disabled={
+                this.state.buttonLoading || this.state.comment.trim() === ''
+              }
+              onPress={() => this.submit()}>
+              {this.state.buttonLoading ? (
+                <LottieView
+                  source={require('../../json/loading.json')}
+                  autoPlay
+                  loop
+                  style={{width: 68}}
+                />
+              ) : (
+                <Ionicon
+                  name="send"
+                  color={
+                    this.state.comment.trim() === '' ? '#c5c3c6' : '#00bbf9'
+                  }
+                  size={22}
+                />
+              )}
+            </TouchableOpacity>
           </View>
         </View>
       </Container>
@@ -384,9 +400,16 @@ export default class QuestionDetail extends Component {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#ffffff',
-    paddingBottom: 99,
+    paddingBottom: 68,
   },
-
+  input: {
+    backgroundColor: '#ffffff',
+    borderRadius: 12,
+    padding: 6,
+    paddingLeft: 9,
+    fontSize: 12.9,
+    fontFamily: 'Montserrat-Medium',
+  },
   headerBodyText: {
     justifyContent: 'center',
     //left: 30,
@@ -554,5 +577,12 @@ const styles = StyleSheet.create({
     letterSpacing: -1,
     color: '#001219',
     marginRight: 6,
+  },
+  bottomAbsolute: {
+    height: 68,
+    backgroundColor: '#8d99ae24',
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
   },
 });

@@ -303,7 +303,7 @@ export default class LogIn extends Component {
   };
 
   render() {
-    const {width, height} = Dimensions.get('window');
+    const {width} = Dimensions.get('window');
 
     const dataCarousel = [
       {
@@ -434,16 +434,14 @@ export default class LogIn extends Component {
                 placeholder="Email / Username"
                 placeholderTextColor="#6c757d"
                 onChangeText={text => {
-                  if (text.trim() !== '') {
-                    this.setState({
-                      email: text,
-                      paginationData: [
-                        ...this.state.paginationData.slice(0, 2),
-                        {title: 'Account', isCompleted: true},
-                        ...this.state.paginationData.slice(3),
-                      ],
-                    });
-                  } else this.setState({email: text});
+                  this.setState({
+                    email: text,
+                    paginationData: [
+                      ...this.state.paginationData.slice(0, 2),
+                      {title: 'Account', isCompleted: text.trim() !== ''},
+                      ...this.state.paginationData.slice(3),
+                    ],
+                  });
                 }}
                 style={styles.input}
               />
@@ -521,26 +519,18 @@ export default class LogIn extends Component {
                 maxLength={6}
                 value={this.state.password}
                 onChangeText={text => {
-                  if (
-                    text.trim() !== '' &&
-                    text === this.state.passwordConfirm
-                  ) {
-                    this.setState({
-                      password: text.replace(/[^0-9]/g, ''),
-                      paginationData: [
-                        ...this.state.paginationData.slice(0, 3),
-                        {title: 'Password', isCompleted: true},
-                      ],
-                    });
-                  } else {
-                    this.setState({
-                      password: text.replace(/[^0-9]/g, ''),
-                      paginationData: [
-                        ...this.state.paginationData.slice(0, 3),
-                        {title: 'Password', isCompleted: false},
-                      ],
-                    });
-                  }
+                  this.setState({
+                    password: text.replace(/[^0-9]/g, ''),
+                    paginationData: [
+                      ...this.state.paginationData.slice(0, 3),
+                      {
+                        title: 'Password',
+                        isCompleted:
+                          text.trim() !== '' &&
+                          text === this.state.passwordConfirm,
+                      },
+                    ],
+                  });
                 }}
                 style={styles.input}
               />
@@ -561,23 +551,17 @@ export default class LogIn extends Component {
                 keyboardType="numeric"
                 value={this.state.passwordConfirm}
                 onChangeText={text => {
-                  if (text.trim() !== '' && text === this.state.password) {
-                    this.setState({
-                      passwordConfirm: text.replace(/[^0-9]/g, ''),
-                      paginationData: [
-                        ...this.state.paginationData.slice(0, 3),
-                        {title: 'Password', isCompleted: true},
-                      ],
-                    });
-                  } else {
-                    this.setState({
-                      passwordConfirm: text.replace(/[^0-9]/g, ''),
-                      paginationData: [
-                        ...this.state.paginationData.slice(0, 3),
-                        {title: 'Password', isCompleted: false},
-                      ],
-                    });
-                  }
+                  this.setState({
+                    passwordConfirm: text.replace(/[^0-9]/g, ''),
+                    paginationData: [
+                      ...this.state.paginationData.slice(0, 3),
+                      {
+                        title: 'Password',
+                        isCompleted:
+                          text.trim() !== '' && text === this.state.password,
+                      },
+                    ],
+                  });
                 }}
                 style={styles.input}
               />

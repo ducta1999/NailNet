@@ -1,5 +1,11 @@
 import React, {Component} from 'react';
-import {StyleSheet, ScrollView, TouchableOpacity} from 'react-native';
+import {
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Image,
+  Dimensions,
+} from 'react-native';
 import {
   View,
   Text,
@@ -14,9 +20,13 @@ import {
   Spinner,
   Header,
 } from 'native-base';
-import * as dataService from '../../services/DataService';
 import * as authentication from '../../services/Authentication';
 import * as constant from '../../services/Constant';
+import * as dataService from '../../services/DataService';
+import LottieView from 'lottie-react-native';
+import Loading from '../Components/Loading';
+import Icon from 'react-native-vector-icons/Ionicons';
+import moment from 'moment';
 
 export default class PrivateQuestion extends Component {
   constructor(props) {
@@ -35,17 +45,21 @@ export default class PrivateQuestion extends Component {
   }
 
   async ensureDataFetched() {
-    var user = await authentication.getLoggedInUser();
+    try {
+      var user = await authentication.getLoggedInUser();
 
-    var items = await dataService.get(
-      `api/faqquestions/getall?isApproved=true&private=true&sortby=createtime&email=` +
-        user.email,
-    );
+      var items = await dataService.get(
+        `api/faqquestions/getall?isApproved=true&private=true&sortby=createtime&email=` +
+          user.email,
+      );
 
-    this.setState({
-      questions: items,
-      loading: false,
-    });
+      this.setState({
+        questions: items,
+        loading: false,
+      });
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   openAddQuestionPage() {
@@ -53,122 +67,99 @@ export default class PrivateQuestion extends Component {
   }
 
   render() {
+    const {height} = Dimensions.get('window');
+
     return (
-      <Content>
+      <Content style={{backgroundColor: '#fff'}}>
         <Header hasTabs searchBar transparent>
           <View
             style={{
               flex: 1,
               flexDirection: 'row',
               justifyContent: 'space-between',
+              alignItems: 'center',
               marginTop: 8,
             }}>
-            <View></View>
-
-            <View>
-              <View>
-                <TouchableOpacity onPress={() => this.openAddQuestionPage()}>
-                  <Thumbnail
-                    source={require('../../icons/edit.png')}
-                    style={styles.thumbnail}
-                  />
-                </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => this.props.navigation.openDrawer()}>
+              <Image
+                source={require('../../icons/menu.png')}
+                style={{width: 28, height: 28}}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => this.openAddQuestionPage()}>
+              <View style={{width: 68, height: 68}}>
+                <LottieView
+                  source={require('../../json/create.json')}
+                  autoPlay
+                  loop
+                />
               </View>
-            </View>
+            </TouchableOpacity>
           </View>
         </Header>
         {this.state.loading == false ? (
-          <ScrollView>
-            <List>
-              {this.state.questions &&
-                this.state.questions.items &&
-                this.state.questions.items.map((item, i) => (
-                  <ListItem
-                    avatar
-                    key={i}
-                    noBorder
-                    onPress={() => this.gotoQuestionDetail(item.id)}>
-                    <Left>
-                      <Thumbnail
-                        small
-                        //source={require("../../icons/Avatar.png")}
-                        defaultSource={{uri: 'avatar'}}
-                        source={{
-                          uri:
-                            constant.BASE_URL +
-                            'api/avatars/getimage/' +
-                            item.createByEmail +
-                            '?random_number=' +
-                            new Date().getTime(),
-                        }}
-                      />
-                    </Left>
-                    <Body>
-                      <Text style={styles.name}>
-                        {item.proProfile.firstName} {item.proProfile.lastName}
-                      </Text>
-
-                      {item.answers.length == 0 ? (
-                        <Text style={styles.question} numberOfLines={2}>
-                          {item.description}
+          <ScrollView style={{padding: 12, marginBottom: 88}}>
+            {this.state.questions &&
+              this.state.questions.items &&
+              this.state.questions.items.map((item, i) => (
+                <TouchableOpacity
+                  activeOpacity={0.79}
+                  key={i}
+                  style={{marginBottom: 26}}
+                  onPress={() => this.gotoQuestionDetail(item.id)}>
+                  <View style={[styles.questionCard]}>
+                    <View style={[styles.row, styles.cardHeader]}>
+                      <Text style={styles.title}>{item.title}</Text>
+                      <View style={styles.row}>
+                        <Text style={styles.category}>
+                          {item.industry.description}
                         </Text>
-                      ) : (
-                        <Text style={styles.question} numberOfLines={2}>
-                          {
-                            item.answers[item.answers.length - 1]
-                              .answerDescription
-                          }
-                        </Text>
-                      )}
-
-                      <Text style={styles.title}>Title: {item.title}</Text>
-                      <Text style={styles.category}>
-                        Category: {item.industry.description}
-                      </Text>
-                      <View style={styles.footerGroup}>
-                        <View style={styles.footerGroupView}>
-                          <Text style={styles.footerGroupText}>
-                            Post date: {item.createTime}
-                          </Text>
-                        </View>
-
-                        <View style={styles.footerGroupView}>
-                          <Text style={styles.footerGroupText}>
-                            View: {item.view}
-                          </Text>
-                        </View>
-
-                        <View style={styles.footerGroupView}>
-                          <Text style={styles.footerGroupText}>
-                            Answer: {item.answers.length}
-                          </Text>
-                        </View>
+                        <Icon
+                          name="chevron-forward-outline"
+                          size={18}
+                          color="#979dac"
+                        />
                       </View>
-                    </Body>
-                    <Right style={styles.right}>
-                      <Button
-                        backgroundColor="#47BFB3"
-                        style={styles.replyButton}
-                        onPress={() => this.gotoQuestionDetail(item.id)}>
-                        <Text>REPLY</Text>
-                      </Button>
-                    </Right>
-                  </ListItem>
-                ))}
-            </List>
+                    </View>
+                    <View style={[styles.row, styles.cardBody]}>
+                      <View style={styles.itemBody2}>
+                        <Text style={styles.subTitle}>Name</Text>
+                        <Text style={styles.subTxt}>{item.fullName}</Text>
+                      </View>
+
+                      <View style={styles.itemBody2}>
+                        <Text style={styles.subTitle}>Post Date</Text>
+                        <Text style={styles.subTxt}>
+                          {moment(item.createTime, 'DD/MM/YYYY').format('ll')}
+                        </Text>
+                      </View>
+
+                      <View style={styles.itemBody1}>
+                        <Text style={styles.subTitle}>View</Text>
+                        <Text style={styles.subTxt}>{item.view}</Text>
+                      </View>
+
+                      <View style={styles.itemBody1}>
+                        <Text style={styles.subTitle}>Answer</Text>
+                        <Text style={styles.subTxt}>{item.answers.length}</Text>
+                      </View>
+                    </View>
+                    <View style={{width: '100%'}}>
+                      <Text style={styles.subTitle}>Description</Text>
+                      <Text
+                        style={styles.question}
+                        numberOfLines={2}
+                        ellipsizeMode="tail">
+                        {item.description}
+                      </Text>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              ))}
           </ScrollView>
         ) : (
-          <View>
-            <Spinner color="red" />
-            <Text
-              style={{
-                textAlign: 'center',
-                color: 'white',
-                fontWeight: 'bold',
-              }}>
-              Loading
-            </Text>
-          </View>
+          <Loading />
         )}
       </Content>
     );
@@ -192,19 +183,25 @@ export default class PrivateQuestion extends Component {
 
 const styles = StyleSheet.create({
   name: {
-    color: '#D94526',
-    fontWeight: 'bold',
+    fontFamily: 'Montserrat-SemiBold',
+    color: '#000',
   },
   question: {
-    color: 'white',
+    fontFamily: 'Montserrat-Regular',
+    color: '#000',
+    fontSize: 12.68,
   },
   title: {
-    color: '#47BFB3',
-    fontSize: 12,
+    color: '#000',
+    fontSize: 19,
+    fontFamily: 'Montserrat-SemiBold',
+    letterSpacing: -1.23,
   },
   category: {
-    color: '#47BFB3',
-    fontSize: 12,
+    color: '#2a6f97',
+    fontSize: 14,
+    fontFamily: 'Montserrat-SemiBold',
+    marginRight: 12,
   },
   footerGroupText: {
     color: '#47BFB3',
@@ -229,5 +226,59 @@ const styles = StyleSheet.create({
     height: 25,
     marginTop: 5,
     borderRadius: 0,
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  questionCard: {
+    backgroundColor: '#fff',
+    padding: 16,
+    borderRadius: 2,
+    borderWidth: 0.2,
+    borderColor: '#ccc',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.32,
+    shadowRadius: 5.46,
+
+    elevation: 9,
+  },
+  subTitle: {
+    fontFamily: 'Montserrat-Regular',
+    color: '#6c757d',
+    fontSize: 12.68,
+    letterSpacing: -1,
+    marginBottom: 4,
+  },
+  cardHeader: {
+    paddingBottom: 9,
+    borderBottomWidth: 1,
+    borderBottomColor: '#979dacb5',
+    borderStyle: 'dotted',
+    borderRadius: 1,
+  },
+  cardBody: {
+    marginVertical: 9,
+    paddingBottom: 9,
+    borderBottomWidth: 1,
+    borderBottomColor: '#979dacb5',
+    borderStyle: 'dotted',
+    borderRadius: 1,
+  },
+  itemBody1: {
+    width: '16%',
+  },
+  itemBody2: {
+    width: '31%',
+  },
+  subTxt: {
+    fontFamily: 'Montserrat-SemiBold',
+    color: '#000',
+    fontSize: 12.68,
   },
 });

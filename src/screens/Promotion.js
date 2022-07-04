@@ -4,6 +4,7 @@ import {
   Dimensions,
   ScrollView,
   TouchableOpacity,
+  Image,
 } from 'react-native';
 import {
   View,
@@ -29,9 +30,13 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import * as dataService from '../services/DataService';
 import * as authentication from '../services/Authentication';
 import * as constant from '../services/Constant';
-import SectionedMultiSelect from 'react-native-sectioned-multi-select';
 import MultiSelect from './Components/MultiSelect';
-let ScreenHeight = Dimensions.get('window').height;
+import Loading from './Components/Loading';
+import AnimatedSearchBox from './Components/AnimatedSearchBox';
+import LinearGradient from 'react-native-linear-gradient';
+import LottieView from 'lottie-react-native';
+import moment from 'moment';
+
 export default class Promotion extends Component {
   constructor(props) {
     super(props);
@@ -44,10 +49,10 @@ export default class Promotion extends Component {
       categories: [],
       searchText: null,
     };
+    this.refSearchBox = React.createRef();
   }
 
   async componentDidMount() {
-    var promotions = await dataService.get('api/promotions/getall');
     // var cities = await dataService.getOnlineData(
     //   "https://thongtindoanhnghiep.co/api/city"
     // );
@@ -94,8 +99,11 @@ export default class Promotion extends Component {
     // });
   }
 
-  async ensureDataFetched() {
-    const {searchText, selectedCategory, selectedCity} = this.state;
+  async ensureDataFetched(
+    searchText = this.state.searchText,
+    selectedCity = this.state.selectedCity,
+  ) {
+    console.log(searchText, selectedCity);
 
     var categoriesFromAPI = await dataService.get(
       'api/promotioncategories/getall',
@@ -103,7 +111,6 @@ export default class Promotion extends Component {
     var categories = [];
 
     for (var index = categoriesFromAPI.items.length - 1; index >= 0; index--) {
-      var promotion = [];
       if (searchText != null) {
         if (selectedCity[0] != null) {
           console.log(selectedCity[0]);
@@ -142,399 +149,330 @@ export default class Promotion extends Component {
     });
   }
 
-  searchByTitle(title) {
-    this.setState({searchText: title, loading: true}, () => {
-      this.ensureDataFetched();
-    });
+  onpenDrawer() {
+    this.props.navigation.openDrawer();
   }
 
-  applyFilterByCity(value) {
-    this.setState({selectedCity: value, loading: true}, () => {
-      this.ensureDataFetched();
-    });
-    //this.ensureDataFetched(this.state.searchText, value);
-  }
+  openSearchBox = () => this.refSearchBox.open();
 
-  applyFilterBycategory(value) {
-    this.setState({selectedCategory: value, loading: true}, () => {
-      this.ensureDataFetched();
-    });
-  }
+  closeSearchBox = () => this.refSearchBox.close();
 
   render() {
+    const {categories, loading} = this.state;
     return (
-      <Container style={styles.container}>
-        <Header hasTabs transparent>
+      <Content style={{backgroundColor: '#fff'}}>
+        <Header hasTabs searchBar transparent>
           <View
             style={{
               flex: 1,
               flexDirection: 'row',
               justifyContent: 'space-between',
+              alignItems: 'center',
               marginTop: 8,
             }}>
-            <View>
-              <TouchableOpacity onPress={() => this.props.navigation.goBack()}>
-                <Icon name="arrow-back-outline" color="#fff" size={28} />
-              </TouchableOpacity>
-            </View>
-            <View>
-              <Input
-                placeholder="Enter title to search"
-                placeholderTextColor="#848484"
-                style={styles.input}
-                onSubmitEditing={event =>
-                  this.searchByTitle(event.nativeEvent.text)
-                }
+            <TouchableOpacity onPress={() => this.onpenDrawer()}>
+              <Image
+                source={require('../icons/menu.png')}
+                style={{width: 28, height: 28}}
               />
-            </View>
-            <View>
-              <View>
-                <TouchableOpacity
-                  onPress={() =>
-                    this.props.navigation.navigate('AddPromotion')
-                  }>
-                  <Thumbnail
-                    source={require('../icons/edit.png')}
-                    style={styles.thumbnail}
-                  />
-                </TouchableOpacity>
-              </View>
+            </TouchableOpacity>
+            <View style={{flex: 0.96}}>
+              <AnimatedSearchBox
+                ref={ref => (this.refSearchBox = ref)}
+                placeholder={'Search by Title'}
+                placeholderTextColor="#848484"
+                backgroundColor="#f6f6f7"
+                searchIconColor="#000"
+                focusAfterOpened
+                searchIconSize={18}
+                borderRadius={12}
+                onChangeText={text => {
+                  this.setState({searchText: text});
+                  this.ensureDataFetched(text, this.state.selectedCity);
+                }}
+                onBlur={() => this.closeSearchBox()}
+              />
             </View>
           </View>
         </Header>
+        <View
+          style={{
+            paddingHorizontal: 12,
+            marginBottom: 9,
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}>
+          <View style={{width: '84%'}}>
+            {this.state.cities && (
+              <MultiSelect
+                items={this.state.cities}
+                placeHolder="Choose City..."
+                selectedItems={this.state.selectedCity}
+                setSelectedItems={value => {
+                  this.setState({selectedCity: value});
+                  this.ensureDataFetched(this.state.searchText, value);
+                }}
+              />
+            )}
+          </View>
 
-        <Content>
-          {this.state.loading == false ? (
-            <View>
-              <View style={{marginLeft: 20}}>
-                <View>
-                  <Thumbnail
-                    small
-                    source={require('../icons/signupicon_city.png')}
-                  />
-                </View>
-                <View
-                  style={{
-                    marginLeft: 55,
-                    justifyContent: 'center',
-                    marginTop: -50,
-                    marginBottom: -25,
-                  }}>
-                  {this.state.cities && (
-                    <MultiSelect
-                      items={this.state.cities}
-                      placeHolder="Choose City..."
-                      selectedItems={this.state.selectedCity}
-                      setSelectedItems={value => this.applyFilterByCity(value)}
-                    />
-                  )}
-                </View>
-              </View>
-              {/* <Item>
-                <Thumbnail
-                  small
-                  style={{ marginLeft: 20 }}
-                  source={require("../icons/signupicon_city.png")}
-                />
-
-                {this.state.loading == false && this.state.cities && (
-                  <Picker
-                    mode="dropdown"
-                    placeholder="GUEST"
-                    iosIcon={<Icon name="arrow-down" />}
-                    style={styles.picker}
-                    selectedValue={this.state.selectedCity}
-                    onValueChange={value => this.applyFilterByCity(value)}
-                  >
-                    <Picker.Item
-                      label={"Please choose your city"}
-                      value={null}
-                    />
-                    {this.state.cities.map((city, i) => (
-                      <Picker.Item
-                        label={city.name}
-                        value={city.name}
-                        key={i}
-                      />
-                    ))}
-                  </Picker>
-                )}
-                <Icon
-                  name="caret-down"
-                  color="#FFFFFF"
-                  size={30}
-                  style={styles.caretIcon}
-                />
-              </Item> */}
-
-              {/* <Item>
-                <Thumbnail
-                  style={{ marginLeft: 20 }}
-                  small
-                  source={require("../icons/signupicon_nail.png")}
-                />
-
-                {this.state.loading == false && this.state.cities && (
-                  <Picker
-                    mode="dropdown"
-                    placeholder="GUEST"
-                    iosIcon={<Icon name="arrow-down" />}
-                    style={styles.picker}
-                    selectedValue={this.state.selectedCategory}
-                    onValueChange={value => this.applyFilterBycategory(value)}
-                  >
-                    <Picker.Item
-                      label={"Please choose your category"}
-                      value={null}
-                    />
-                    {this.state.categories.items.map((category, i) => (
-                      <Picker.Item
-                        label={category.description}
-                        value={category.id}
-                        key={i}
-                      />
-                    ))}
-                  </Picker>
-                )}
-                <Icon
-                  name="caret-down"
-                  color="#FFFFFF"
-                  size={30}
-                  style={styles.caretIcon}
-                />
-              </Item> */}
-
-              <Tabs
-                transparent
-                tabBarUnderlineStyle={styles.tabUnderLine}
-                // //renderTabBar={() => <ScrollableTab />}
-              >
-                {this.state.categories.map((item, i) => (
-                  <Tab
-                    heading={
-                      <TabHeading style={styles.tabHeading}>
-                        <Text>{item.category.description}</Text>
-                      </TabHeading>
-                    }
-                    style={styles.tabs}>
-                    <View style={{flex: 1, backgroundColor: '#1F2426'}}>
-                      {this.renderListItem(item.promotions)}
-                    </View>
-                  </Tab>
-                ))}
-                {/* <Tab
-              heading={
-                <TabHeading style={styles.tabHeading}>
-                  <Text>DOCTOR</Text>
-                </TabHeading>
-              }
-              style={styles.tabs}
-            >
-              {this.renderListItem(this.state.list)}
-            </Tab> */}
-              </Tabs>
+          <TouchableOpacity
+            onPress={() => this.props.navigation.navigate('AddPromotion')}>
+            <View style={{width: 68, height: 68}}>
+              <LottieView
+                source={require('../json/create.json')}
+                autoPlay
+                loop
+              />
             </View>
-          ) : (
-            <View>
-              <Spinner color="red" />
-              <Text
-                style={{
-                  textAlign: 'center',
-                  color: 'white',
-                  fontWeight: 'bold',
-                }}>
-                Loading
-              </Text>
-            </View>
-          )}
-        </Content>
-      </Container>
+          </TouchableOpacity>
+        </View>
+
+        {loading == false ? (
+          <Tabs
+            tabBarUnderlineStyle={styles.tabUnderLine}
+            renderTabBar={() => <ScrollableTab />}>
+            {categories.map((item, i) => (
+              <Tab
+                heading={
+                  <TabHeading style={styles.tabHeading}>
+                    <Text
+                      style={{
+                        color: 'black',
+                      }}>
+                      {item.category.description}
+                    </Text>
+                  </TabHeading>
+                }
+                style={styles.tabs}>
+                <View style={{flex: 1, backgroundColor: '#fff'}}>
+                  {this.renderListItem(item.promotions)}
+                </View>
+              </Tab>
+            ))}
+          </Tabs>
+        ) : (
+          <Loading />
+        )}
+      </Content>
     );
   }
 
   renderListItem(items) {
+    const {height} = Dimensions.get('window');
+
     return (
-      <View style={styles.scrollview}>
-        {items && items.length != 0 ? (
-          <ScrollView>
-            <List style={styles.list}>
-              {items.map((item, i) => (
-                <ListItem
-                  avatar
-                  key={i}
-                  onPress={() =>
-                    this.props.navigation.navigate('PromotionDetail', {
-                      id: item.id,
-                    })
-                  }>
-                  <Body>
-                    <Text style={styles.name}>{item.title}</Text>
-                    <Text
-                      style={styles.description}
-                      numberOfLines={3}
-                      ellipsizeMode="tail">
-                      {item.description}
-                    </Text>
-                    <Text style={styles.location}>
-                      Location: {item.location}
-                    </Text>
-                    <Text style={styles.discount}>
-                      Discount: {item.discount}%
-                    </Text>
-                    <Text style={styles.location}>
-                      category:{' '}
-                      {
-                        this.state.categories.find(
-                          i => i.category.id == item.categoryID,
-                        ).category.description
-                      }
-                    </Text>
-                    <Text style={styles.location}>From: {item.fromDate}</Text>
-                    <Text style={styles.location}>To: {item.toDate}</Text>
-                    <Text style={styles.location}>Phone: {item.phone}</Text>
-                    {/* <View style={styles.footerGroup}>
-                    <View style={styles.footerGroupView}>
-                      <Text style={styles.footerGroupText}>
-                        Post date: {item.postDate}
-                      </Text>
-                    </View>
+      <ScrollView style={{padding: 12}}>
+        {items.map((item, i) => (
+          <TouchableOpacity
+            activeOpacity={0.79}
+            key={i}
+            style={{marginBottom: 18, marginTop: 9}}
+            onPress={() =>
+              this.props.navigation.navigate('PromotionDetail', {
+                id: item.id,
+              })
+            }>
+            <View style={[styles.questionCard]}>
+              <View style={[styles.row, styles.cardHeader]}>
+                <Text style={styles.title}>{item.title}</Text>
+                <View style={styles.row}>
+                  <Text style={styles.category}>
+                    {
+                      this.state.categories.find(
+                        i => i.category.id == item.categoryID,
+                      ).category.description
+                    }
+                  </Text>
+                  <Icon
+                    name="chevron-forward-outline"
+                    size={18}
+                    color="#979dac"
+                  />
+                </View>
+              </View>
+              <View style={[styles.row, styles.cardBody]}>
+                <View style={styles.itemBody2}>
+                  <Text style={styles.subTitle}>Location</Text>
+                  <Text style={styles.subTxt}>{item.location}</Text>
+                </View>
 
-                    <View style={styles.footerGroupView}>
-                      <Text style={styles.footerGroupText}>
-                        View: {item.view}
-                      </Text>
-                    </View>
+                <View style={styles.itemBody2}>
+                  <Text style={styles.subTitle}>From</Text>
+                  <Text style={styles.subTxt}>
+                    {moment(item.fromDate, 'DD/MM/YYYY').format('ll')}
+                  </Text>
+                </View>
 
-                    <View style={styles.footerGroupView}>
-                      <Text style={styles.footerGroupText}>
-                        Answer: {item.answer}
-                      </Text>
-                    </View>
-                  </View> */}
-                  </Body>
-                  <Right style={styles.right}>
-                    {/* <Thumbnail large source={require("../images/2.jpeg")} /> */}
-                    {item.pictures && item.pictures.length > 0 ? (
-                      <Thumbnail
-                        large
-                        source={{
-                          uri:
-                            constant.BASE_URL +
-                            'api/promotionpictures/getimage/' +
-                            item.pictures[0].id,
-                        }}
-                      />
-                    ) : (
-                      <Thumbnail large source={require('../images/4.jpg')} />
-                    )}
-                  </Right>
-                </ListItem>
-              ))}
-            </List>
-          </ScrollView>
-        ) : (
-          <View style={{height: 400}} />
-        )}
-      </View>
+                <View style={styles.itemBody2}>
+                  <Text style={styles.subTitle}>To</Text>
+                  <Text style={styles.subTxt}>
+                    {moment(item.toDate, 'DD/MM/YYYY').format('ll')}
+                  </Text>
+                </View>
+
+                <View style={styles.itemBody1}>
+                  <Text style={styles.subTitle}>Discount</Text>
+                  <Text style={styles.subTxt}>{item.discount}%</Text>
+                </View>
+              </View>
+              <View style={{width: '100%'}}>
+                <Text style={styles.subTitle}>Description</Text>
+                <Text
+                  style={styles.question}
+                  numberOfLines={2}
+                  ellipsizeMode="tail">
+                  {item.description}
+                </Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
     );
   }
 }
 
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: '#1F2426',
-  },
-
-  list: {
-    //height: ScreenHeight,
-    backgroundColor: '#1F2426',
-  },
-  name: {
-    color: '#D94526',
-    fontWeight: 'bold',
-  },
-  description: {
-    color: 'white',
-  },
-  location: {
-    color: '#47BFB3',
-    fontSize: 15,
-  },
-  picker: {
-    marginLeft: 40,
-    //alignItems: "center",
-    color: 'white',
+  input: {
+    backgroundColor: '#f6f6f7',
+    borderRadius: 12,
+    width: 222,
+    paddingLeft: 18,
+    fontSize: 14,
+    fontFamily: 'Montserrat-Regular',
   },
   caretIcon: {
     right: 25,
   },
-  discount: {
-    color: '#D94526',
-    fontSize: 15,
+  tabs: {
+    backgroundColor: '#003566',
+    borderWidth: 0,
   },
-  //   footerGroupText: {
-  //     color: "#47BFB3",
-  //     fontSize: 12
-  //   },
-  footerGroup: {
-    flex: 1,
-    flexDirection: 'row',
-  },
-  footerGroupView: {
-    marginRight: 20,
-  },
-  right: {
-    justifyContent: 'center',
-    marginTop: 15,
-    // marginLeft: 15
-  },
-  replyButton: {
-    height: 30,
-  },
-  title: {
-    fontSize: 15,
-    color: '#47BFB3',
-    //marginRight: 80,
-    marginTop: 10,
-  },
-
-  input: {
-    // alignItems: "center"
+  picker: {
+    marginLeft: 40,
     color: 'white',
-    marginTop: -15,
-    marginLeft: -50,
-    marginRight: -20,
   },
   tabHeading: {
-    backgroundColor: '#1F2426',
+    backgroundColor: '#fff',
+    fontFamily: 'Montserrat-Medium',
     // borderBottomWidth: 1,
     // borderBottomColor: "white"
   },
   tabUnderLine: {
-    display: 'none',
-    backgroundColor: '#1F2426',
+    backgroundColor: '#003566',
+    height: 2.68,
+  },
+  name: {
+    color: '#FFFFFF',
+    fontFamily: 'Montserrat-SemiBold',
+    fontSize: 16,
+  },
+  titleLeft: {
+    color: 'white',
+    fontSize: 12,
+    fontFamily: 'Montserrat-SemiBold',
+  },
+  titleRight: {
+    color: 'white',
+    fontSize: 12,
+    fontFamily: 'Montserrat-Medium',
+  },
+  avatar: {
+    width: 44,
+    height: 44,
+    borderWidth: 1,
+    borderColor: 'white',
+  },
+  right: {
+    marginTop: 25,
+
+    paddingLeft: 0,
   },
   thumbnail: {
     width: 25,
     height: 25,
     marginTop: 5,
+    borderRadius: 0,
   },
-});
+  major: {
+    color: '#89aae6',
+    fontSize: 11,
+    fontFamily: 'Montserrat-SemiBoldItalic',
+  },
+  pd9: {
+    paddingVertical: 4,
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  questionCard: {
+    backgroundColor: '#fff',
+    padding: 16,
+    borderRadius: 2,
+    borderWidth: 0.2,
+    borderColor: '#ccc',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.32,
+    shadowRadius: 5.46,
 
-//multiselect style
-const multiSelectStyles = StyleSheet.create({
-  container: {
-    backgroundColor: '#1F2426',
+    elevation: 9,
   },
-  selectToggleText: {color: 'white'},
-  button: {backgroundColor: '#D94526'},
-  searchBar: {backgroundColor: '#1F2426'},
-  searchTextInput: {color: '#D94526'},
+  subTitle: {
+    fontFamily: 'Montserrat-Regular',
+    color: '#6c757d',
+    fontSize: 12.68,
+    letterSpacing: -1,
+    marginBottom: 4,
+  },
+  cardHeader: {
+    paddingBottom: 9,
+    borderBottomWidth: 1,
+    borderBottomColor: '#979dacb5',
+    borderStyle: 'dotted',
+    borderRadius: 1,
+  },
+  cardBody: {
+    marginVertical: 9,
+    paddingBottom: 9,
+    borderBottomWidth: 1,
+    borderBottomColor: '#979dacb5',
+    borderStyle: 'dotted',
+    borderRadius: 1,
+  },
+  itemBody1: {
+    width: '15%',
+  },
+  itemBody2: {
+    width: '28%',
+  },
+  subTxt: {
+    fontFamily: 'Montserrat-SemiBold',
+    color: '#000',
+    fontSize: 12.68,
+  },
+  title: {
+    color: '#000',
+    fontSize: 19,
+    fontFamily: 'Montserrat-SemiBold',
+    letterSpacing: -1.23,
+  },
+  category: {
+    color: '#2a6f97',
+    fontSize: 14,
+    fontFamily: 'Montserrat-SemiBold',
+    marginRight: 12,
+  },
+  question: {
+    fontFamily: 'Montserrat-Regular',
+    color: '#000',
+    fontSize: 12.68,
+  },
 });
-const color = {
-  text: '#D94526',
-  subText: '#47BFB3',
-  searchPlaceholderTextColor: '#D94526',
-  itemBackground: '#1F2426',
-  subItemBackground: '#1F2426',
-};
