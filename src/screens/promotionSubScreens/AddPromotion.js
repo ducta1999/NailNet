@@ -462,11 +462,23 @@ export default class AddPromotion extends Component {
               open={this.state.openFromDate}
               date={this.state.rawFromDate}
               onConfirm={date => {
-                this.setState({
-                  openFromDate: false,
-                  fromDate: moment(date).format('DD-MM-yyyy'),
-                  rawFromDate: date,
-                });
+                if (
+                  moment(date).diff(moment(this.state.rawToDate), 'minutes') > 0
+                ) {
+                  this.setState({
+                    openFromDate: false,
+                    toDate: moment(date).format('DD-MM-yyyy'),
+                    fromDate: moment(date).format('DD-MM-yyyy'),
+                    rawToDate: date,
+                    rawFromDate: date,
+                  });
+                } else {
+                  this.setState({
+                    openFromDate: false,
+                    fromDate: moment(date).format('DD-MM-yyyy'),
+                    rawFromDate: date,
+                  });
+                }
               }}
               onCancel={() => {
                 this.setState({openFromDate: false});
@@ -477,11 +489,24 @@ export default class AddPromotion extends Component {
               open={this.state.openToDate}
               date={this.state.rawToDate}
               onConfirm={date => {
-                this.setState({
-                  openToDate: false,
-                  toDate: moment(date).format('DD-MM-yyyy'),
-                  rawToDate: date,
-                });
+                if (
+                  moment(date).diff(moment(this.state.rawFromDate), 'minutes') <
+                  0
+                ) {
+                  this.setState({
+                    openToDate: false,
+                    toDate: moment(date).format('DD-MM-yyyy'),
+                    fromDate: moment(date).format('DD-MM-yyyy'),
+                    rawToDate: date,
+                    rawFromDate: date,
+                  });
+                } else {
+                  this.setState({
+                    openToDate: false,
+                    toDate: moment(date).format('DD-MM-yyyy'),
+                    rawToDate: date,
+                  });
+                }
               }}
               onCancel={() => {
                 this.setState({openToDate: false});
