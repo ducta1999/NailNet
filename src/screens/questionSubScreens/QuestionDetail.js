@@ -35,6 +35,7 @@ import Ionicon from 'react-native-vector-icons/Ionicons';
 import Loading from '../Components/Loading';
 import moment from 'moment';
 import ExplodingHeart from '../Components/ExplodingHeart';
+import LottieButton from '@ocean28799/react-native-lottie-button';
 import * as toastService from '../../services/ToastService';
 import LottieView from 'lottie-react-native';
 
@@ -285,13 +286,19 @@ export default class QuestionDetail extends Component {
                     </Text>
                   </TouchableOpacity>
                   <View style={styles.row}>
-                    <ExplodingHeart
+                    <LottieButton
                       width={48}
                       status={answer.like.includes(email)}
                       onPress={() => this.likePress(answer)}
                       activeOpacity={0.68}
-                      type="heart"
+                      source={require('../../json/heart.json')}
                     />
+                    {/* <ExplodingHeart
+                      width={48}
+                      status={answer.like.includes(email)}
+                      onPress={() => this.likePress(answer)}
+                      activeOpacity={0.68}
+                    /> */}
                     <Text
                       style={{
                         fontFamily: 'Montserrat-SemiBold',

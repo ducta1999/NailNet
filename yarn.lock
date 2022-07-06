@@ -1179,6 +1179,11 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
+"@ocean28799/react-native-lottie-button@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@ocean28799/react-native-lottie-button/-/react-native-lottie-button-1.0.0.tgz#24fac23964113582e144d56417162f863b166f04"
+  integrity sha512-4x5e2Dfljq27XrWpHbH48c1SjAygRQL8uLGfi2M1wWffUkxcwSpx310QdLsLlmNLYDwxp997WYsbPfcjWTwOTA==
+
 "@react-native-community/cli-debugger-ui@^7.0.3":
   version "7.0.3"
   resolved "https://registry.yarnpkg.com/@react-native-community/cli-debugger-ui/-/cli-debugger-ui-7.0.3.tgz#3eeeacc5a43513cbcae56e5e965d77726361bcb4"
