@@ -1179,6 +1179,11 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
+"@ocean28799/react-native-animated-searchbox@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@ocean28799/react-native-animated-searchbox/-/react-native-animated-searchbox-1.0.1.tgz#44e0fb6bc2a16d2f5e96bbbb8c46390b223f921c"
+  integrity sha512-ojAMCan+udiCqgdfxTOXMN2jhg7qbXw27vUdvwLfJTPQctz2bRYoc4HKkOemDnqH+oCMtkkVsTnu20P5vunyvg==
+
 "@ocean28799/react-native-lottie-button@^1.0.0":
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@ocean28799/react-native-lottie-button/-/react-native-lottie-button-1.0.0.tgz#24fac23964113582e144d56417162f863b166f04"
