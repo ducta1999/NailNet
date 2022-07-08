@@ -133,78 +133,91 @@ export default class AddPromotion extends Component {
   };
 
   async submit() {
-    var user = await authentication.getLoggedInUser();
-    this.setState({buttonLoading: true});
+    try {
+      var user = await authentication.getLoggedInUser();
+      this.setState({buttonLoading: true});
 
-    const {
-      title,
-      selectedCategory,
-      discount,
-      description,
-      rawFromDate,
-      rawToDate,
-      selectedCity,
-      avatarSource,
-    } = this.state;
+      const {
+        title,
+        selectedCategory,
+        discount,
+        description,
+        rawFromDate,
+        rawToDate,
+        selectedCity,
+        avatarSource,
+      } = this.state;
 
-    if (
-      title.trim() == '' ||
-      selectedCity.length == 0 ||
-      selectedCategory.length == 0 ||
-      description.trim() == '' ||
-      rawFromDate == null ||
-      rawToDate == null
-    ) {
-      toastService.error('Error: ' + 'Input cannot be empty!');
-    } else if (!formatDate.checkIsBefore(rawFromDate, rawToDate)) {
-      toastService.error(
-        'Error: ' + 'From Date and To Date is not valid. Please check again',
-      );
-    } else {
-      var data = {
-        title: title,
-        phone: '',
-        email: user.email,
-        discount: discount,
-        description: description,
-        fromDate: formatDate.formatDateToSendAPI(rawFromDate),
-        toDate: formatDate.formatDateToSendAPI(rawToDate),
-        location: selectedCity[0],
-        categoryID: selectedCategory[0],
-        createByEmail: user.email,
-      };
-
-      var result = await dataService.post('api/promotions/add', data);
-
-      if (result.status === 200) {
-        toastService.success('Add promotion successfully!');
-
-        for (var i = 0; i < avatarSource.length; i++) {
-          var image = avatarSource[i];
-          var data = {
-            promotionID: result.data.id,
-            createByEmail: user.email,
-          };
-          var promotionpicture = await dataService.post(
-            'api/promotionpictures/add',
-            data,
-          );
-
-          dataService.post(
-            'api/promotionpictures/upload/' + promotionpicture.data.id,
-            {
-              extension: '.' + image.extension,
-              base64: image.base64,
-            },
-          );
-        }
-
-        this.props.navigation.goBack();
+      if (
+        title.trim() == '' ||
+        selectedCity.length == 0 ||
+        selectedCategory.length == 0 ||
+        description.trim() == '' ||
+        rawFromDate == null ||
+        rawToDate == null
+      ) {
+        toastService.error('Error: ' + 'Input cannot be empty!');
+      } else if (!formatDate.checkIsBefore(rawFromDate, rawToDate)) {
+        toastService.error(
+          'Error: ' + 'From Date and To Date is not valid. Please check again',
+        );
       } else {
-        toastService.error('Error: ' + result.data);
+        var data = {
+          title: title,
+          phone: '',
+          email: user.email,
+          discount: discount,
+          description: description,
+          fromDate: formatDate.formatDateToSendAPI(rawFromDate),
+          toDate: formatDate.formatDateToSendAPI(rawToDate),
+          location: selectedCity[0],
+          categoryID: selectedCategory[0],
+          createByEmail: user.email,
+        };
+
+        var result = await dataService.post('api/promotions/add', data);
+
+        if (result.status === 200) {
+          this.setState({
+            buttonLoading: false,
+            success: true,
+          });
+
+          for (var i = 0; i < avatarSource.length; i++) {
+            var image = avatarSource[i];
+            var data = {
+              promotionID: result.data.id,
+              createByEmail: user.email,
+            };
+            var promotionpicture = await dataService.post(
+              'api/promotionpictures/add',
+              data,
+            );
+
+            dataService.post(
+              'api/promotionpictures/upload/' + promotionpicture.data.id,
+              {
+                extension: '.' + image.extension,
+                base64: image.base64,
+              },
+            );
+          }
+          setTimeout(() => {
+            this.setState({
+              success: false,
+            });
+            this.props.navigation.goBack();
+          }, 999);
+          toastService.success('Add promotion successfully!');
+        } else {
+          toastService.error('Error: ' + result.data);
+        }
       }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      this.setState({buttonLoading: false});
     }
-    this.setState({buttonLoading: false});
   }
 
   async showImagePicker(options) {
@@ -336,7 +349,7 @@ export default class AddPromotion extends Component {
             <Text style={styles.subTitle}>Enter promote information</Text>
             <View style={styles.item}>
               <Icon
-                name="information-circle"
+                name="information-circle-outline"
                 color="#6c757d"
                 size={24}
                 style={styles.icon}
@@ -359,7 +372,7 @@ export default class AddPromotion extends Component {
             </View>
             <View style={styles.item}>
               <Icon
-                name="information-circle"
+                name="information-circle-outline"
                 color="#6c757d"
                 size={24}
                 style={styles.icon}
@@ -383,7 +396,7 @@ export default class AddPromotion extends Component {
 
             <View style={styles.item}>
               <Icon
-                name="information-circle"
+                name="information-circle-outline"
                 color="#6c757d"
                 size={24}
                 style={styles.icon}

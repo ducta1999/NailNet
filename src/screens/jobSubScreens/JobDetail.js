@@ -2,7 +2,13 @@ import * as authentication from '../../services/Authentication';
 import * as dataService from '../../services/DataService';
 import * as constant from '../../services/Constant';
 import React, {Component} from 'react';
-import {StyleSheet, TouchableOpacity, Linking} from 'react-native';
+import {
+  StyleSheet,
+  TouchableOpacity,
+  Linking,
+  Dimensions,
+  ScrollView,
+} from 'react-native';
 import Slideshow from 'react-native-image-slider-show';
 import Ionicon from 'react-native-vector-icons/Ionicons';
 import {
@@ -30,6 +36,8 @@ import {
   Tab,
   TabHeading,
 } from 'native-base';
+import Loading from '../Components/Loading';
+import moment from 'moment';
 
 export default class JobDetail extends Component {
   constructor(props) {
@@ -59,8 +67,11 @@ export default class JobDetail extends Component {
 
     var dataSource = [];
     for (var i = 0; i < job.pictures.length; i++) {
+      // dataSource.push({
+      //   url: constant.BASE_URL + 'api/jobimages/getimage/' + job.pictures[i].id,
+      // });
       dataSource.push({
-        url: constant.BASE_URL + 'api/jobimages/getimage/' + job.pictures[i].id,
+        url: 'https://picsum.photos/2048',
       });
     }
     if (job.pictures.length == 0) {
@@ -86,6 +97,16 @@ export default class JobDetail extends Component {
   render() {
     const {loading, job, id, email, user, category, dataSource} = this.state;
 
+    const {width} = Dimensions.get('window');
+    const renderItem = (title, value) => {
+      return (
+        <View style={{width: '49%', marginTop: 12}}>
+          <Text style={styles.txtGray}>{title}</Text>
+          <Text style={styles.txtTime}>{value}</Text>
+        </View>
+      );
+    };
+
     return (
       <Container style={styles.container}>
         <Header transparent>
@@ -98,143 +119,109 @@ export default class JobDetail extends Component {
             }}>
             <View>
               <TouchableOpacity onPress={() => this.props.navigation.goBack()}>
-                <Ionicon name="arrow-back-outline" color="#fff" size={28} />
+                <Ionicon name="close-outline" color="#000" size={28} />
               </TouchableOpacity>
             </View>
-            <View>
-              <Title style={styles.headerBodyText}>Job Detail</Title>
-            </View>
+
             <View />
           </View>
         </Header>
         {loading == false ? (
           <Content>
-            <Slideshow dataSource={dataSource} />
-            <Card style={{flex: 0, marginTop: 5}} transparent>
-              {/* <CardItem style={styles.carditem}>
-                <Body />
-              </CardItem> */}
-              <CardItem style={styles.carditem}>
-                <Body>
-                  <Text style={styles.title}>{job.title}</Text>
-                </Body>
-              </CardItem>
-              <CardItem style={styles.carditem} bordered>
-                <Body>
-                  <Text style={styles.discount}>Price: {job.price}/h</Text>
-                  <Text style={styles.normal}>From: {job.fromDate}</Text>
-                  <Text style={styles.normal}>To: {job.toDate}</Text>
-                  <Text style={styles.normal}>
-                    Category: {category.description}
-                  </Text>
-                </Body>
-              </CardItem>
-              <CardItem style={styles.carditem} bordered>
-                <Left>
-                  <Thumbnail
-                    //source={require("../../icons/Avatar.png")}
-                    defaultSource={{uri: 'avatar'}}
-                    source={{
-                      uri:
-                        constant.BASE_URL +
-                        'api/avatars/getimage/' +
-                        job.createByEmail +
-                        '?random_number=' +
-                        new Date().getTime(),
-                    }}
-                  />
-                </Left>
-                <Body>
-                  <Text style={styles.normal}>Email:{job.email}</Text>
-                  <Text style={styles.normal}>Phone:{job.phone}</Text>
-                </Body>
-              </CardItem>
-              <CardItem style={styles.carditem} bordered>
-                <Body>
-                  <Text style={styles.normal}>{job.description}</Text>
-                </Body>
-              </CardItem>
-              <CardItem style={styles.carditem} bordered>
-                <Body>
-                  <Text style={styles.normal}>Address: {job.address}</Text>
-                </Body>
-              </CardItem>
-              <CardItem style={{height: 60, backgroundColor: '#1F2426'}} />
-            </Card>
+            <Slideshow
+              dataSource={dataSource}
+              arrowSize={24}
+              arrowLeft={
+                <Ionicon name="chevron-back-outline" color="#fff" size={24} />
+              }
+              arrowRight={
+                <Ionicon
+                  name="chevron-forward-outline"
+                  color="#fff"
+                  size={24}
+                />
+              }
+            />
+            <ScrollView style={{paddingBottom: 68}}>
+              <View style={styles.body}>
+                <Text style={styles.title}>{job.title}</Text>
+                <View style={styles.row}>
+                  {renderItem(
+                    'From',
+                    moment(job.fromDate, 'DD/MM/yyyy').format('LL'),
+                  )}
+                  {renderItem(
+                    'To',
+                    moment(job.toDate, 'DD/MM/yyyy').format('LL'),
+                  )}
+                </View>
+                <View style={styles.row}>
+                  {renderItem('Price', `${job.price}$`)}
+                  {renderItem('Category', category.description)}
+                </View>
+
+                <View style={styles.row}>
+                  {renderItem('Email', job.email)}
+                  {renderItem(
+                    'Phone',
+                    job.phone.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3'),
+                  )}
+                </View>
+                <View style={[styles.row, {marginTop: 12}]}>
+                  <View style={{width: '100%'}}>
+                    <Text style={styles.txtGray}>Address</Text>
+                    <Text style={styles.txtTime}>{job.address}</Text>
+                  </View>
+                </View>
+                <Text
+                  style={[styles.txtGray, {color: '#343a40', marginTop: 24}]}>
+                  Description
+                </Text>
+                <Text style={[styles.txtTime, {color: '#6c757d'}]}>
+                  {job.description}
+                </Text>
+              </View>
+            </ScrollView>
           </Content>
         ) : (
-          <View>
-            <Spinner color="red" />
-            <Text
-              style={{
-                textAlign: 'center',
-                color: 'white',
-                fontWeight: 'bold',
-              }}>
-              Loading
-            </Text>
-          </View>
+          <Loading />
         )}
-
-        <Tabs
-          transparent
-          tabBarUnderlineStyle={styles.tabUnderLine}
-          style={{
-            position: 'absolute',
-            bottom: 0,
-            height: 60,
-          }}
-          initialPage={5}
-          tabBarPosition="bottom"
-          //   //renderTabBar={() => <ScrollableTab />}
-        >
-          <Tab
-            heading={
-              <TabHeading
-                style={styles.tabHeading}
-                onPress={() => Linking.openURL(`tel:${job.phone}`)}>
-                <TouchableOpacity
-                  onPress={() => Linking.openURL(`tel:${job.phone}`)}
-                  style={{flexDirection: 'row'}}>
-                  <Icon name="call" color="white" />
-                  <Text style={{color: 'white'}}>Call</Text>
-                </TouchableOpacity>
-              </TabHeading>
+        <View
+          style={[
+            styles.row,
+            {
+              padding: 24,
+              position: 'absolute',
+              bottom: 0,
+              left: 0,
+              width: width,
+              backgroundColor: '#184e77',
+            },
+          ]}>
+          <TouchableOpacity
+            onPress={() => Linking.openURL(`tel:${job.phone}`)}
+            style={styles.row}>
+            <Ionicon name="call-outline" color="#fff" size={24} />
+            <Text style={styles.btnTxt}>Call</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => Linking.openURL(`sms:${job.phone}`)}
+            style={styles.row}>
+            <Ionicon name="send-outline" color="#fff" size={24} />
+            <Text style={styles.btnTxt}>SMS</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() =>
+              this.props.navigation.navigate('Chat', {
+                senderEmail: email,
+                receiverEmail: job.createByEmail,
+              })
             }
-            style={styles.tabs}
-          />
-          <Tab
-            heading={
-              <TabHeading style={styles.tabHeading}>
-                <TouchableOpacity
-                  onPress={() => Linking.openURL(`sms:${job.phone}`)}
-                  style={{flexDirection: 'row'}}>
-                  <Icon name="send" color="white" />
-                  <Text style={{color: 'white'}}>SMS</Text>
-                </TouchableOpacity>
-              </TabHeading>
-            }
-            style={styles.tabs}
-          />
-          <Tab
-            heading={
-              <TabHeading style={styles.tabHeading}>
-                <TouchableOpacity
-                  onPress={() =>
-                    this.props.navigation.navigate('Chat', {
-                      senderEmail: email,
-                      receiverEmail: job.createByEmail,
-                    })
-                  }
-                  style={{flexDirection: 'row'}}>
-                  <Icon name="chatboxes" />
-                  <Text style={{color: 'white'}}>Chat</Text>
-                </TouchableOpacity>
-              </TabHeading>
-            }
-            style={styles.tabs}
-          />
-        </Tabs>
+            style={styles.row}>
+            <Ionicon name="chatbox-ellipses-outline" color="#fff" size={24} />
+            <Text style={styles.btnTxt}>Chat</Text>
+          </TouchableOpacity>
+        </View>
       </Container>
     );
   }
@@ -242,47 +229,49 @@ export default class JobDetail extends Component {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#1F2426',
-  },
-  carditem: {
-    backgroundColor: '#1F2426',
-  },
-  headerBodyText: {
-    justifyContent: 'center',
-    //left: 30,
-    fontSize: 20,
-    marginTop: 5,
-    color: '#47BFB3',
-  },
-  tabUnderLine: {
-    display: 'none',
-    backgroundColor: '#D94526',
-  },
-  tabHeading: {
-    backgroundColor: '#D94526',
-    // borderBottomWidth: 1,
-    // borderBottomColor: "white"
-  },
-  tabs: {
-    backgroundColor: '#D94526',
-    borderWidth: 0,
+    backgroundColor: '#fff',
   },
   title: {
-    color: '#D94526',
-    fontSize: 30,
-    fontWeight: 'bold',
+    fontFamily: 'Montserrat-SemiBold',
+    color: '#000',
+    fontSize: 22,
+    letterSpacing: -0.2,
+    marginBottom: 12,
   },
   discount: {
     color: 'red',
     fontSize: 15,
+    fontFamily: 'Montserrat-SemiBold',
   },
   normal: {
-    color: 'white',
+    color: '#000',
     fontSize: 15,
+    fontFamily: 'Montserrat-Regular',
   },
-  thumbnail: {
-    width: 25,
-    height: 25,
-    marginTop: 5,
+  body: {
+    paddingVertical: 12,
+    paddingHorizontal: 28,
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  txtGray: {
+    fontFamily: 'Montserrat-SemiBold',
+    color: '#6c757d',
+    fontSize: 12.68,
+  },
+  txtTime: {
+    fontFamily: 'Montserrat-SemiBold',
+    color: '#000',
+    fontSize: 14,
+    marginTop: 2,
+  },
+  btnTxt: {
+    fontFamily: 'Montserrat-SemiBold',
+    color: '#fff',
+    fontSize: 14,
+    marginLeft: 9,
   },
 });

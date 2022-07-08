@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {StyleSheet, ScrollView, TouchableOpacity} from 'react-native';
+import {StyleSheet, ScrollView, TouchableOpacity, Image} from 'react-native';
 import {
   View,
   Content,
@@ -25,6 +25,8 @@ import * as dataService from './../services/DataService';
 import * as constant from './../services/Constant';
 import SectionedMultiSelect from 'react-native-sectioned-multi-select';
 import MultiSelect from './Components/MultiSelect';
+import Loading from './Components/Loading';
+import LottieView from 'lottie-react-native';
 
 export default class Classified extends Component {
   constructor(props) {
@@ -88,26 +90,35 @@ export default class Classified extends Component {
   }
 
   async selectCategory(value, mainCategoryId) {
-    var mainCategories = this.state.mainCategories;
+    try {
+      var mainCategories = this.state.mainCategories;
 
-    this.setState({listLoading: true});
+      this.setState({listLoading: true});
 
-    var classifieds =
-      mainCategoryId == null
-        ? {items: null}
-        : await dataService.get(
-            'api/classifieds/getall?isApproved=true&classifiedcategoryid=' +
-              value[0],
-          );
-
-    for (var i = 0; i < mainCategories.length; i++) {
-      if (mainCategories[i].mainCategory.id == mainCategoryId) {
-        mainCategories[i].classifieds = classifieds.items;
-        mainCategories[i].selectedCategory = value;
+      var classifieds =
+        mainCategoryId == null
+          ? {items: null}
+          : await dataService.get(
+              'api/classifieds/getall?isApproved=true&classifiedcategoryid=' +
+                value[0],
+            );
+      for (var i = 0; i < mainCategories.length; i++) {
+        if (mainCategories[i].mainCategory.id == mainCategoryId) {
+          mainCategories[i].classifieds = classifieds.items;
+          mainCategories[i].selectedCategory = value;
+        }
       }
-    }
 
-    this.setState({mainCategories: mainCategories, listLoading: false});
+      this.setState({mainCategories: mainCategories});
+    } catch (error) {
+      console.log(error);
+    } finally {
+      this.setState({listLoading: false});
+    }
+  }
+
+  onpenDrawer() {
+    this.props.navigation.openDrawer();
   }
 
   render() {
@@ -115,114 +126,64 @@ export default class Classified extends Component {
 
     return (
       <Container style={styles.container}>
-        <Header transparent>
+        <Header hasTabs searchBar transparent>
           <View
             style={{
               flex: 1,
               flexDirection: 'row',
               justifyContent: 'space-between',
+              alignItems: 'center',
               marginTop: 8,
             }}>
-            <View>
-              <TouchableOpacity
-                onPress={() => {
-                  this.setState({loading: true});
-                  this.props.navigation.goBack();
-                }}>
-                <Icon name="arrow-back-outline" color="#fff" size={28} />
-              </TouchableOpacity>
-            </View>
-            <View>
-              <Text style={styles.title}>Classified</Text>
-            </View>
-            <View>
-              <TouchableOpacity
-                onPress={() => this.props.navigation.navigate('AddClassified')}>
-                <Thumbnail
-                  source={require('../icons/edit.png')}
-                  style={styles.thumbnail}
+            <TouchableOpacity onPress={() => this.onpenDrawer()}>
+              <Image
+                source={require('../icons/menu.png')}
+                style={{width: 28, height: 28}}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => this.props.navigation.navigate('AddClassified')}>
+              <View style={{width: 68, height: 68}}>
+                <LottieView
+                  source={require('../json/create.json')}
+                  autoPlay
+                  loop
                 />
-              </TouchableOpacity>
-            </View>
+              </View>
+            </TouchableOpacity>
           </View>
         </Header>
 
-        <Content>
+        <Content style={{marginTop: 12}}>
           {loading == false ? (
             <View>
               <Tabs
-                transparent
                 tabBarUnderlineStyle={styles.tabUnderLine}
-                //renderTabBar={() => <ScrollableTab />}
-              >
+                renderTabBar={() => <ScrollableTab />}>
                 {mainCategories &&
                   mainCategories.map((item, i) => (
                     <Tab
                       heading={
                         <TabHeading style={styles.tabHeading}>
-                          <Text>{item.mainCategory.description}</Text>
+                          <Text
+                            style={{
+                              color: 'black',
+                            }}>
+                            {item.mainCategory.description}
+                          </Text>
                         </TabHeading>
-                      }>
-                      <View style={{flex: 1, backgroundColor: '#1F2426'}}>
-                        {/* {this.renderListItem(item.promotions)} */}
-
-                        <View style={styles.multiselect}>
-                          {loading == false && (
-                            <MultiSelect
-                              items={item.subCategories}
-                              placeHolder="Choose sub category..."
-                              selectedItems={item.selectedCategory}
-                              setSelectedItems={value =>
-                                this.selectCategory(value, item.mainCategory.id)
-                              }
-                            />
-
-                            // <Picker
-                            //   mode="dropdown"
-                            //   placeholder="GUEST"
-                            //   iosIcon={<Icon name="arrow-down" />}
-                            //   style={styles.picker}
-                            //   selectedValue={selectedCategory}
-                            //   onValueChange={value =>
-                            //     this.selectCategory(value, item.mainCategory.id)
-                            //   }
-                            // >
-                            //   <Picker.Item
-                            //     label={"Choose your category"}
-                            //     value={null}
-                            //   />
-                            //   {item.subCategories &&
-                            //     item.subCategories.map((category, index) => (
-                            //       <Picker.Item
-                            //         label={category.description}
-                            //         value={category.id}
-                            //         key={index}
-                            //       />
-                            //     ))}
-                            // </Picker>
-                          )}
-                          {/* <Icon
-                            name="caret-down"
-                            color="#FFFFFF"
-                            size={30}
-                            style={styles.caretIcon}
-                          /> */}
-                        </View>
-
-                        {listLoading == true && (
-                          <View>
-                            <Spinner color="red" />
-                            <Text
-                              style={{
-                                textAlign: 'center',
-                                color: 'white',
-                                fontWeight: 'bold',
-                              }}>
-                              Loading
-                            </Text>
-                          </View>
-                        )}
-
+                      }
+                      style={styles.tabs}>
+                      <View style={{flex: 1, backgroundColor: '#fff'}}>
+                        <MultiSelect
+                          items={item.subCategories}
+                          placeHolder="Choose sub category..."
+                          selectedItems={item.selectedCategory}
+                          setSelectedItems={value =>
+                            this.selectCategory(value, item.mainCategory.id)
+                          }
+                        />
+                        {listLoading == true && <Loading />}
                         {item.classifieds && item.classifieds.length > 0 && (
                           <View>{this.renderListItem(item.classifieds)}</View>
                         )}
@@ -232,17 +193,7 @@ export default class Classified extends Component {
               </Tabs>
             </View>
           ) : (
-            <View>
-              <Spinner color="red" />
-              <Text
-                style={{
-                  textAlign: 'center',
-                  color: 'white',
-                  fontWeight: 'bold',
-                }}>
-                Loading
-              </Text>
-            </View>
+            <Loading />
           )}
         </Content>
       </Container>
@@ -250,7 +201,6 @@ export default class Classified extends Component {
   }
 
   renderListItem(items) {
-    console.log(items);
     return (
       <View>
         <ScrollView>
@@ -302,7 +252,7 @@ export default class Classified extends Component {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#1F2426',
+    backgroundColor: '#fff',
   },
   listItemText: {
     color: 'white',
@@ -320,11 +270,12 @@ const styles = StyleSheet.create({
     //marginRight: 80,
   },
   tabUnderLine: {
-    display: 'none',
-    backgroundColor: '#1F2426',
+    backgroundColor: '#003566',
+    height: 2.68,
   },
   tabHeading: {
-    backgroundColor: '#1F2426',
+    backgroundColor: '#fff',
+    fontFamily: 'Montserrat-Medium',
     // borderBottomWidth: 1,
     // borderBottomColor: "white"
   },
@@ -367,21 +318,3 @@ const styles = StyleSheet.create({
     paddingRight: 30,
   },
 });
-
-//multiselect style
-const multiSelectStyles = StyleSheet.create({
-  container: {
-    backgroundColor: '#1F2426',
-  },
-  selectToggleText: {color: '#D94526'},
-  button: {backgroundColor: '#D94526'},
-  searchBar: {backgroundColor: '#1F2426'},
-  searchTextInput: {color: '#D94526'},
-});
-const color = {
-  text: '#D94526',
-  subText: '#47BFB3',
-  searchPlaceholderTextColor: '#D94526',
-  itemBackground: '#1F2426',
-  subItemBackground: '#1F2426',
-};

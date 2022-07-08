@@ -103,7 +103,7 @@ export default class PromotionDetail extends Component {
     const {width} = Dimensions.get('window');
     const renderItem = (title, value) => {
       return (
-        <View style={{width: '50%', marginTop: 12}}>
+        <View style={{width: '49%', marginTop: 12}}>
           <Text style={styles.txtGray}>{title}</Text>
           <Text style={styles.txtTime}>{value}</Text>
         </View>

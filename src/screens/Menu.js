@@ -91,7 +91,7 @@ export default class Menu extends Component {
       {title: 'FAQs', route: 'Question', icon: 'help-circle-outline'},
       {title: 'Promotion', route: 'Promotion', icon: 'cash-outline'},
       {title: 'Shop', route: 'Shop', icon: 'storefront-outline'},
-      {title: 'Classifields', route: 'Classifield', icon: 'albums-outline'},
+      {title: 'Classified', route: 'Classified', icon: 'albums-outline'},
       {title: 'Job', route: 'Job', icon: 'medkit-outline'},
       {title: 'NailTV', route: 'NailTV', icon: 'tv-outline'},
       {
